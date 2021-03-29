@@ -1,4 +1,6 @@
-;; -*- lexical-binding: t -*-
+;; Package --- Shared  -*- lexical-binding: t; -*-
+;;; Commentary:
+;;; Code:
 
 (use-package all-the-icons
   :ensure t)
