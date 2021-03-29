@@ -1,0 +1,26 @@
+;; Package --- native configuration
+;; -*- lexical-binding: t -*-
+;;; Commentary:
+;;; Code:
+
+(show-paren-mode 1)
+(fset 'yes-or-no-p 'y-or-n-p)
+(column-number-mode 1)
+(set-default 'cursor-in-non-selected-windows 'hollow)
+(global-auto-revert-mode t) ;; Ensure Cloud files exists for this (org mode agenda)
+(save-place-mode 1) ;; Remember where I was last time I visited the file
+
+(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-current-absolute t)
+(setq-default display-line-numbers-width 4)
+(setq-default display-line-numbers-widen t)
+(global-display-line-numbers-mode)
+
+;; Time
+(defvar display-time-string-forms)
+(setq display-time-string-forms
+       '((propertize (concat " " 24-hours ":" minutes " ")
+ 		    'face 'egoge-display-time)))
+(display-time-mode 1)
+
+;;; native-config.el ends here

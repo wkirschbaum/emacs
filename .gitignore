@@ -1,0 +1,16 @@
+*~
+/auto-save-list/
+
+/eshell/
+/elpa/
+/straight/
+/projects
+/transient/
+/var/
+/projectile-bookmarks.eld
+/places
+/.lsp-session*
+/network-security.data
+/org-roam.db
+/org-clock-save.el
+/url/
