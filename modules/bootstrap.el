@@ -1,3 +1,7 @@
+;;; Package --- Bootstrapping  -*- lexical-binding: t; -*-
+;;; Commentary:
+;;; Code:
+
 (defvar bootstrap-version)
 
 (let ((bootstrap-file

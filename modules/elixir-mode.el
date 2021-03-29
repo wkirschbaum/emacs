@@ -1,3 +1,7 @@
+;;; Package --- elixir-mode -*- lexical-binding: t; -*-
+;;; Commentary:
+;;; Code:
+
 (use-package elixir-mode
   :ensure t
   :hook subword-mode

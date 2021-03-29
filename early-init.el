@@ -1,3 +1,6 @@
+;;; Package --- Early init optimisations -*- lexical-binding: t; -*-
+;;; Commentary:
+;;; Code:
 (defmacro k-time (&rest body)
   "Measure and return the time it takes evaluating BODY."
   `(let ((time (current-time)))
@@ -24,3 +27,6 @@
 
 ;; (set-face-attribute 'default nil  :family "Source Code Pro" :height 100 :weight 'normal)
 (set-face-attribute 'default nil  :family "Hack" :height 120 :weight 'normal)
+
+(provide 'early-init)
+;;; early-init.el ends here

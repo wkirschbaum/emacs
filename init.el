@@ -1,5 +1,4 @@
-;; Package --- Personal init file
-;; -*- lexical-binding: t -*-
+;; Package --- Personal init file  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
