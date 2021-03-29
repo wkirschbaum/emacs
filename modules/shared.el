@@ -8,13 +8,6 @@
 (use-package ripgrep
   :ensure t)
 
-(use-package minions
-  :ensure t
-  :config
-  (setq minions-mode-line-lighter "{*}"
-        minions-direct '(projectile-mode flycheck-mode))
-  (minions-mode 1))
-
 (use-package which-key
   :ensure t
   :config

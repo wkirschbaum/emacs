@@ -20,8 +20,10 @@
         "yaml-mode"
         "compilation-mode"
         "javascript-mode"
+        "web-mode"
         "styling"
-        "extras"))
+        "extras"
+        "functions"))
 
 (let ((config-path "~/.config/emacs/modules/"))
   (dolist (module whk/modules)
