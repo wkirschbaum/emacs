@@ -19,7 +19,9 @@
         "markdown-mode"
         "yaml-mode"
         "compilation-mode"
-        "styling"))
+        "javascript-mode"
+        "styling"
+        "extras"))
 
 (let ((config-path "~/.config/emacs/modules/"))
   (dolist (module whk/modules)
