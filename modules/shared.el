@@ -5,6 +5,9 @@
 (use-package all-the-icons
   :ensure t)
 
+(use-package ripgrep
+  :ensure t)
+
 (use-package minions
   :ensure t
   :config
@@ -116,9 +119,3 @@
          (magit-post-refresh . diff-hl-magit-pre-refresh))
   :config
   (global-diff-hl-mode))
-
-(use-package ripgrep
-  :ensure t)
-
-(use-package ag
-  :ensure t)
