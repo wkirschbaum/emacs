@@ -110,8 +110,10 @@
 
 (use-package diff-hl
   :ensure t
+  :demand t
   :hook ((dired-mode . diff-hl-dired-mode)
-	 (magit-post-refresh . diff-hl-update))
+	 (magit-post-refresh . diff-hl-magit-post-refresh)
+         (magit-post-refresh . diff-hl-magit-pre-refresh))
   :config
   (global-diff-hl-mode))
 
