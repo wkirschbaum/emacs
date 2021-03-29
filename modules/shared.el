@@ -61,13 +61,21 @@
 
 (use-package consult
   :straight t
+  :demand t
   :bind ("M-i" . consult-imenu)
   :bind ("C-s" . consult-isearch)
   :bind ("M-g g" . consult-goto-line)
-  :bind ("C-x b" . consult-buffer))
+  :bind ("C-x b" . consult-buffer)
+  :init
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref
+	xref-search-program 'ripgrep)
+  :config
+  (setq consult-project-root-function #'vc-root-dir))
 
 (use-package embark
   :ensure t
+  :demand t
   :bind
   (("C-S-a" . embark-act)       ;; pick some comfortable binding
    ("C-h B" . embark-bindings) ;; alternative for `describe-bindings'
@@ -83,6 +91,13 @@
                  nil
                  (window-parameters (mode-line-format . none)))))
 
+(use-package embark-consult
+  :ensure t
+  :after (embark consult)
+  :demand t
+  :hook
+  (emark-collect-mode . emabark-consult-preview-minor-mode))
+
 ;; Project management
 
 (use-package magit
@@ -93,23 +108,15 @@
 ;; (use-package forge
 ;;   :ensure t)
 
-;; (use-package diff-hl
-;;   :ensure t
-;;   :hook ((prog-mode . diff-hl-mode)
-;;          (org-mode . diff-hl-mode)
-;;          (magit-post-refresh . diff-hl-magit-post-refresh)
-;;          (magit-post-refresh . diff-hl-magit-pre-refresh)))
+(use-package diff-hl
+  :ensure t
+  :hook ((dired-mode . diff-hl-dired-mode)
+	 (magit-post-refresh . diff-hl-update))
+  :config
+  (global-diff-hl-mode))
 
 (use-package ripgrep
   :ensure t)
 
 (use-package ag
   :ensure t)
-
-(use-package projectile
-  :ensure t
-  :demand t
-  :bind ("C-x p" . projectile-command-map)
-  :config
-  (projectile-mode))
-
