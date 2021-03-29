@@ -9,7 +9,7 @@
 
 ;; When idle for 10 sec run the GC no matter what.
 (defvar k-gc-timer
-  (run-with-idle-timer 10 t
+  (run-with-idle-timer 20 t
                        (lambda ()
                          (k-time (garbage-collect)))))
 
