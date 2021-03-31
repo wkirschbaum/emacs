@@ -35,37 +35,35 @@
 
 (use-package selectrum-prescient
   :ensure t
-  :demand t
-  :bind ("C-x C-z" . selectrum-repeat)
   :config
   (setq precient-filter-method '(literal-prefix regexp initialism))
+  (setq magit-completing-read-function #'selectrum-completing-read)
   (selectrum-prescient-mode +1)
   (prescient-persist-mode +1))
 
-(use-package marginalia
+(use-package projectile
   :ensure t
-  :init
-  (marginalia-mode)
+  :after (selectrum)
+  :demand t
+  :bind-keymap ("C-x p" . projectile-command-map)
   :config
-  (advice-add #'marginalia-cycle :after
-              (lambda ()
-		(when
-		    (bound-and-true-p selectrum-mode)
-		  (selectrum-exhibit 'keep-selected))))
-  (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
-
+  (setq projectile-file-exists-remote-cache-expire nil
+        projectile-completion-system 'default
+        projectile-dynamic-mode-line t
+        projectile-mode-line-function '(lambda () (format " [%s]" (projectile-project-name))))
+  (projectile-mode +1))
 
 (use-package consult
   :straight t
   :demand t
-  :bind ("M-i" . consult-imenu)
-  :bind ("C-s" . consult-isearch)
-  :bind ("M-g g" . consult-goto-line)
-  :bind ("C-x b" . consult-buffer)
+  :bind (("M-i" . consult-imenu)
+         ("M-g g" . consult-goto-line)
+         ("M-s r" . consult-ripgrep)
+         ("C-x b" . consult-buffer))
   :init
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref
-	xref-search-program 'ripgrep)
+        xref-search-program 'ripgrep)
   :config
   (setq consult-project-root-function #'vc-root-dir))
 
@@ -75,8 +73,7 @@
   :bind
   (("C-S-a" . embark-act)       ;; pick some comfortable binding
    ("C-h B" . embark-bindings) ;; alternative for `describe-bindings'
-   :map minibuffer-local-map
-   ("C-c C-o" . embark-occur))
+  )
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
@@ -87,14 +84,20 @@
                  nil
                  (window-parameters (mode-line-format . none)))))
 
-(use-package embark-consult
-  :ensure t
-  :after (embark consult)
-  :demand t
-  :hook
-  (emark-collect-mode . emabark-consult-preview-minor-mode))
-
 ;; Project management
+
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode)
+  :config
+  (advice-add #'marginalia-cycle :after
+              (lambda ()
+                (when
+                    (bound-and-true-p selectrum-mode)
+                  (selectrum-exhibit 'keep-selected))))
+  (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
+
 
 (use-package magit
   :ensure t
