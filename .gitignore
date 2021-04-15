@@ -15,3 +15,6 @@
 /org-clock-save.el
 /url/
 fly_check*.el
+/bookmarks
+/projectile.cache
+/custom.el

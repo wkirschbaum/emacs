@@ -12,9 +12,17 @@
 
 (setq display-line-numbers-type 'relative)
 (setq display-line-numbers-current-absolute t)
+(setq default-frame-alist '((fullscreen . maximized)))
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
+
 (setq-default display-line-numbers-width 4)
 (setq-default display-line-numbers-widen t)
 (setq-default indent-tabs-mode nil)
+(setq-default auto-revert-verbose nil)
+(setq-default wdired-allow-to-change-permissions t)
+(setq-default wdired-create-parent-directories t)
 
 (global-display-line-numbers-mode)
 (display-time-mode 1)

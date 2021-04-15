@@ -2,6 +2,14 @@
 ;;; Commentary:
 ;;; Code:
 
+(defun setup-custom-config (config-path)
+  (setq custom-file (concat config-path "custom.el"))
+  (if (file-exists-p custom-file)
+      (load custom-file)))
+
+(let ((config-path "~/.config/emacs/"))
+  (setup-custom-config config-path))
+
 (defvar whk/modules)
 (setq whk/modules
       '(
@@ -17,6 +25,7 @@
         "elixir-mode"
         "docker-mode"
         "markdown-mode"
+        "terraform-mode"
         "yaml-mode"
         "compilation-mode"
         "javascript-mode"
@@ -35,3 +44,4 @@
 
 (provide 'init.el)
 ;;; init.el ends here
+

@@ -5,6 +5,9 @@
 (use-package all-the-icons
   :ensure t)
 
+(use-package ag
+  :ensure t)
+
 (use-package ripgrep
   :ensure t)
 
