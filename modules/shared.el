@@ -107,8 +107,11 @@
   :config
   (setq magit-completing-read-function #'selectrum-completing-read))
 
-;; (use-package forge
-;;   :ensure t)
+(use-package git-timemachine
+  :ensure t)
+
+(use-package forge
+  :ensure t)
 
 (use-package diff-hl
   :ensure t

@@ -18,3 +18,5 @@ fly_check*.el
 /bookmarks
 /projectile.cache
 /custom.el
+/forge-database.sqlite
+/session.10cee5deeb000161884422100000006970464
