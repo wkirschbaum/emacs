@@ -2,10 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'exwm)
-(require 'exwm-config)
-(exwm-config-default)
-
 (defun setup-custom-config (config-path)
   (setq custom-file (concat config-path "custom.el"))
   (if (file-exists-p custom-file)
@@ -18,6 +14,7 @@
 (setq whk/modules
       '(
         "bootstrap"
+        "exwm"
         "native-config"
         "shared"
         "bell"
