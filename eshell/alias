@@ -1,1 +1,2 @@
+alias wmip curl https://status.prod.fltpay.net/api/ip
 alias clear clear t

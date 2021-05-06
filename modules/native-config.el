@@ -30,7 +30,7 @@
 ;; Time
 (defvar display-time-string-forms)
 (setq display-time-string-forms
-       '((propertize (concat " " 24-hours ":" minutes " ")
+       '((propertize (concat " " day "/" month "/" year " " 24-hours ":" minutes " ")
                      'face 'egoge-display-time)))
 
 

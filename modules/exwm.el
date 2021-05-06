@@ -1,6 +1,6 @@
-(server-start)
+;; (server-start)
 
-(use-package xelb :ensure t :demand t)
+;; (use-package xelb :ensure t :demand t)
 (use-package exwm :ensure t :demand t)
 
 (require 'exwm-config)
@@ -13,6 +13,12 @@
              "xrandr" nil "xrandr --output HDMI-0 --left-of HDMI-1 --auto")))
 (exwm-randr-enable)
 
+(require 'exwm-systemtray)
+(exwm-systemtray-enable)
+
+(add-hook 'exwm-update-class-hook
+          (lambda ()
+            (exwm-workspace-rename-buffer exwm-class-name)))
 
 (setq exwm-input-global-keys
       `(
@@ -37,26 +43,26 @@
                     (interactive)
                     (start-process "" nil "/usr/bin/slock")))))
 
-(setq exwm-input-simulation-keys
-      '(
-        ;; movement
-        ([?\C-b] . [left])
-        ([?\M-b] . [C-left])
-        ([?\C-f] . [right])
-        ([?\M-f] . [C-right])
-        ([?\C-p] . [up])
-        ([?\C-n] . [down])
-        ([?\C-a] . [home])
-        ([?\C-e] . [end])
-        ([?\M-v] . [prior])
-        ([?\C-v] . [next])
-        ([?\C-d] . [delete])
-        ([?\C-k] . [S-end delete])
-        ;; cut/paste.
-        ([?\C-w] . [?\C-x])
-        ([?\M-w] . [?\C-c])
-        ([?\C-y] . [?\C-v])
-        ;; search
-        ([?\C-s] . [?\C-f])))
+;; (setq exwm-input-simulation-keys
+;;       '(
+;;         ;; movement
+;;         ([?\C-b] . [left])
+;;         ([?\M-b] . [C-left])
+;;         ([?\C-f] . [right])
+;;         ([?\M-f] . [C-right])
+;;         ([?\C-p] . [up])
+;;         ([?\C-n] . [down])
+;;         ([?\C-a] . [home])
+;;         ([?\C-e] . [end])
+;;         ([?\M-v] . [prior])
+;;         ([?\C-v] . [next])
+;;         ([?\C-d] . [delete])
+;;         ([?\C-k] . [S-end delete])
+;;         ;; cut/paste.
+;;         ([?\C-w] . [?\C-x])
+;;         ([?\M-w] . [?\C-c])
+;;         ([?\C-y] . [?\C-v])
+;;         ;; search
+;;         ([?\C-s] . [?\C-f])))
 
 (exwm-enable)

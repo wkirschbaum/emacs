@@ -21,3 +21,5 @@ fly_check*.el
 /forge-database.sqlite
 /session.*
 /eww-bookmarks
+/eln-cache/
+/tramp

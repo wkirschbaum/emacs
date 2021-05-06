@@ -14,7 +14,8 @@
 (setq whk/modules
       '(
         "bootstrap"
-        "exwm"
+;        "exwm"
+        "desktop"
         "native-config"
         "shared"
         "bell"
@@ -31,6 +32,8 @@
         "compilation-mode"
         "javascript-mode"
         "web-mode"
+        "ledger"
+        "haskell"
         "styling"
         "extras"
         "functions"))
