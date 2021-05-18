@@ -2,6 +2,15 @@
 ;;; Commentary:
 ;;; Code:
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq window-system '(x))
+    (exec-path-from-shell-copy-env "SSH_AGENT_PID")
+    (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
+    (exec-path-from-shell-copy-env "MYSQL_SOCKET")
+    (exec-path-from-shell-initialize)))
+
 (use-package all-the-icons
   :ensure t)
 
@@ -31,22 +40,64 @@
   :config
   (global-company-mode t))
 
-(use-package selectrum
-  :ensure t
-  :config
-  (selectrum-mode +1))
+;; Enable vertico
+(use-package vertico
+  :init
+  (vertico-mode)
 
-(use-package selectrum-prescient
-  :ensure t
-  :config
-  (setq precient-filter-method '(literal-prefix regexp initialism))
-  (setq magit-completing-read-function #'selectrum-completing-read)
-  (selectrum-prescient-mode +1)
-  (prescient-persist-mode +1))
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
+)
+
+;; Use the `orderless' completion style.
+;; Enable `partial-completion' for files to allow path expansion.
+;; You may prefer to use `initials' instead of `partial-completion'.
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  (defun crm-indicator (args)
+    (cons (concat "[CRM] " (car args)) (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Grow and shrink minibuffer
+  ;;(setq resize-mini-windows t)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+
+;; (use-package selectrum
+;;   :ensure t
+;;   :config
+;;   (selectrum-mode +1))
+
+;; (use-package selectrum-prescient
+;;   :ensure t
+;;   :config
+;;   (setq precient-filter-method '(literal-prefix regexp initialism))
+;;   (setq magit-completing-read-function #'selectrum-completing-read)
+;;   (selectrum-prescient-mode +1)
+;;   (prescient-persist-mode +1))
 
 (use-package projectile
   :ensure t
-  :after (selectrum)
+  :after (vertico)
   :demand t
   :bind-keymap ("C-x p" . projectile-command-map)
   :config
@@ -92,20 +143,10 @@
 (use-package marginalia
   :ensure t
   :init
-  (marginalia-mode)
-  :config
-  (advice-add #'marginalia-cycle :after
-              (lambda ()
-                (when
-                    (bound-and-true-p selectrum-mode)
-                  (selectrum-exhibit 'keep-selected))))
-  (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
-
+  (marginalia-mode))
 
 (use-package magit
-  :ensure t
-  :config
-  (setq magit-completing-read-function #'selectrum-completing-read))
+  :ensure t)
 
 (use-package git-timemachine
   :ensure t)

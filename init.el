@@ -2,15 +2,15 @@
 ;;; Commentary:
 ;;; Code:
 
+(setq comp-deferred-compilation-deny-list '())
+(setq native-comp-async-report-warnings-errors nil)
+
 (defun setup-custom-config (config-path)
   ;; Remove on next upgrade
-  (setq comp-deferred-compilation-deny-list '())
 
   (setq custom-file (concat config-path "custom.el"))
   (if (file-exists-p custom-file)
       (load custom-file)))
-
-(setq native-comp-async-report-warnings-errors nil)
 
 (let ((config-path "~/.config/emacs/"))
   (setup-custom-config config-path))
