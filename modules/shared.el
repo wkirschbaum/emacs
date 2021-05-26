@@ -2,6 +2,31 @@
 ;;; Commentary:
 ;;; Code:
 
+(use-package yasnippet
+  :ensure t)
+
+(use-package yasnippet-snippets
+  :ensure t)
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  (defun crm-indicator (args)
+    (cons (concat "[CRM] " (car args)) (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Grow and shrink minibuffer
+  (setq resize-mini-windows t)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+
 (use-package exec-path-from-shell
   :ensure t
   :config
@@ -43,11 +68,7 @@
 ;; Enable vertico
 (use-package vertico
   :init
-  (vertico-mode)
-
-  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-  ;; (setq vertico-cycle t)
-)
+  (vertico-mode))
 
 ;; Use the `orderless' completion style.
 ;; Enable `partial-completion' for files to allow path expansion.
@@ -63,42 +84,8 @@
   :init
   (savehist-mode))
 
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  (defun crm-indicator (args)
-    (cons (concat "[CRM] " (car args)) (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  ;; Grow and shrink minibuffer
-  ;;(setq resize-mini-windows t)
-
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
-
-;; (use-package selectrum
-;;   :ensure t
-;;   :config
-;;   (selectrum-mode +1))
-
-;; (use-package selectrum-prescient
-;;   :ensure t
-;;   :config
-;;   (setq precient-filter-method '(literal-prefix regexp initialism))
-;;   (setq magit-completing-read-function #'selectrum-completing-read)
-;;   (selectrum-prescient-mode +1)
-;;   (prescient-persist-mode +1))
-
 (use-package projectile
   :ensure t
-  :after (vertico)
-  :demand t
   :bind-keymap ("C-x p" . projectile-command-map)
   :config
   (setq projectile-file-exists-remote-cache-expire nil

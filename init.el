@@ -19,7 +19,6 @@
 (setq whk/modules
       '(
         "bootstrap"
-;        "exwm"
         "desktop"
         "native-config"
         "shared"
@@ -28,7 +27,7 @@
         "dired"
         "org"
         "po-mode"
-        "lsp"
+        "lsp-mode"
         "elixir-mode"
         "docker-mode"
         "markdown-mode"
@@ -38,10 +37,12 @@
         "javascript-mode"
         "web-mode"
         "ledger"
-        "haskell"
+        "haskell-mode"
+        ;; "rust-mode"
         "styling"
         "extras"
-        "functions"))
+        "functions"
+        "secret"))
 
 (let ((config-path "~/.config/emacs/modules/"))
   (dolist (module whk/modules)

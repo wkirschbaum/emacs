@@ -24,3 +24,4 @@ fly_check*.el
 /eln-cache/
 /tramp
 /history
+/modules/secret.el
