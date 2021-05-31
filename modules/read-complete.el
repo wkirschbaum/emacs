@@ -16,6 +16,10 @@
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t))
 
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist :init (savehist-mode))
+(use-package recentf :init (recentf-mode))
+
 ;; Enable vertico
 (use-package vertico
   :init
@@ -30,11 +34,10 @@
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
+(use-package marginalia
+  :ensure t
   :init
-  (savehist-mode))
-
+  (marginalia-mode))
 
 (use-package embark
   :ensure t
@@ -53,13 +56,6 @@
                  nil
                  (window-parameters (mode-line-format . none)))))
 
-;; Project management
-
-(use-package marginalia
-  :ensure t
-  :init
-  (marginalia-mode))
-
 (use-package consult
   :straight t
   :demand t
@@ -73,3 +69,10 @@
         xref-search-program 'ripgrep)
   :config
   (setq consult-project-root-function #'vc-root-dir))
+
+(use-package embark-consult
+  :ensure t
+  :after (embark consult)
+  :demand t
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
