@@ -25,3 +25,4 @@ fly_check*.el
 /tramp
 /history
 /modules/secret.el
+/lsp-tmp-*/
