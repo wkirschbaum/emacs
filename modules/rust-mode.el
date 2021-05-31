@@ -1,5 +1,5 @@
-(use-package rustic
+(use-package rust-mode
   :ensure t
   :config
-  (setq rustic-format-on-save nil)
+  (setq rustic-format-on-save t)
   (setq rustic-lsp-format t))

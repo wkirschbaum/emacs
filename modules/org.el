@@ -64,15 +64,6 @@
 
 (setq org-ellipsis " ↴")
 
-(use-package deft
-  :ensure t
-  :bind ("C-c n" . deft)
-  :bind ("C-c l" . deft-find-file)
-  :config
-  (setq deft-recursive t
-        deft-extensions '("txt" "org" "md")
-        deft-directory "~/Cloud/notes"))
-
 (use-package org-roam
   :ensure t
   :bind ("C-c C-j" . org-journal-new-entry)

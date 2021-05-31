@@ -25,13 +25,5 @@
 (setq-default wdired-create-parent-directories t)
 
 (global-display-line-numbers-mode)
-(display-time-mode 1)
-
-;; Time
-(defvar display-time-string-forms)
-(setq display-time-string-forms
-       '((propertize (concat " " day "/" month "/" year " " 24-hours ":" minutes " ")
-                     'face 'egoge-display-time)))
-
 
 ;;; native-config.el ends here

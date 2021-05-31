@@ -20,7 +20,9 @@
          (typescript-mode . lsp)
          (rust-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+  :commands lsp
+  :config
+  (setq lsp-ui-doc-enable nil))
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
