@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(setq comp-deferred-compilation-deny-list '())
+(Xsetq comp-deferred-compilation-deny-list '())
 (setq native-comp-async-report-warnings-errors nil)
 
 (defun setup-custom-config (config-path)
@@ -41,6 +41,7 @@
         "ledger"
         "haskell-mode"
         "rust-mode"
+        "elfeed"
         "styling"
         "extras"
         "functions"

@@ -27,3 +27,4 @@ fly_check*.el
 /modules/secret.el
 /lsp-tmp-*/
 /recentf
+/.cache/

@@ -46,3 +46,5 @@
   :ensure t
   :config
   (global-company-mode t))
+
+(use-package restclient :ensure t)

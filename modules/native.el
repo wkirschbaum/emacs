@@ -9,6 +9,7 @@
 (set-default 'cursor-in-non-selected-windows 'hollow)
 (global-auto-revert-mode t) ;; Ensure Cloud files exists for this (org mode agenda)
 (save-place-mode 1) ;; Remember where I was last time I visited the file
+(winner-mode 1)
 
 (setq display-line-numbers-type 'relative)
 (setq display-line-numbers-current-absolute t)
@@ -25,5 +26,7 @@
 (setq-default wdired-create-parent-directories t)
 
 (global-display-line-numbers-mode)
+;; This goes into elixir-mode for some reason?
+;; (global-subword-mode 1)
 
 ;;; native-config.el ends here
