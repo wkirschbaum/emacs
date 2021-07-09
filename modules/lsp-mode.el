@@ -3,6 +3,7 @@
   :init
   (add-to-list `exec-path "~/src/tools/elixir-ls/bin/")
   (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-elixir-fetch-deps t)
   (setq lsp-enable-file-watchers t
         lsp-file-watch-threshold 8000
         lsp-modeline-code-actions-enable t)
@@ -31,7 +32,6 @@
 ;; (use-package dap-mode :ensure t)
 ;; (use-package dap-elixir)
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
-
 
 ;; (use-package lsp-mode
 ;;   :ensure t

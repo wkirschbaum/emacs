@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(Xsetq comp-deferred-compilation-deny-list '())
+(setq comp-deferred-compilation-deny-list '())
 (setq native-comp-async-report-warnings-errors nil)
 
 (defun setup-custom-config (config-path)
@@ -44,7 +44,10 @@
         "elfeed"
         "styling"
         "extras"
+        "org-publish"
+        "ebdb"
         "functions"
+        "experiments"
         "secret"))
 
 (let ((config-path "~/.config/emacs/modules/"))

@@ -29,4 +29,5 @@
 ;; This goes into elixir-mode for some reason?
 ;; (global-subword-mode 1)
 
-;;; native-config.el ends here
+(provide 'native)
+;;; native.el ends here

@@ -66,7 +66,7 @@
 
 (use-package org-roam
   :ensure t
-  :bind ("C-c C-j" . org-journal-new-entry)
+  :bind ("C-c C-j" . org-roam-dailies-find-today)
   :bind ("C-c M-c" . org-roam-capture)
   :bind ("C-c r f" . org-roam-find-file)
   :bind ("C-c r r" . org-roam)
