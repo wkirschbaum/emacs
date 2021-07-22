@@ -29,5 +29,11 @@
 ;; This goes into elixir-mode for some reason?
 ;; (global-subword-mode 1)
 
+(global-set-key (kbd "C-x w a") 'windmove-left)
+(global-set-key (kbd "C-x w e") 'windmove-right)
+(global-set-key (kbd "C-x w p") 'windmove-up)
+(global-set-key (kbd "C-x w n") 'windmove-down)
+
+
 (provide 'native)
 ;;; native.el ends here

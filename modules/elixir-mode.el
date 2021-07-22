@@ -7,6 +7,9 @@
   :hook subword-mode
   :hook (before-save . lsp-format-buffer))
 
+(use-package erlang
+  :ensure t)
+
 (use-package mix :ensure t)
 (use-package exunit
   :ensure t

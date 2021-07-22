@@ -44,7 +44,6 @@
         "elfeed"
         "styling"
         "extras"
-        "org-publish"
         "ebdb"
         "functions"
         "experiments"

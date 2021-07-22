@@ -28,3 +28,4 @@ fly_check*.el
 /lsp-tmp-*/
 /recentf
 /.cache/
+/.org-id-locations
