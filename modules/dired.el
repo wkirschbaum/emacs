@@ -3,6 +3,7 @@
 ;;; Code:
 
 (setq dired-listing-switches "-alh")
+(setq dired-kill-when-opening-new-dired-buffer t)
 (use-package dired-subtree
   :ensure t
   :after dired

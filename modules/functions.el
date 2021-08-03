@@ -45,4 +45,14 @@
          (i (% (abs (random)) (length alnum))))
     (substring alnum i (1+ i))))
 
-;; end here
+(defun whk/magit-find-file-dwim ()
+  (interactive)
+  (magit-find-file-other-window (magit-get-previous-branch) (buffer-file-name)))
+
+
+
+
+(provide 'functions)
+;;; functions.el ends here
+
+

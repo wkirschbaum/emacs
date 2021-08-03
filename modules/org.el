@@ -70,30 +70,20 @@
   :ensure t
   :bind ("C-c C-j" . org-roam-dailies-find-today)
   :bind ("C-c M-c" . org-roam-capture)
-  :bind ("C-c r f" . org-roam-find-file)
+  :bind ("C-c r f" . org-roam-node-find)
   :bind ("C-c r r" . org-roam)
   :bind ("C-c r i" . org-roam-insert)
   :config
   (add-hook 'after-init-hook 'org-roam-mode)
   (setq org-roam-dailies-directory "daily/")
-  (setq org-roam-directory "~/Cloud/notes")
-  (setq org-roam-db-update-method 'immediate)
-  (setq org-roam-dailies-capture-templates
-        '(("d" "random" entry
-           #'org-roam-capture--get-point
-           "* %?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+title: %<%Y-%m-%d>\n\n"
-           :olp ("Random"))
-          ("l" "Lab notes" entry
-           #'org-roam-capture--get-point
-           "* %?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+title: %<%Y-%m-%d>\n"
-           :olp ("Lab notes"))
-          ("j" "journal" entry
-           #'org-roam-capture--get-point
-           "* %?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+title: %<%Y-%m-%d>\n"
-           :olp ("Journal")))))
+  (setq org-roam-directory "~/Cloud/notes"))
+
+
+
+(use-package ox-hugo
+  :ensure t
+  :after ox)
+
+
+(provide 'org)
+;;; org.el ends here

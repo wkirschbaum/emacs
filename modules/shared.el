@@ -45,6 +45,10 @@
 (use-package company
   :ensure t
   :config
-  (global-company-mode t))
+  (setq company-idle-delay 0
+        company-minimum-prefix-length 2
+        company-selection-wrap-around t)
+  (global-company-mode))
 
-(use-package restclient :ensure t)
+(use-package restclient
+  :ensure t)

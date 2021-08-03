@@ -45,9 +45,11 @@
         "styling"
         "extras"
         "ebdb"
+        "dart-mode"
         "functions"
         "experiments"
-        "secret"))
+        "secret"
+        "registers"))
 
 (let ((config-path "~/.config/emacs/modules/"))
   (dolist (module whk/modules)

@@ -19,6 +19,7 @@
   :hook (
          (elixir-mode . lsp)
          (typescript-mode . lsp)
+         (dart-mode . lsp)
          (rust-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
