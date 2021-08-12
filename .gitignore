@@ -29,3 +29,5 @@ fly_check*.el
 /recentf
 /.cache/
 /.org-id-locations
+/.extension
+/.dap-breakpoints

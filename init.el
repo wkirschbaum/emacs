@@ -21,6 +21,7 @@
         "bootstrap"
         "native"
         "shared"
+        "company-mode"
         "git"
         "read-complete"
         "bell"

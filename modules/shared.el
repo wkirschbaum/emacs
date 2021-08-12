@@ -42,13 +42,5 @@
   :hook (prog-mode . flyspell-prog-mode)
   :hook (text-mode . flyspell-mode))
 
-(use-package company
-  :ensure t
-  :config
-  (setq company-idle-delay 0
-        company-minimum-prefix-length 2
-        company-selection-wrap-around t)
-  (global-company-mode))
-
 (use-package restclient
   :ensure t)
