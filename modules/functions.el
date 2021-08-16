@@ -52,7 +52,51 @@
 
 
 
+(defun xah-make-backup ()
+  "Make a backup copy of current file or dired marked files.
+If in dired, backup current file or marked files.
+The backup file name is in this format
+ x.html~2018-05-15_133429~
+ The last part is hour, minutes, seconds.
+in the same dir. If such a file already exist, it's overwritten.
+If the current buffer is not associated with a file, nothing's done.
+
+URL `http://ergoemacs.org/emacs/elisp_make-backup.html'
+Version 2018-05-15"
+  (interactive)
+  (let (($fname (buffer-file-name))
+        ($date-time-format "%Y-%m-%d_%H%M%S"))
+    (if $fname
+        (let (($backup-name
+               (concat $fname "~" (format-time-string $date-time-format) "~")))
+          (copy-file $fname $backup-name t)
+          (message (concat "Backup saved at: " $backup-name)))
+      (if (string-equal major-mode "dired-mode")
+          (progn
+            (mapc (lambda ($x)
+                    (let (($backup-name
+                           (concat $x "~" (format-time-string $date-time-format) "~")))
+                      (copy-file $x $backup-name t)))
+                  (dired-get-marked-files))
+            (message "marked files backed up"))
+        (user-error "buffer not file nor dired")))))
+
+(defun xah-make-backup-and-save ()
+  "Backup of current file and save, or backup dired marked files.
+For detail, see `xah-make-backup'.
+If the current buffer is not associated with a file nor dired, nothing's done.
+URL `http://ergoemacs.org/emacs/elisp_make-backup.html'
+Version 2015-10-14"
+  (interactive)
+  (if (buffer-file-name)
+      (progn
+        (xah-make-backup)
+        (when (buffer-modified-p)
+          (save-buffer)))
+    (progn
+      (xah-make-backup))))
+
+(global-set-key (kbd "C-c b") 'xah-make-backup-and-save)
+
 (provide 'functions)
 ;;; functions.el ends here
-
-
