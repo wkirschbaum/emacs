@@ -49,7 +49,8 @@
         "dart-mode"
         "functions"
         "experiments"
-        "secret"))
+        "secret"
+        "email"))
 
 (let ((config-path "~/.config/emacs/modules/"))
   (dolist (module whk/modules)

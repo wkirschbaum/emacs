@@ -34,6 +34,7 @@
 (global-set-key (kbd "C-x w p") 'windmove-up)
 (global-set-key (kbd "C-x w n") 'windmove-down)
 
+(global-set-key (kbd "C-h a") 'apropos-library)
 
 (provide 'native)
 ;;; native.el ends here

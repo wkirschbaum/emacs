@@ -2,9 +2,7 @@
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.erb\\'" . web-mode)
-         ("\\.html.eex\\'" . web-mode)
-         ("\\.html.leex\\'" . web-mode)
-         )
+         ("\\.[hl]?eex\\'" . web-mode))
   :config
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
@@ -18,3 +16,9 @@
   :ensure t
   :hook web-mode
   :hook css-mode)
+
+
+;; (straight-use-package
+;;  '(lsp-tailwindcss :type git :host github :repo "merrickluo/lsp-tailwindcss"))
+
+;; (use-package lsp-tailwindcss)

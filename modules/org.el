@@ -78,12 +78,15 @@
   (setq org-roam-dailies-directory "daily/")
   (setq org-roam-directory "~/Cloud/notes"))
 
-
-
 (use-package ox-hugo
   :ensure t
   :after ox)
 
+(use-package org-contrib
+  :ensure t)
+
+(use-package ox-confluence
+  :after org-contrib)
 
 (provide 'org)
 ;;; org.el ends here

@@ -2,7 +2,7 @@
   :ensure t
   :config
   (setq company-idle-delay 0
-        company-minimum-prefix-length 0
+        company-minimum-prefix-length 2
         company-idle-delay 0.3
         company-dabbrev-downcase nil
         )
