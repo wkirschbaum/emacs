@@ -4,6 +4,9 @@
 
 (setq dired-listing-switches "-alh")
 (setq dired-kill-when-opening-new-dired-buffer t)
+;; Allow Mail attachements from Dired
+(add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
+
 (use-package dired-subtree
   :ensure t
   :after dired
