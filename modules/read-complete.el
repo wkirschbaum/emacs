@@ -76,3 +76,11 @@
   :demand t
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
+
+
+(use-package consult-dir
+  :ensure t
+  :bind (("C-x C-d" . consult-dir)
+         :map vertico-map
+         ("C-x C-d" . consult-dir)
+         ("C-x C-j" . consult-dir-jump-file)))

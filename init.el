@@ -24,6 +24,7 @@
         "company-mode"
         "git"
         "read-complete"
+        "eshell"
         "bell"
         "whitespace"
         "dired"

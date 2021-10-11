@@ -4,10 +4,12 @@
 
 (use-package elixir-mode
   :ensure t
+  :config
+  (global-subword-mode t)
   :hook (before-save . lsp-format-buffer))
 
-(use-package erlang
-  :ensure t)
+;; (use-package erlang
+;;   :ensure t)
 
 (use-package mix :ensure t)
 (use-package exunit
