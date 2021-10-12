@@ -31,3 +31,4 @@ fly_check*.el
 /.org-id-locations
 /.extension
 /.dap-breakpoints
+/modules/email.el
