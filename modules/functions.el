@@ -1,5 +1,9 @@
 ;; -*- lexical-binding: t -*-
 
+(defun insert-current-date () (interactive)
+       (insert (shell-command-to-string "echo -n $(date +%Y-%m-%d)")))
+
+
 (defun func-region (start end func)
   "run a function over the region between START and END in current buffer."
   (save-excursion

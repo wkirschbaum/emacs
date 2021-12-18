@@ -15,3 +15,9 @@
          (magit-post-refresh . diff-hl-magit-pre-refresh))
   :config
   (global-diff-hl-mode))
+
+(use-package git-modes
+  :ensure t
+  :config 
+  (add-to-list 'auto-mode-alist
+               (cons "/.dockerignore\\'" 'gitignore-mode)))

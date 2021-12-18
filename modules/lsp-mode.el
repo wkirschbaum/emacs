@@ -20,10 +20,13 @@
          (elixir-mode . lsp)
          ;; (typescript-mode . lsp)
          (dart-mode . lsp)
+         (csharp-mode . lsp)
+         (clojure-mode . lsp)
          (rust-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
   :config
+  (setq lsp-lens-enable nil)
   (setq lsp-ui-doc-enable nil))
 
 ;; optionally

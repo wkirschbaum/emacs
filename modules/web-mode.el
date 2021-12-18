@@ -2,6 +2,7 @@
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.erb\\'" . web-mode)
+         ("\\.cshtml\\'" . web-mode)
          ("\\.[hl]?eex\\'" . web-mode))
   :config
   (setq web-mode-markup-indent-offset 2)
