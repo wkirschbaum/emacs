@@ -34,6 +34,10 @@
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
+(use-package savehist
+  :init
+  (savehist-mode))
+
 (use-package marginalia
   :ensure t
   :init
@@ -43,8 +47,9 @@
   :ensure t
   :demand t
   :bind
-  (("C-S-a" . embark-act)       ;; pick some comfortable binding
-   ("C-h B" . embark-bindings) ;; alternative for `describe-bindings'
+  (("C-." . embark-act)
+   ("C-;" . embark-dwim)
+   ("C-h B" . embark-bindings)
   )
   :init
   ;; Optionally replace the key help with a completing-read interface
@@ -70,12 +75,12 @@
   :config
   (setq consult-project-root-function #'vc-root-dir))
 
-(use-package embark-consult
-  :ensure t
-  :after (embark consult)
-  :demand t
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+;; (use-package embark-consult
+;;   :ensure t
+;;   :after (embark consult)
+;;   :demand t
+;;   :hook
+;;   (embark-collect-mode . consult-preview-at-point-mode))
 
 
 (use-package consult-dir
@@ -84,3 +89,23 @@
          :map vertico-map
          ("C-x C-d" . consult-dir)
          ("C-x C-j" . consult-dir-jump-file)))
+
+
+;; (defun my/xref-show-definitions-completing-read (fetcher alist)
+;;   (let ((old-dir default-directory)
+;;         (set-default-directory (lambda (dir) (setq default-directory dir))))
+;;     (advice-add 'file-name-directory :filter-return set-default-directory)
+;;     (unwind-protect
+;;         (xref-show-definitions-completing-read fetcher alist)
+;;       (setq default-directory old-dir)
+;;       (advice-remove 'file-name-directory set-default-directory))))
+
+(setq xref-show-xrefs-function 'xref-show-definitions-buffer)
+
+;; (setq xref-show-xrefs-function 'xref-show-definitions-completing-read)
+
+
+
+
+(setq xref-show-definitions-function 'consult-xref)
+;; (setq xref-show-definitions-function 'xref-show-definitions-buffer)

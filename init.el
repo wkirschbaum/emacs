@@ -30,7 +30,6 @@
         "whitespace"
         "dired"
         "org"
-        "projects"
         "po-mode"
         "lsp-mode"
         "elixir-mode"
@@ -53,6 +52,7 @@
         "ebdb"
         "dart-mode"
         "functions"
+        "treesitter"
         "experiments"
         "secret"
         "email"))

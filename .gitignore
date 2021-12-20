@@ -7,7 +7,6 @@
 /projects
 /transient/
 /var/
-/projectile-bookmarks.eld
 /places
 /.lsp-session*
 /network-security.data
@@ -32,3 +31,4 @@ fly_check*.el
 /.extension
 /.dap-breakpoints
 /modules/email.el
+/multisession/

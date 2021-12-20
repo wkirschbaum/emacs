@@ -1,9 +1,4 @@
-;; (use-package minions
-;;   :ensure t
-;;   :config
-;;   (setq minions-mode-line-lighter "{*}"
-;;         minions-direct '(projectile-mode flycheck-mode))
-;;   (minions-mode 1))
+;; (use-package zeno-theme :ensure t :config (load-theme 'zeno))
 
 (use-package modus-themes
   :ensure t

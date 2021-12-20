@@ -5,7 +5,7 @@
 (use-package exec-path-from-shell
   :ensure t
   :config
-  (when (memq window-system '(x))
+  (when (memq window-system '(x pgtk))
     (exec-path-from-shell-copy-env "SSH_AGENT_PID")
     (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
     (exec-path-from-shell-copy-env "MYSQL_SOCKET")
