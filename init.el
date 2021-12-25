@@ -32,7 +32,8 @@
         "org"
         "po-mode"
         "lsp-mode"
-        "elixir-mode"
+        ;; "elixir-mode"
+        "elixir-custom-mode"
         "erlang-mode"
         "docker-mode"
         "markdown-mode"
@@ -67,4 +68,3 @@
 
 (provide 'init.el)
 ;;; init.el ends here
-

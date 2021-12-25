@@ -2,24 +2,31 @@
 ;;; Commentary:
 ;;; Code:
 
-(use-package elixir-mode
-  :ensure t
-  :config
-  (global-subword-mode t)
-  :hook (before-save . lsp-format-buffer))
+;; (load "~/src/emacs/emacs-elixir/elixir-smie")
+;; (load "~/src/emacs/emacs-elixir/elixir-format")
+;; (load "~/src/emacs/emacs-elixir/elixir-mode")
+;; (require 'elixir-mode)
+
+(defun whk/reload-elixir ()
+  "Reload elixir-mode"
+  (interactive)
+  (progn
+    (ignore-errors
+      (unload-feature 'elixir-mode))
+    (elixir-mode)))
 
 ;; (use-package erlang
 ;;   :ensure t)
 
-(use-package mix :ensure t)
-(use-package exunit
-  :ensure t
-  :bind
-  ("C-c , a" . exunit-verify-all)
-  ("C-c , s" . exunit-verify-single)
-  ("C-c , v" . exunit-verify)
-  ("C-c , r" . exunit-rerun)
-  ("C-c , t" . exunit-toggle-file-and-test))
+;; (use-package mix :ensure t)
+;; (use-package exunit
+;;   :ensure t
+;;   :bind
+;;   ("C-c , a" . exunit-verify-all)
+;;   ("C-c , s" . exunit-verify-single)
+;;   ("C-c , v" . exunit-verify)
+;;   ("C-c , r" . exunit-rerun)
+;;   ("C-c , t" . exunit-toggle-file-and-test))
 
 ;; (use-package polymode
 ;;   :ensure t
@@ -39,4 +46,4 @@
 ;;     :hostmode 'poly-elixir-hostmode
 ;;     :innermodes '(poly-liveview-expr-elixir-innermode))
 ;;   )
-(setq web-mode-engines-alist '(("elixir" . "\\.ex\\'")))
+;; (setq web-mode-engines-alist '(("elixir" . "\\.ex\\'")))
