@@ -125,7 +125,7 @@
     "defoverridable"))
 
 (defconst elixir-block-mid-keywords
-  '("do" "else" "rescue" "catch"))
+  '("do" "else" "rescue" "catch" "fn"))
 
 (defconst elixir-block-end-keywords
   '("end"))
@@ -233,8 +233,6 @@ by `end-of-defun'."
       ((result
         (pcase (cons kind token)
           ('(:elem . basic) elixir-indent-level)
-          (`(:before . "->")
-           elixir-indent-level)
           (`(:before . ,(or ";" "stab_eol"))
            (cond
             ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
