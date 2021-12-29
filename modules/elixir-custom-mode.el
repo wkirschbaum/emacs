@@ -9,6 +9,8 @@
 
 ;; - comments
 ;; - docs
+;; - """ comments
+;; - sexps with @doc before ( to ignore )
 ;; - sigils
 ;; - start and end of defun levels
 ;; - when statements
@@ -81,12 +83,13 @@
              ("def" id "do" insts "end")
              ("if" exp "do" insts "end")
              ("if" exp "do" insts "else" insts "end")
+             ("if" short-do-else)
+             ("for" exps "do" insts "end")
+             ("for" short-do-else)
              ("with" exps "do" insts "end")
              ("with" exps "do" insts "else" matches "end")
-             ("for" exps "do" insts "end")
-             ("if" short-do-else)
              ("with" short-do-else)
-             ("for" short-do-else)
+             ("fn" matches "end")
              )
        (matches (match) (match "stab_eol"))
        (match (exp "->" insts))
@@ -108,7 +111,11 @@
        (left ";"))))))
 
 (defconst elixir-block-beg-keywords
-  '("defmodule" "defprotocol" "def" "case" "cond" "if" "unless" "with" "for"))
+  '("def" "defp" "defmodule" "defprotocol"
+    "defmacro" "defmacrop" "defdelegate"
+    "defexception" "defstruct" "defimpl"
+    "defguard" "defguardp" "defcallback"
+    "defoverridable" "fn"))
 
 (defconst elixir-block-mid-keywords
   '("do" "else" "rescue" "catch"))
@@ -144,6 +151,8 @@
   "Return t if the next line is a stab_op"
   (save-excursion
     (skip-chars-forward "\n")
+    ;; TODO: maybe too generic of a match
+    ;; and it probably does not handle comments
     (looking-at ".*->.*" (line-end-position))
     ))
 
@@ -190,6 +199,7 @@ move forward."
         (elixir-end-of-defun (- count))
       (and (re-search-backward (concat "^\\s *" elixir-block-beg-re "\\_>") nil t count)
            (beginning-of-line)
+           t
            ))))
 
 (defun elixir-end-of-defun (&optional arg)
@@ -202,6 +212,7 @@ by `end-of-defun'."
         (elixir-beginning-of-defun (- count))
       (and (re-search-forward (concat "^\\s *" elixir-block-end-re "\\_>") nil t count)
            (end-of-line)
+           t
            ))))
 
 (defcustom elixir-indent-level 2
@@ -236,7 +247,7 @@ by `end-of-defun'."
 
   ;; (kill-all-local-variables)
 
-  (setq-local debug-on-error t)
+  (setq-local smie-indent-basic elixir-indent-level)
 
   (smie-setup elixir-smie-grammar #'elixir-smie-rules
               :forward-token  #'elixir-smie--forward-token
