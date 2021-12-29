@@ -89,10 +89,11 @@
              ("with" exps "do" insts "end")
              ("with" exps "do" insts "else" matches "end")
              ("with" short-do-else)
+             ("fn" "->" insts "end")
              ("fn" matches "end")
              )
-       (matches (match) (match "stab_eol"))
        (match (exp "->" insts))
+       (matches (match) (matches "stab_eol" match))
        (short-do-else
         (exps "," "do:" exp)
         (short-do-else "," "else:" exp))
@@ -104,7 +105,10 @@
             (exp "-" exp)
             ("(" exp ")")
             (id)))
-     '((left ",")
+     '((right "fn")
+       (left "end")
+       (right "->")
+       (left ",")
        (right "=")
        (left "*" "/")
        (left "+" "-")
@@ -225,6 +229,8 @@ by `end-of-defun'."
       ((result
         (pcase (cons kind token)
           ('(:elem . basic) elixir-indent-level)
+          (`(:before . "->")
+           elixir-indent-level)
           (`(:before . ,(or ";" "stab_eol"))
            (cond
             ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
@@ -236,6 +242,7 @@ by `end-of-defun'."
             (t (smie-rule-parent elixir-indent-level)))
            ))))
     (progn
+      (message "(%s . (\"%s\") -> %s" kind token result)
       result)))
 
 ;;;###autoload
