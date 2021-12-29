@@ -78,9 +78,13 @@
      '((id)
        (insts (inst) (inst ";" insts))
        (inst (exp)
-             ("defmodule" id "do" insts "end")
-             ("defprotocol" id "do" insts "end")
-             ("def" id "do" insts "end")
+             ("defmodule" exp "do" insts "end")
+             ("defprotocol" exp "do" insts "end")
+             ("def" exp "do" insts "end")
+             ("try" "do" insts "after" matches "end")
+             ("try" "do" insts "catch" matches "end")
+             ("try" "do" insts "rescue" matches "end")
+             ("try" "do" insts "end")
              ("if" exp "do" insts "end")
              ("if" exp "do" insts "else" insts "end")
              ("if" short-do-else)
@@ -90,8 +94,7 @@
              ("with" exps "do" insts "else" matches "end")
              ("with" short-do-else)
              ("fn" "->" insts "end")
-             ("fn" matches "end")
-             )
+             ("fn" matches "end"))
        (match (exp "->" insts))
        (matches (match) (matches "stab_eol" match))
        (short-do-else
@@ -103,12 +106,12 @@
             (exp "*" exp)
             (exp "+" exp)
             (exp "-" exp)
-            ("(" exp ")")
-            (id)))
+            (exp "in" exp)
+            ("(" exp ")")))
      '((right "fn")
        (left "end")
        (right "->")
-       (left ",")
+       (left "," "in")
        (right "=")
        (left "*" "/")
        (left "+" "-")
@@ -119,7 +122,7 @@
     "defmacro" "defmacrop" "defdelegate"
     "defexception" "defstruct" "defimpl"
     "defguard" "defguardp" "defcallback"
-    "defoverridable" "fn"))
+    "defoverridable"))
 
 (defconst elixir-block-mid-keywords
   '("do" "else" "rescue" "catch"))
@@ -129,6 +132,9 @@
 
 (defconst elixir-block-beg-re
   (regexp-opt elixir-block-beg-keywords))
+
+(defconst elixir-stab-beg-re
+  (concat ".*" (regexp-opt '("fn" "do" "catch" "rescue" "else" "after")) ".*->.*"))
 
 (defconst elixir-block-end-re
   (regexp-opt elixir-block-end-keywords))
@@ -155,11 +161,9 @@
   "Return t if the next line is a stab_op"
   (save-excursion
     (skip-chars-forward "\n")
-    ;; TODO: maybe too generic of a match
-    ;; and it probably does not handle comments
-    (looking-at ".*->.*" (line-end-position))
-    ))
-
+    ;; TODO: Do not brute force these checks
+    (and (not (looking-at elixir-stab-beg-re (line-end-position)))
+         (looking-at ".*->.*" (line-end-position)))))
 
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
