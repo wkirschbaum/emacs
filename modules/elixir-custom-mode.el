@@ -76,10 +76,10 @@
    (smie-merge-prec2s
     (smie-bnf->prec2
      '((id)
-       (insts (inst) (inst ";" insts))
+       (insts (inst) (insts ";" insts))
        (inst (exp)
-             ("defmodule" exp "do" insts "end")
-             ("defprotocol" exp "do" insts "end")
+             ("defmodule" exps "do" insts "end")
+             ("defprotocol" exps "do" insts "end")
              ("def" exp "do" insts "end")
              ("try" "do" insts "after" matches "end")
              ("try" "do" insts "catch" matches "end")
@@ -96,11 +96,11 @@
              ("fn" "->" insts "end")
              ("fn" matches "end"))
        (match (exp "->" insts))
-       (matches (match) (matches "stab_eol" match))
+       (matches (match) (matches "stab_eol" matches))
        (short-do-else
         (exps "," "do:" exp)
         (short-do-else "," "else:" exp))
-       (exps (exp) (exp "," exp))
+       (exps (exp) (exps "," exp))
        (exp (exp "=" exp)
             (exp "/" exp)
             (exp "*" exp)
@@ -109,7 +109,7 @@
             (exp "in" exp)
             ("(" exp ")")))
      '((right "fn")
-       (left "end")
+       (left "end" "stab_eol")
        (right "->")
        (left "," "in")
        (right "=")
@@ -141,6 +141,9 @@
 
 (defconst elixir-block-keywords
   (append
+   '(
+     "fn" "case" "for" "in" "cond"
+     "if" "try" "raise" "do" "else" "true" "false" "with")
    elixir-block-beg-keywords
    elixir-block-end-keywords
    elixir-block-mid-keywords))
@@ -174,9 +177,7 @@
     (if (eolp) (forward-char 1) (forward-comment 1))
     ;; inject a stab_eol if the next line is a stab_op
     ;; so that we can add matches as a rule
-    (if (elixir-smie--stab-eol-p)
-        "stab_eol"
-      ";"))
+    (if (elixir-smie--stab-eol-p) "stab_eol" ";"))
    (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
