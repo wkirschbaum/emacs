@@ -80,6 +80,8 @@
              ("defmodule" exps "do" insts "end")
              ("defprotocol" exps "do" insts "end")
              ("def" exps "do" insts "end")
+             (exp "=" insts)
+             ("fn" matches "end")
              ("try" "do" insts "after" matches "end")
              ("try" "do" insts "catch" matches "end")
              ("try" "do" insts "rescue" matches "end")
@@ -91,11 +93,10 @@
              ("for" short-do-else)
              ("with" exps "do" insts "end")
              ("with" exps "do" insts "else" matches "end")
-             ("with" short-do-else)
-             ("fn" matches "end"))
+             ("with" short-do-else))
        (insts (inst) (insts ";" insts))
        (match (exp "->" insts))
-       (matches (match) (matches "stab_eol" matche))
+       (matches (match) (matches "stab_eol" matches))
        (short-do-else
         (exps "," "do:" exp)
         (short-do-else "," "else:" exp))
@@ -108,12 +109,12 @@
             (exp "in" exp)
             ("when" exp)
             ("(" exp ")")))
-     '((assoc ";"))
+     '((assoc ";") (right "="))
      '((assoc "stab_eol"))
      '((assoc ","))
      '((assoc "in")
        (assoc "when")
-       (assoc "=")
+       (right "=")
        (assoc "*" "/")
        (assoc "+" "-"))))))
 
@@ -164,7 +165,7 @@
   "Return t if the next line is a stab_op"
   (save-excursion
     (skip-chars-forward " *\n")
-    (and (not (looking-at "fn.*->.*" (line-end-position)))
+    (and (not (looking-at ".*fn.*->.*" (line-end-position)))
          (looking-at ".*->.*" (line-end-position)))))
 
 (defun elixir-smie--forward-token ()
@@ -176,7 +177,7 @@
     (if (eolp) (forward-char 1) (forward-comment 1))
     ;; inject a stab_eol if the next line is a stab_op
     ;; so that we can add matches as a rule
-    (if (elixir-smie--stab-eol-p) "stab_eol" ";"))
+    (if (and t (elixir-smie--stab-eol-p)) "stab_eol" ";"))
    (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
@@ -232,7 +233,8 @@ by `end-of-defun'."
       ((result
         (pcase (cons kind token)
           ('(:elem . basic) elixir-indent-level)
-          (`(:before . "->") elixir-indent-level)
+          (`(:before . "->") (smie-rule-parent))
+          (`(:after . "->") (smie-rule-parent elixir-indent-level))
           (`(:before . "stab_eol") elixir-indent-level)
           (`(:before . ";")
            (cond
