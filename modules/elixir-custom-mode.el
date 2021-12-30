@@ -92,11 +92,10 @@
              ("with" exps "do" insts "end")
              ("with" exps "do" insts "else" matches "end")
              ("with" short-do-else)
-             ("fn" "->" insts "end")
              ("fn" matches "end"))
        (insts (inst) (insts ";" insts))
        (match (exp "->" insts))
-       (matches (match) (matches "stab_eol" matches))
+       (matches (match) (matches "stab_eol" matche))
        (short-do-else
         (exps "," "do:" exp)
         (short-do-else "," "else:" exp))
@@ -109,8 +108,8 @@
             (exp "in" exp)
             ("when" exp)
             ("(" exp ")")))
-     '((assoc ";") (assoc "stab_eol"))
-     '((assoc "fn") (left "end") (right "->"))
+     '((assoc ";"))
+     '((assoc "stab_eol"))
      '((assoc ","))
      '((assoc "in")
        (assoc "when")
@@ -156,6 +155,9 @@
     (not (or (bolp)
              (memq (char-before) '(?\[ ?\( ?\{))
              (memq (char-before) '(?, ?= ?+ ?- ?* ?/))
+             (and (eq (char-before) ?>)
+                  (member (save-excursion (elixir-smie--backward-token))
+                          '("->")))
              ))))
 
 (defun elixir-smie--stab-eol-p ()
@@ -230,10 +232,11 @@ by `end-of-defun'."
       ((result
         (pcase (cons kind token)
           ('(:elem . basic) elixir-indent-level)
+          (`(:before . "->") elixir-indent-level)
+          (`(:before . "stab_eol") elixir-indent-level)
           (`(:before . ";")
            (cond
-            ((apply #'smie-rule-parent-p
-                    (cons "stab_eol" (cons "->" elixir-block-mid-keywords)))
+            ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
              (smie-rule-parent elixir-indent-level))))
           (`(:before . ,(or "=" "+" "-" "*" "/"))
            (cond
