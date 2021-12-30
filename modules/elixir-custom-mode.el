@@ -126,7 +126,7 @@
     "defoverridable"))
 
 (defconst elixir-block-mid-keywords
-  '("do" "else" "rescue" "catch" "fn"))
+  '("do" "else" "rescue" "catch"))
 
 (defconst elixir-block-end-keywords
   '("end"))
@@ -135,7 +135,7 @@
   (regexp-opt elixir-block-beg-keywords))
 
 (defconst elixir-stab-beg-re
-  (concat ".*" (regexp-opt '("fn" "do" "catch" "rescue" "else" "after")) ".*->.*"))
+  (concat ".*" (regexp-opt '("do" "catch" "rescue" "else" "after")) ".*->.*"))
 
 (defconst elixir-block-end-re
   (regexp-opt elixir-block-end-keywords))
@@ -234,18 +234,21 @@ by `end-of-defun'."
       ((result
         (pcase (cons kind token)
           ('(:elem . basic) elixir-indent-level)
-          (`(:before . "->") elixir-indent-level)
+          (`(:before . "stab_eol") elixir-indent-level)
+          (`(:before . "->") (smie-rule-parent elixir-indent-level))
           (`(:before . ,(or ";" "stab_eol"))
            (cond
-            ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
+            ((smie-rule-parent-p "->") elixir-indent-level)
+            ((smie-rule-parent-p "fn")
              (smie-rule-parent elixir-indent-level))
-            ;; maybe check for danling-p?
-            ((smie-rule-parent-p "->") elixir-indent-level)))
-          (`(:before . ,(or "=" "+" "-" "*" "/"))
+            ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
+             (smie-rule-parent elixir-indent-level))))
+          (`(:before . ,(or "=" "+" "-" "*" "/" "->"))
            (cond
             ((smie-rule-parent-p nil) elixir-indent-level)
             (t (smie-rule-parent elixir-indent-level)))
-           ))))
+           )
+          )))
     (progn
       (message "(%s . (\"%s\") -> %s" kind token result)
       result)))
