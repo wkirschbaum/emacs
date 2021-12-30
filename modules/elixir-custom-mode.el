@@ -107,15 +107,16 @@
             (exp "+" exp)
             (exp "-" exp)
             (exp "in" exp)
+            ("when" exp)
             ("(" exp ")")))
      '((assoc ";") (assoc "stab_eol"))
      '((assoc "fn") (left "end") (right "->"))
-     '((assoc ",")
-       (assoc "in")
+     '((assoc ","))
+     '((assoc "in")
+       (assoc "when")
        (assoc "=")
        (assoc "*" "/")
-       (assoc "+" "-")
-       )))))
+       (assoc "+" "-"))))))
 
 (defconst elixir-block-beg-keywords
   '("def" "defp" "defmodule" "defprotocol"
@@ -142,7 +143,7 @@
 (defconst elixir-block-keywords
   (append
    '(
-     "fn" "case" "for" "in" "cond"
+     "fn" "case" "for" "in" "cond" "when"
      "if" "try" "raise" "do" "else" "true" "false" "with")
    elixir-block-beg-keywords
    elixir-block-end-keywords
@@ -233,11 +234,13 @@ by `end-of-defun'."
       ((result
         (pcase (cons kind token)
           ('(:elem . basic) elixir-indent-level)
+          (`(:before . "->") elixir-indent-level)
           (`(:before . ,(or ";" "stab_eol"))
            (cond
             ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
              (smie-rule-parent elixir-indent-level))
-            ((smie-rule-parent-p "->") (smie-rule-parent))))
+            ;; maybe check for danling-p?
+            ((smie-rule-parent-p "->") elixir-indent-level)))
           (`(:before . ,(or "=" "+" "-" "*" "/"))
            (cond
             ((smie-rule-parent-p nil) elixir-indent-level)
