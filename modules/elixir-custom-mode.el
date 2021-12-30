@@ -134,9 +134,6 @@
 (defconst elixir-block-beg-re
   (regexp-opt elixir-block-beg-keywords))
 
-(defconst elixir-stab-beg-re
-  (concat ".*" (regexp-opt '("do" "catch" "rescue" "else" "after")) ".*->.*"))
-
 (defconst elixir-block-end-re
   (regexp-opt elixir-block-end-keywords))
 
@@ -164,9 +161,8 @@
 (defun elixir-smie--stab-eol-p ()
   "Return t if the next line is a stab_op"
   (save-excursion
-    (skip-chars-forward "\n")
-    ;; TODO: Do not brute force these checks
-    (and (not (looking-at elixir-stab-beg-re (line-end-position)))
+    (skip-chars-forward " *\n")
+    (and (not (looking-at "fn.*->.*" (line-end-position)))
          (looking-at ".*->.*" (line-end-position)))))
 
 (defun elixir-smie--forward-token ()
@@ -234,16 +230,12 @@ by `end-of-defun'."
       ((result
         (pcase (cons kind token)
           ('(:elem . basic) elixir-indent-level)
-          (`(:before . "stab_eol") elixir-indent-level)
-          (`(:before . "->") (smie-rule-parent elixir-indent-level))
-          (`(:before . ,(or ";" "stab_eol"))
+          (`(:before . ";")
            (cond
-            ((smie-rule-parent-p "->") elixir-indent-level)
-            ((smie-rule-parent-p "fn")
-             (smie-rule-parent elixir-indent-level))
-            ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
+            ((apply #'smie-rule-parent-p
+                    (cons "stab_eol" (cons "->" elixir-block-mid-keywords)))
              (smie-rule-parent elixir-indent-level))))
-          (`(:before . ,(or "=" "+" "-" "*" "/" "->"))
+          (`(:before . ,(or "=" "+" "-" "*" "/"))
            (cond
             ((smie-rule-parent-p nil) elixir-indent-level)
             (t (smie-rule-parent elixir-indent-level)))
