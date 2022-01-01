@@ -95,8 +95,9 @@
              ("with" short-do-else)
              ("fn" matches "end"))
        (insts (inst) (insts ";" insts))
+       (inst ("fn" matches "end"))
+       (matches (match) (matches "stab_line" matches))
        (match (exp "->" insts))
-       (matches (match) (matches "stab_eol" matches))
        (short-do-else
         (exps "," "do:" exp)
         (short-do-else "," "else:" exp))
@@ -109,8 +110,7 @@
             (exp "in" exp)
             ("when" exp)
             ("(" exp ")")))
-     '((assoc ";") (right "=") (right "->"))
-     '((assoc "stab_eol"))
+     '((assoc ";") (right "stab_line") (right "="))
      '((assoc ","))
      '((assoc "in")
        (assoc "when")
@@ -161,13 +161,29 @@
              ;;              '("->")))
              ))))
 
-(defun elixir-smie--stab-eol-p ()
-  "Return t if this line is a stab_op"
-  (save-excursion
-    (skip-chars-backward " \t")
-    (and (bolp)
-         (not (looking-at ".*fn.*->.*" (line-end-position)))
-         (looking-at ".*->.*" (line-end-position)))))
+(defun wkh/virtual-token-p (token)
+  (cond ((equal token ";") t)
+        ((equal token "stab_line") t)
+        (t nil)))
+
+(defun whk/elixir-forward-token ()
+  "Debug forward token"
+  (interactive)
+  (let ((token (elixir-smie--forward-token)))
+    (progn
+      (if (wkh/virtual-token-p token) (insert (concat "t: " token)))
+      (message "%s" token))))
+
+(defun whk/elixir-backward-token ()
+  "Debug forward token"
+  (interactive)
+  (let ((token (elixir-smie--backward-token)))
+    (progn
+      (if (wkh/virtual-token-p token)
+          (let ((point (point)))
+            (insert (concat "t: " token))
+            (goto-char point)))
+      (message "%s" token))))
 
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
@@ -176,17 +192,26 @@
      (looking-at "[\n#]")
      (elixir-smie--implicit-semi-p))
     (if (eolp) (forward-char 1) (forward-comment 1))
-    ";")
+    ;; (skip-chars-forward "[ \t]")
+    (if (looking-at ".*->$" (line-end-position))
+        "stab_line"
+      ";"))
    (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
-  (let ((pos (point)))
-    (forward-comment (- (point)))
-    (cond ((and (> pos (line-end-position)) (elixir-smie--implicit-semi-p))
-           (skip-chars-forward " \t") ";")
-          (t
-           (skip-chars-backward " \t")
-           (smie-default-backward-token)))))
+  (skip-chars-backward " \t")
+  (cond
+   ((and
+     (bolp)
+     (save-excursion
+       (backward-char 1)
+       (elixir-smie--implicit-semi-p)))
+    (let ((token (if (looking-at ".*->" (line-end-position))
+               "stab_line"
+             ";")))
+      (forward-comment (- (point)))
+      token))
+   (t (smie-default-backward-token))))
 
 (defvar elixir-font-lock-keywords
   (append `((,(regexp-opt elixir-block-keywords 'symbols) . font-lock-keyword-face))))
@@ -237,6 +262,7 @@ by `end-of-defun'."
           ;; (`(:before . "stab_eol") elixir-indent-level)
           (`(:before . ";")
            (cond
+            ((smie-rule-parent-p "->") elixir-indent-level)
             ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
              (smie-rule-parent elixir-indent-level))))
           (`(:before . ,(or "=" "+" "-" "*" "/"))
