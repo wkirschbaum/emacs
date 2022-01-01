@@ -48,23 +48,34 @@
   (pcase (cons kind token)
     ('(:elem . basic) elixir-indent-level)))
 
+(defconst elixir-smie--doc-start-token "__doc_start__")
+(defconst elixir-smie--stab-op-token "__stab_op__")
+
+(defun whk/elixir-special-delim-p (token)
+  (or
+   (equal token ";")
+   (equal token elixir-smie--doc-start-token)
+   (equal token elixir-smie--stab-op-token)))
+
 (defun whk/elixir-clear-tokens ()
   "Debug forward token"
   (interactive)
-  (goto-char (point-min))
-  (while (not (eobp))
-    (let ((token (elixir-smie--forward-token)))
-      (cond ((equal token ";")
-             (delete-char -1))
-            ((equal token "")
-             (forward-sexp))))))
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (let ((token (elixir-smie--forward-token)))
+        (cond ((whk/elixir-special-delim-p token)
+               (delete-char (- (length token))))
+              ((equal token "")
+               (forward-sexp)))))))
 
 (defun whk/elixir-forward-token-populate ()
   "Debug forward token"
   (interactive)
   (while (not (eobp))
     (let ((token (elixir-smie--forward-token)))
-      (cond ((and (not (eobp))(eolp)) (insert ";")))
+      (if (whk/elixir-special-delim-p token)
+          (insert token))
       (if (equal token "")
           (forward-sexp)))))
 
@@ -72,8 +83,12 @@
   "Debug forward token"
   (interactive)
   (while (not (bobp))
-    (if (equal (elixir-smie--backward-token) "")
-        (backward-sexp))))
+    (let ((token (elixir-smie--backward-token)))
+      (if (whk/elixir-special-delim-p token)
+          (save-excursion
+            (insert token)))
+      (if (equal token "")
+          (backward-sexp)))))
 
 (defun whk/elixir-forward-token ()
   "Debug backward token"
@@ -88,10 +103,18 @@
     (message "f: \"%s\"" token)))
 
 (defun elixir-smie--forward-token ()
-  (smie-default-forward-token))
+  (skip-chars-forward " \t")
+  (cond ((looking-at "[\n#]")
+         (forward-comment (point-max))
+         (if (not (eobp)) ";"))
+   (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
-  (smie-default-backward-token))
+  (skip-chars-backward " \t")
+  (cond
+   ((bolp)
+    (forward-comment (- (point-max))) ";")
+   (t (smie-default-backward-token))))
 
 ;;;###autoload
 (define-derived-mode elixir-mode prog-mode "Elixir"
@@ -100,8 +123,8 @@
   ;; Comments
   (setq-local comment-use-syntax t)
   (setq-local comment-start "#")
-  ;; (setq-local comment-end "")
-  ;; (setq-local comment-start-skip "#+ *")
+  (setq-local comment-end "")
+  (setq-local comment-start-skip "#+ *")
 
   (smie-setup elixir-smie-grammar #'elixir-smie-rules
               :forward-token  #'elixir-smie--forward-token
