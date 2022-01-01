@@ -1,49 +1,92 @@
-;;; Package --- elixir-mode -*- lexical-binding: t; -*-
+;;; elixir-mode.el --- Major mode for editing Elixir files -*- lexical-binding: t -*-
+
+;; Version: 1.0.0
+;; Authors: Wilhelm H Kirschbaum
+;; Keywords: languages elixir
+;; package-Requires: ((emacs "25.1"))
+
 ;;; Commentary:
+
+;; Experimental
+
 ;;; Code:
 
-;; (load "~/src/emacs/emacs-elixir/elixir-smie")
-;; (load "~/src/emacs/emacs-elixir/elixir-format")
-;; (load "~/src/emacs/emacs-elixir/elixir-mode")
-;; (require 'elixir-mode)
 
-(defun whk/reload-elixir ()
-  "Reload elixir-mode"
+(ignore-errors
+  (unload-feature 'elixir-mode))
+
+(require 'smie)
+
+(defgroup elixir nil
+  "Major mode for editing Elixir code."
+  :prefix "elixir-"
+  :group 'languages)
+
+(defcustom elixir-indent-level 2
+  "Indentation of Elixir statements."
+  :type 'integer
+  :safe 'integerp)
+
+(defconst elixir-mode-syntax-table
+  (let ((table (make-syntax-table)))
+    (modify-syntax-entry ?\' "\"'" table)
+    (modify-syntax-entry ?\" "\"\"" table)
+
+    (modify-syntax-entry ?\# "<" table)
+    (modify-syntax-entry ?\n ">" table)
+    table))
+
+(defconst elixir-smie-grammar
+  (smie-prec2->grammar
+   (smie-merge-prec2s
+    (smie-bnf->prec2
+     '((id)
+       (insts (inst) (insts "" insts)))
+     '((assoc ""))))))
+
+(defun elixir-smie-rules (kind token)
+  (pcase (cons kind token)
+    ('(:elem . basic) elixir-indent-level)))
+
+(defun whk/elixir-backward-token ()
+  "Debug backward token"
   (interactive)
-  (progn
-    (ignore-errors
-      (unload-feature 'elixir-mode))
-    (elixir-mode)))
+  (let ((token (elixir-smie--backward-token)))
+    (message "f: \"%s\"" token)))
 
-;; (use-package erlang
-;;   :ensure t)
+(defun whk/elixir-forward-token ()
+  "Debug forward token"
+  (interactive)
+  (let ((token (elixir-smie--forward-token)))
+    (message "f: \"%s\"" token)))
 
-;; (use-package mix :ensure t)
-;; (use-package exunit
-;;   :ensure t
-;;   :bind
-;;   ("C-c , a" . exunit-verify-all)
-;;   ("C-c , s" . exunit-verify-single)
-;;   ("C-c , v" . exunit-verify)
-;;   ("C-c , r" . exunit-rerun)
-;;   ("C-c , t" . exunit-toggle-file-and-test))
+(defun elixir-smie--forward-token ()
+  (smie-default-forward-token))
 
-;; (use-package polymode
-;;   :ensure t
-;;   :mode ("\.ex$" . poly-elixir-web-mode)
-;;   :config
-;;   (define-hostmode poly-elixir-hostmode :mode 'elixir-mode)
-;;   (define-innermode poly-liveview-expr-elixir-innermode
-;;     :mode 'web-mode
-;;     :head-matcher (rx line-start (* space) "~H" (= 3 (char "\"'")) line-end)
-;;     :tail-matcher (rx line-start (* space) (= 3 (char "\"'")) line-end)
-;;     :head-mode 'host
-;;     :tail-mode 'host
-;;     :allow-nested nil
-;;     :keep-in-mode 'host
-;;     :fallback-mode 'host)
-;;   (define-polymode poly-elixir-web-mode
-;;     :hostmode 'poly-elixir-hostmode
-;;     :innermodes '(poly-liveview-expr-elixir-innermode))
-;;   )
-;; (setq web-mode-engines-alist '(("elixir" . "\\.ex\\'")))
+(defun elixir-smie--backward-token ()
+  (smie-default-backward-token))
+
+;;;###autoload
+(define-derived-mode elixir-mode prog-mode "Elixir"
+  :syntax-table elixir-mode-syntax-table
+
+  ;; Comments
+  (setq-local comment-use-syntax t)
+  (setq-local comment-start "#")
+  ;; (setq-local comment-end "")
+  ;; (setq-local comment-start-skip "#+ *")
+
+  (smie-setup elixir-smie-grammar #'elixir-smie-rules
+              :forward-token  #'elixir-smie--forward-token
+              :backward-token #'elixir-smie--backward-token))
+
+
+;;;###autoload
+(progn
+  (add-to-list 'auto-mode-alist '("\\.elixir\\'" . elixir-mode))
+  (add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-mode))
+  (add-to-list 'auto-mode-alist '("\\.exs\\'" . elixir-mode))
+  (add-to-list 'auto-mode-alist '("mix\\.lock" . elixir-mode)))
+
+(provide 'elixir-mode)
+;;; elixir-mode.el ends here

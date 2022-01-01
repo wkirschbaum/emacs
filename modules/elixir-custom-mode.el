@@ -75,48 +75,9 @@
   (smie-prec2->grammar
    (smie-merge-prec2s
     (smie-bnf->prec2
-     '((id)
-       (inst (exp)
-             ("defmodule" exps "do" insts "end")
-             ("defprotocol" exps "do" insts "end")
-             ("def" exps "do" insts "end")
-             (exp "=" insts)
-             ("try" "do" insts "after" matches "end")
-             ("try" "do" insts "catch" matches "end")
-             ("try" "do" insts "rescue" matches "end")
-             ("try" "do" insts "end")
-             ("if" exp "do" insts "end")
-             ("if" exp "do" insts "else" insts "end")
-             ("if" short-do-else)
-             ("for" exps "do" insts "end")
-             ("for" short-do-else)
-             ("with" exps "do" insts "end")
-             ("with" exps "do" insts "else" matches "end")
-             ("with" short-do-else)
-             ("fn" matches "end"))
-       (insts (inst) (insts ";" insts))
-       (inst ("fn" matches "end"))
-       (matches (match) (matches "stab_line" matches))
-       (match (exp "->" insts))
-       (short-do-else
-        (exps "," "do:" exp)
-        (short-do-else "," "else:" exp))
-       (exps (exp) (exps "," exps))
-       (exp (exp "=" exp)
-            (exp "/" exp)
-            (exp "*" exp)
-            (exp "+" exp)
-            (exp "-" exp)
-            (exp "in" exp)
-            ("when" exp)
-            ("(" exp ")")))
-     '((assoc ";") (right "stab_line") (right "="))
-     '((assoc ","))
-     '((assoc "in")
-       (assoc "when")
-       (right "=")
-       (assoc "*" "/")
-       (assoc "+" "-"))))))
+     '((id))
+     '((assoc ";"))))))
+
 
 (defconst elixir-block-beg-keywords
   '("def" "defp" "defmodule" "defprotocol"
@@ -171,7 +132,6 @@
   (interactive)
   (let ((token (elixir-smie--forward-token)))
     (progn
-      (if (wkh/virtual-token-p token) (insert (concat "t: " token)))
       (message "%s" token))))
 
 (defun whk/elixir-backward-token ()
@@ -179,10 +139,6 @@
   (interactive)
   (let ((token (elixir-smie--backward-token)))
     (progn
-      (if (wkh/virtual-token-p token)
-          (let ((point (point)))
-            (insert (concat "t: " token))
-            (goto-char point)))
       (message "%s" token))))
 
 (defun elixir-smie--forward-token ()
@@ -192,7 +148,6 @@
      (looking-at "[\n#]")
      (elixir-smie--implicit-semi-p))
     (if (eolp) (forward-char 1) (forward-comment 1))
-    ;; (skip-chars-forward "[ \t]")
     (if (looking-at ".*->$" (line-end-position))
         "stab_line"
       ";"))
@@ -201,16 +156,15 @@
 (defun elixir-smie--backward-token ()
   (skip-chars-backward " \t")
   (cond
-   ((and
-     (bolp)
-     (save-excursion
-       (backward-char 1)
-       (elixir-smie--implicit-semi-p)))
-    (let ((token (if (looking-at ".*->" (line-end-position))
-               "stab_line"
-             ";")))
-      (forward-comment (- (point)))
-      token))
+   ;; ((and
+   ;;   (save-excursion
+   ;;     (unless (bobp) (backward-char 1))
+   ;;     (elixir-smie--implicit-semi-p)))
+   ;;  (let ((token (if (looking-at ".*->" (line-end-position))
+   ;;             "stab_line"
+   ;;           ";")))
+   ;;    (forward-comment (- (point)))
+   ;;    token))
    (t (smie-default-backward-token))))
 
 (defvar elixir-font-lock-keywords
@@ -253,27 +207,12 @@ by `end-of-defun'."
   :safe 'integerp)
 
 (defun elixir-smie-rules(kind token)
-  (let
-      ((result
-        (pcase (cons kind token)
-          ('(:elem . basic) elixir-indent-level)
-          ;; (`(:before . "->") (smie-rule-parent))
-          ;; (`(:after . "->") (smie-rule-parent elixir-indent-level))
-          ;; (`(:before . "stab_eol") elixir-indent-level)
-          (`(:before . ";")
-           (cond
-            ((smie-rule-parent-p "->") elixir-indent-level)
-            ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
-             (smie-rule-parent elixir-indent-level))))
-          (`(:before . ,(or "=" "+" "-" "*" "/"))
-           (cond
-            ((smie-rule-parent-p nil) elixir-indent-level)
-            (t (smie-rule-parent elixir-indent-level)))
-           )
-          )))
-    (progn
-      (message "(%s . (\"%s\") -> %s" kind token result)
-      result)))
+  (pcase (cons kind token)
+    ('(:elem . basic) elixir-indent-level)
+    (`(:before . ,(or ";" "stab_line"))
+     (cond
+      ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
+       (smie-rule-parent elixir-indent-level))))))
 
 ;;;###autoload
 (define-derived-mode elixir-mode
@@ -284,15 +223,15 @@ by `end-of-defun'."
 
   ;; (kill-all-local-variables)
 
-  (setq-local smie-indent-basic elixir-indent-level)
+  ;; (setq-local smie-indent-basic elixir-indent-level)
 
   (smie-setup elixir-smie-grammar #'elixir-smie-rules
               :forward-token  #'elixir-smie--forward-token
               :backward-token #'elixir-smie--backward-token)
 
 
-  (setq-local beginning-of-defun-function 'elixir-beginning-of-defun)
-  (setq-local end-of-defun-function 'elixir-end-of-defun)
+  ;; (setq-local beginning-of-defun-function 'elixir-beginning-of-defun)
+  ;; (setq-local end-of-defun-function 'elixir-end-of-defun)
 
   ;; Comments
   (setq-local comment-start "#")
@@ -300,8 +239,8 @@ by `end-of-defun'."
   (setq-local comment-start-skip "#+\\s-*")
 
   ;; Syntax
-  (setq-local parse-sexp-ignore-comments t)
-  (setq-local parse-sexp-lookup-properties t)
+  ;; (setq-local parse-sexp-ignore-comments t)
+  ;; (setq-local parse-sexp-lookup-properties t)
 
   ;; Fonts
   (setq-local font-lock-defaults
