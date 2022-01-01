@@ -20,9 +20,10 @@
 
 ;; Wombat customization
 (set-face-background 'default "#111")
-
-(set-face-background 'lazy-highlight "#960")
-(set-face-foreground 'lazy-highlight "#ccc")
+(set-face-foreground 'font-lock-function-name-face "#95e454")
+(set-face-foreground 'font-lock-string-face "#a9bc7a")
+;; (set-face-background 'lazy-highlight "#960")
+;; (set-face-foreground 'lazy-highlight "#ccc")
 
 (setq-default indicate-empty-lines t)
 (setq-default indicate-buffer-boundaries 'left)
