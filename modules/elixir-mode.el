@@ -105,16 +105,16 @@
 
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
-  (cond ((looking-at "[\n#]")
+  (cond ((and (not (eobp)) (looking-at "[\n#]"))
          (if (eolp) (forward-char 1))
          (forward-comment (point-max))
          (if (not (eobp)) ";"))
-   (t (smie-default-forward-token))))
+        (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
   (skip-chars-backward " \t")
   (cond
-   ((bolp)
+   ((and (bolp) (not (bobp)))
     (backward-char 1)
     (forward-comment (- (point-max))) ";")
    (t (smie-default-backward-token))))
