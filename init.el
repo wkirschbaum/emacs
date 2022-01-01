@@ -2,8 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
-(setq comp-deferred-compilation-deny-list '())
-(setq native-comp-async-report-warnings-errors nil)
+;; (setq comp-deferred-compilation-deny-list '())
+;; (setq native-comp-async-report-warnings-errors nil)
 
 (defun setup-custom-config (config-path)
   ;; Remove on next upgrade
@@ -22,6 +22,8 @@
         "native"
         "shared"
         "registers"
+        "paredit"
+        "styling"
         "company-mode"
         "git"
         "read-complete"
@@ -48,7 +50,6 @@
         "csharp-mode"
         "rust-mode"
         "elfeed"
-        "styling"
         "extras"
         "ebdb"
         "dart-mode"

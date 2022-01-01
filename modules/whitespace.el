@@ -1,7 +1,7 @@
 (use-package whitespace
   :hook (prog-mode . whitespace-mode)
   :config
-  (setq whitespace-style '(face tab-mark trailing empty)))
+  (setq whitespace-style '(face tab-mark trailing)))
 
 (defun whk/whitespace-cleanup ()
   "Cleans white spaces in progmode."

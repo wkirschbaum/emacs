@@ -15,9 +15,15 @@
 (setq display-line-numbers-type 'relative)
 (setq display-line-numbers-current-absolute t)
 (setq default-frame-alist '((fullscreen . maximized)))
-(setq make-backup-files nil)
-(setq auto-save-default nil)
+
 (setq create-lockfiles nil)
+
+;; if we make backups put it into the backup directory
+;; (setq make-backup-files nil)
+;; (setq auto-save-default nil)
+(make-directory "~/.config/emacs/backup/" t)
+(setq auto-save-file-name-transforms '(("~/.config/emacs/backup/" t)))
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup/")))
 
 (setq-default display-line-numbers-width 4)
 (setq-default display-line-numbers-widen t)
@@ -26,9 +32,9 @@
 (setq-default wdired-allow-to-change-permissions t)
 (setq-default wdired-create-parent-directories t)
 
+(setq sentence-end-double-space nil)
+
 (global-display-line-numbers-mode)
-;; This goes into elixir-mode for some reason?
-;; (global-subword-mode 1)
 
 (global-set-key (kbd "C-x w a") 'windmove-left)
 (global-set-key (kbd "C-x w e") 'windmove-right)
