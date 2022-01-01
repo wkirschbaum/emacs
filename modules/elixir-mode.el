@@ -41,6 +41,7 @@
    (smie-merge-prec2s
     (smie-bnf->prec2
      '((id)
+       (inst ("def" insts "do" insts "end"))
        (insts (inst) (insts ";" insts)))
      '((assoc ";"))))))
 
@@ -105,6 +106,7 @@
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
   (cond ((looking-at "[\n#]")
+         (if (eolp) (forward-char 1))
          (forward-comment (point-max))
          (if (not (eobp)) ";"))
    (t (smie-default-forward-token))))
@@ -113,6 +115,7 @@
   (skip-chars-backward " \t")
   (cond
    ((bolp)
+    (backward-char 1)
     (forward-comment (- (point-max))) ";")
    (t (smie-default-backward-token))))
 

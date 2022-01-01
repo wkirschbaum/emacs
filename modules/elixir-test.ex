@@ -1,24 +1,24 @@
 abcd foo bar
 
-     # foo bar
+# foo bar
 
-     bee = "
+bee = "
 
 "
 
-     """
+    """
 foo bar
 """
 
-     foo bar
-     end
+      foo bar
+end
 
-     defmodule Boo do
-     foobar  # foo bar
-     end
+defmodule Boo do
+                foobar  # foo bar
+end
 
-     def foo do
+def foo do
 
-     end
+end
 
-       x + 2
+  x + 2
