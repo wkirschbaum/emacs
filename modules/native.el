@@ -23,7 +23,7 @@
 ;; (setq auto-save-default nil)
 (make-directory "~/.config/emacs/backup/" t)
 (setq auto-save-file-name-transforms '(("~/.config/emacs/backup/" t)))
-(setq backup-directory-alist '(("." . "~/.emacs.d/backup/")))
+(setq backup-directory-alist '(("." . "~/.config/emacs/backup/")))
 
 (setq-default display-line-numbers-width 4)
 (setq-default display-line-numbers-widen t)
