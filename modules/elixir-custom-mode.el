@@ -81,7 +81,6 @@
              ("defprotocol" exps "do" insts "end")
              ("def" exps "do" insts "end")
              (exp "=" insts)
-             ("fn" matches "end")
              ("try" "do" insts "after" matches "end")
              ("try" "do" insts "catch" matches "end")
              ("try" "do" insts "rescue" matches "end")
@@ -93,7 +92,8 @@
              ("for" short-do-else)
              ("with" exps "do" insts "end")
              ("with" exps "do" insts "else" matches "end")
-             ("with" short-do-else))
+             ("with" short-do-else)
+             ("fn" matches "end"))
        (insts (inst) (insts ";" insts))
        (match (exp "->" insts))
        (matches (match) (matches "stab_eol" matches))
@@ -109,7 +109,7 @@
             (exp "in" exp)
             ("when" exp)
             ("(" exp ")")))
-     '((assoc ";") (right "="))
+     '((assoc ";") (right "=") (right "->"))
      '((assoc "stab_eol"))
      '((assoc ","))
      '((assoc "in")
@@ -156,16 +156,17 @@
     (not (or (bolp)
              (memq (char-before) '(?\[ ?\( ?\{))
              (memq (char-before) '(?, ?= ?+ ?- ?* ?/))
-             (and (eq (char-before) ?>)
-                  (member (save-excursion (elixir-smie--backward-token))
-                          '("->")))
+             ;; (and (eq (char-before) ?>)
+             ;;      (member (save-excursion (elixir-smie--backward-token))
+             ;;              '("->")))
              ))))
 
 (defun elixir-smie--stab-eol-p ()
-  "Return t if the next line is a stab_op"
+  "Return t if this line is a stab_op"
   (save-excursion
-    (skip-chars-forward " *\n")
-    (and (not (looking-at ".*fn.*->.*" (line-end-position)))
+    (skip-chars-backward " \t")
+    (and (bolp)
+         (not (looking-at ".*fn.*->.*" (line-end-position)))
          (looking-at ".*->.*" (line-end-position)))))
 
 (defun elixir-smie--forward-token ()
@@ -175,9 +176,7 @@
      (looking-at "[\n#]")
      (elixir-smie--implicit-semi-p))
     (if (eolp) (forward-char 1) (forward-comment 1))
-    ;; inject a stab_eol if the next line is a stab_op
-    ;; so that we can add matches as a rule
-    (if (and t (elixir-smie--stab-eol-p)) "stab_eol" ";"))
+    ";")
    (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
@@ -233,9 +232,9 @@ by `end-of-defun'."
       ((result
         (pcase (cons kind token)
           ('(:elem . basic) elixir-indent-level)
-          (`(:before . "->") (smie-rule-parent))
-          (`(:after . "->") (smie-rule-parent elixir-indent-level))
-          (`(:before . "stab_eol") elixir-indent-level)
+          ;; (`(:before . "->") (smie-rule-parent))
+          ;; (`(:after . "->") (smie-rule-parent elixir-indent-level))
+          ;; (`(:before . "stab_eol") elixir-indent-level)
           (`(:before . ";")
            (cond
             ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
