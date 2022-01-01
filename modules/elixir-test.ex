@@ -1,18 +1,24 @@
-abcd foo bar
-
+abcd foo bar;
 
 # foo bar
 
+bee = "
+
+"
+
+"""
 foo bar
-end
+"""
 
-defmodule Boo do
+foo bar;
+end;
 
-end
+defmodule Boo do;
 
-def foo do
+end;
 
-end
+def foo do;
 
+end;
 
-x + 2
+x + 2;
