@@ -199,9 +199,8 @@
   (save-excursion
     (goto-char (line-end-position))
     (and (eq (char-before) ?>)
-         (member (elixir-smie--backward-token)
-                 '("->"))
-         (not (looking-back "*.fn[ \t]+"
+         (member (elixir-smie--backward-token) '("->"))
+         (not (looking-back ".*fn[ \t].*"
                         (line-beginning-position))))))
 
 (defun elixir-smie--forward-token ()
