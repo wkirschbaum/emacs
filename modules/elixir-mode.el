@@ -78,10 +78,14 @@
        (inst (exp)
              ("def" exp "do" insts "end")
              ("defmodule" exp "do" insts "end")
-             ("try" "do" insts "rescue" insts "end"))
+             ("fn" matches "end")
+             ("try" "do" insts "rescue" matches "end"))
        (insts (inst) (insts ";" insts))
+       (match (exp "->" insts))
+       (matches (match) (matches "__stab_op__"  matches))
        (exp (exp "=" exp))
        )
+     '((assoc "__stab_op__"))
      '((assoc ";"))
      '((left "="))))))
 
@@ -98,9 +102,10 @@
 
 (defun elixir-smie-rules (kind token)
   (pcase (cons kind token)
-    ('(:elem . basic) 0)
-    (`(:before . ";")
-     (cond ((smie-rule-parent-p "do")
+    ('(:elem . basic) elixir-indent-level)
+    (`(:before . "->") elixir-indent-level)
+    (`(:before . ,(or";" "__stab_op__"))
+     (cond ((smie-rule-parent-p "do" "rescue")
             (smie-rule-parent elixir-indent-level))
            (t (smie-rule-parent))))
     (`(:before . "=") elixir-indent-level)))
@@ -111,8 +116,7 @@
 (defun whk/elixir-special-delim-p (token)
   (or
    (equal token ";")
-   (equal token elixir-smie--doc-start-token)
-   (equal token elixir-smie--stab-op-token)))
+   (equal token "__stab_op__")))
 
 (defun whk/elixir-clear-tokens ()
   "Debug forward token"
@@ -170,6 +174,11 @@
              ;;              '("->")))
              ))))
 
+(defun elixir-smie--stab-op-p ()
+  "Return t if the line contains a stab line without an fn initiator"
+  (and (not (looking-at ".*fn[ \t]+" (line-end-position)))
+        (looking-at ".*->" (line-end-position))))
+
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
   (cond
@@ -179,16 +188,25 @@
      (elixir-smie--implicit-semi-p))
     (if (eolp) (forward-char 1))
     (forward-comment (point-max))
-    ";")
-   (t (smie-default-forward-token))))
+    (if (elixir-smie--stab-op-p)
+        "__stab_op__"
+      ";"))
+    (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
   (let ((pos (point)))
-    (forward-comment (- (point)))
+    ;; Be careful, as the cond order matters below
     (cond
-     ((and (> pos (line-end-position))
-           (elixir-smie--implicit-semi-p))
-      (skip-chars-forward " \t") ";")
+     ((progn
+        (skip-chars-backward " \t")
+        (and (bolp) (elixir-smie--stab-op-p)))
+      (forward-comment (- (point)))
+      "__stab_op__")
+     ((progn
+        (forward-comment (- (point)))
+        (and (> pos (line-end-position))
+           (elixir-smie--implicit-semi-p)))
+      ";")
      (t (smie-default-backward-token)))))
 
 ;;;###autoload
