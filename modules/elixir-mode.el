@@ -27,27 +27,83 @@
   :type 'integer
   :safe 'integerp)
 
-(defconst elixir-mode-syntax-table
+(defvar elixir-mode-syntax-table
   (let ((table (make-syntax-table)))
+    ;; Operators
+    (modify-syntax-entry ?< "." table)
+    (modify-syntax-entry ?> "." table)
+    (modify-syntax-entry ?& "." table)
+    (modify-syntax-entry ?| "." table)
+    (modify-syntax-entry ?= "." table)
+    (modify-syntax-entry ?/ "." table)
+    (modify-syntax-entry ?+ "." table)
+    (modify-syntax-entry ?* "." table)
+    (modify-syntax-entry ?- "." table)
+
+    ;; Comments
+    (modify-syntax-entry ?# "<" table)
+    (modify-syntax-entry ?\n ">" table)
+
+    ;; Strings
     (modify-syntax-entry ?\' "\"'" table)
     (modify-syntax-entry ?\" "\"\"" table)
 
-    (modify-syntax-entry ?\# "<" table)
-    (modify-syntax-entry ?\n ">" table)
-    table))
+    ;; Symbol constituents
+    (modify-syntax-entry ?! "_" table)
+    (modify-syntax-entry ?? "_" table)
+    (modify-syntax-entry ?_ "_" table)
+    (modify-syntax-entry ?@ "_" table)
+    (modify-syntax-entry ?: "_" table)
+
+    ;; expressions
+    (modify-syntax-entry ?\( "()" table)
+    (modify-syntax-entry ?\) ")(" table)
+    (modify-syntax-entry ?\{ "(}" table)
+    (modify-syntax-entry ?\} "){" table)
+    (modify-syntax-entry ?\[ "(]" table)
+    (modify-syntax-entry ?\] ")[" table)
+
+    ;; what to do with you? expression prefix?
+    (modify-syntax-entry ?% "'" table)
+
+    table)
+  "Syntax table to use in Elixir mode.")
+
 
 (defconst elixir-smie-grammar
   (smie-prec2->grammar
    (smie-merge-prec2s
     (smie-bnf->prec2
      '((id)
-       (inst ("def" insts "do" insts "end"))
-       (insts (inst) (insts ";" insts)))
-     '((assoc ";"))))))
+       (inst (exp)
+             ("def" exp "do" insts "end")
+             ("defmodule" exp "do" insts "end")
+             ("try" "do" insts "rescue" insts "end"))
+       (insts (inst) (insts ";" insts))
+       (exp (exp "=" exp))
+       )
+     '((assoc ";"))
+     '((left "="))))))
+
+(defun elixir-debug--smie-parent ()
+  (if (boundp 'smie--parent)
+      (nth 2 (smie-indent--parent))
+      nil))
+
+(defun elixir-debug--smie-rules (kind token)
+  (let ((parent (elixir-debug--smie-parent))
+        (result (elixir-smie-rules kind token)))
+    (message "\"%s\": (%s %s) -> %s" parent kind token result)
+    result))
 
 (defun elixir-smie-rules (kind token)
   (pcase (cons kind token)
-    ('(:elem . basic) elixir-indent-level)))
+    ('(:elem . basic) 0)
+    (`(:before . ";")
+     (cond ((smie-rule-parent-p "do")
+            (smie-rule-parent elixir-indent-level))
+           (t (smie-rule-parent))))
+    (`(:before . "=") elixir-indent-level)))
 
 (defconst elixir-smie--doc-start-token "__doc_start__")
 (defconst elixir-smie--stab-op-token "__stab_op__")
@@ -103,35 +159,51 @@
   (let ((token (elixir-smie--backward-token)))
     (message "f: \"%s\"" token)))
 
+(defun elixir-smie--implicit-semi-p ()
+  "Return t if an implicit semi colon should be added"
+  (save-excursion
+    (skip-chars-backward " \t")
+    (not (or (bolp)
+             (memq (char-before) '(?\[ ?\( ?\{))
+             (memq (char-before) '(?, ?= ?+ ?- ?* ?/))
+             ;; (and (eq (char-before) ?>)
+             ;;      (member (save-excursion (elixir-smie--backward-token))
+             ;;              '("->")))
+             ))))
+
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
-  (cond ((and (not (eobp)) (looking-at "[\n#]"))
-         (if (eolp) (forward-char 1))
-         (forward-comment (point-max))
-         (if (not (eobp)) ";"))
-        (t (smie-default-forward-token))))
+  (cond
+   ;; ((and (not (eobp)) (looking-at "[\n#]"))
+   ;;  (if (eolp) (forward-char 1))
+   ;;  (forward-comment (point-max))
+   ;;  ";")
+   (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
-  (skip-chars-backward " \t")
-  (cond
-   ((and (bolp) (not (bobp)))
-    (backward-char 1)
-    (forward-comment (- (point-max))) ";")
-   (t (smie-default-backward-token))))
+  (let ((pos (point)))
+    (forward-comment (- (point)))
+    (cond
+     ;; ((and (> pos (line-end-position)))
+     ;;  (skip-chars-forward " \t") ";")
+     (t (smie-default-backward-token)))))
 
 ;;;###autoload
 (define-derived-mode elixir-mode prog-mode "Elixir"
   :syntax-table elixir-mode-syntax-table
 
-  ;; Comments
-  (setq-local comment-use-syntax t)
-  (setq-local comment-start "#")
+  (smie-setup elixir-smie-grammar #'elixir-debug--smie-rules
+              :forward-token  #'elixir-smie--forward-token
+              :backward-token #'elixir-smie--backward-token)
+
+  (setq-local comment-start "# ")
   (setq-local comment-end "")
   (setq-local comment-start-skip "#+ *")
-
-  (smie-setup elixir-smie-grammar #'elixir-smie-rules
-              :forward-token  #'elixir-smie--forward-token
-              :backward-token #'elixir-smie--backward-token))
+  (setq-local parse-sexp-ignore-comments t)
+  (setq-local parse-sexp-lookup-properties t)
+  (setq-local paragraph-start (concat "$\\|" page-delimiter))
+  (setq-local paragraph-separate paragraph-start)
+  (setq-local paragraph-ignore-fill-prefix t))
 
 
 ;;;###autoload
