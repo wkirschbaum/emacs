@@ -17,7 +17,7 @@
           "[/\\\\]node_modules$"
           "[/\\\\]submodules$"))
   :hook (
-         ;; (elixir-mode . lsp)
+         (elixir-mode . lsp)
          ;; (typescript-mode . lsp)
          (dart-mode . lsp)
          (csharp-mode . lsp)

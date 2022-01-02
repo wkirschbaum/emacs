@@ -2,12 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
-;; (setq comp-deferred-compilation-deny-list '())
-;; (setq native-comp-async-report-warnings-errors nil)
+(setq native-comp-async-report-warnings-errors nil)
 
 (defun setup-custom-config (config-path)
-  ;; Remove on next upgrade
-
   (setq custom-file (concat config-path "custom.el"))
   (if (file-exists-p custom-file)
       (load custom-file)))
@@ -55,6 +52,7 @@
         "dart-mode"
         "functions"
         "treesitter"
+        "slime"
         "experiments"
         "secret"
         "email"))

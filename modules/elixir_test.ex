@@ -1,41 +1,50 @@
-defmodule Foo do;
-  def Foo do;
-    fiv = "4";
+try do
+  foo
+rescue
+  :foo ->
+    "foo"
 
-    five =
-      5 + 2 +; # foo bar
-        3 +; # foo bar
-        5899 - 200 - 200 +; # foo bar
-        30;
+    "foo"
+    foo
 
-    4 +;
-      2 * 200 +;
-      2;
+  :bar ->
+    "bar"
+    foo
+    try do
+    rescue
+      :bar ->
+        forr
 
-    # fooo
-    # baar
+      :bar ->
+        forr
+    end
 
-    foo =
-      "foo";
+  :bar ->
+    "bar"
 
-    bar = "bar";
+  :bar ->
+    one
+    two
+    three
 
-    # booo
+    fn foo -> bar end
 
-    five = 4; # foo bar
-  end;
+    x = fn foo ->
+          bar
+          bar
+        end
 
-  # Foo bar
-  def Bar do;
-
-  end;
-end;
-
-def Foo do
-
-end;
+    three
 
 
-defmodule Bar do;
+  foo ->
+    five = 5
 
-end;
+    four =
+      4 +
+        2 + 2
+    six = "six"
+
+    seven = 8
+
+end

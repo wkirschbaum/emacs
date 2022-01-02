@@ -78,16 +78,35 @@
        (inst (exp)
              ("def" exp "do" insts "end")
              ("defmodule" exp "do" insts "end")
+             ("defprotocol" exp "do" insts "end")
+             ("defmacrop" exp "do" insts "end")
+             ("defmacro" exp "do" insts "end")
+             ("quote" "do" insts "end")
+             ("case" exp "do" insts "end")
              ("fn" matches "end")
-             ("try" "do" insts "rescue" matches "end"))
+             ("if" exp "do" insts "end")
+             ("if" exp "do" insts "else" insts "end")
+             ("if" short-do-else)
+             ("try" "do" insts "rescue" matches "end")
+             ("try" "do" insts "after" matches "end")
+             ("try" "do" insts "catch" matches "end")
+             ("try" "do" insts "end")
+             ("with" exp "do" insts "end")
+             ("with" exp "do" insts "else" matches "end")
+             ("with" short-do-else))
        (insts (inst) (insts ";" insts))
+       (short-do-else
+        (exps "," "do:" exp)
+        (short-do-else "," "else:" exp))
        (match (exp "->" insts))
        (matches (match) (matches "__stab_op__"  matches))
        (exp (exp "=" exp))
+       (exps (exp) (exps "," exps))
        )
      '((assoc "__stab_op__"))
      '((assoc ";"))
-     '((left "="))))))
+     '((left "="))
+     '((assoc ","))))))
 
 (defun elixir-debug--smie-parent ()
   (if (boundp 'smie--parent)
@@ -176,8 +195,8 @@
 
 (defun elixir-smie--stab-op-p ()
   "Return t if the line contains a stab line without an fn initiator"
-  (and (not (looking-at ".*fn[ \t]+" (line-end-position)))
-        (looking-at ".*->" (line-end-position))))
+  (and (not (looking-at "fn[ \t]" (line-end-position)))
+        (looking-at ".*->$" (line-end-position))))
 
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
@@ -213,7 +232,7 @@
 (define-derived-mode elixir-mode prog-mode "Elixir"
   :syntax-table elixir-mode-syntax-table
 
-  (smie-setup elixir-smie-grammar #'elixir-debug--smie-rules
+  (smie-setup elixir-smie-grammar #'elixir-smie-rules
               :forward-token  #'elixir-smie--forward-token
               :backward-token #'elixir-smie--backward-token)
 
