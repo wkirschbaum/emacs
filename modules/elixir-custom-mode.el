@@ -196,8 +196,13 @@
 
 (defun elixir-smie--stab-op-p ()
   "Return t if the line contains a stab line without an fn initiator"
-  (and (not (looking-at "[ \t]*fn[ \t]"))
-       (looking-at ".*->$" (line-end-position))))
+  (save-excursion
+    (goto-char (line-end-position))
+    (and (eq (char-before) ?>)
+         (member (elixir-smie--backward-token)
+                 '("->"))
+         (not (looking-back "*.fn[ \t]+"
+                        (line-beginning-position))))))
 
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
