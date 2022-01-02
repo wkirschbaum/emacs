@@ -105,8 +105,9 @@
        )
      '((assoc "__stab_op__"))
      '((assoc ";"))
-     '((left "="))
-     '((assoc ","))))))
+     '((assoc ","))
+     '((right "="))
+     ))))
 
 (defun elixir-debug--smie-parent ()
   (if (boundp 'smie--parent)
@@ -195,8 +196,8 @@
 
 (defun elixir-smie--stab-op-p ()
   "Return t if the line contains a stab line without an fn initiator"
-  (and (not (looking-at "fn[ \t]" (line-end-position)))
-        (looking-at ".*->$" (line-end-position))))
+  (and (not (looking-at "[ \t]*fn[ \t]"))
+       (looking-at ".*->$" (line-end-position))))
 
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")

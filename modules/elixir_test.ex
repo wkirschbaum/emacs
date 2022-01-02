@@ -29,10 +29,17 @@ rescue
 
     fn foo -> bar end
 
-    x = fn foo ->
-          bar
-          bar
-        end
+    fn foo ->
+      bar
+      bar
+    end
+
+    # c = fn foo -> doo end
+
+    # x = fn foo ->
+    #       bar
+    #       bar
+    #     end
 
     three
 
