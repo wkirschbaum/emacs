@@ -164,7 +164,6 @@
   (save-excursion
     (skip-chars-backward " \t")
     (not (or (bolp)
-             (memq (char-before) '(?\[ ?\( ?\{))
              (memq (char-before) '(?, ?= ?+ ?- ?* ?/))
              ;; (and (eq (char-before) ?>)
              ;;      (member (save-excursion (elixir-smie--backward-token))
@@ -174,18 +173,22 @@
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
   (cond
-   ;; ((and (not (eobp)) (looking-at "[\n#]"))
-   ;;  (if (eolp) (forward-char 1))
-   ;;  (forward-comment (point-max))
-   ;;  ";")
+   ((and
+     (not (eobp))
+     (looking-at "[\n#]")
+     (elixir-smie--implicit-semi-p))
+    (if (eolp) (forward-char 1))
+    (forward-comment (point-max))
+    ";")
    (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
   (let ((pos (point)))
     (forward-comment (- (point)))
     (cond
-     ;; ((and (> pos (line-end-position)))
-     ;;  (skip-chars-forward " \t") ";")
+     ((and (> pos (line-end-position))
+           (elixir-smie--implicit-semi-p))
+      (skip-chars-forward " \t") ";")
      (t (smie-default-backward-token)))))
 
 ;;;###autoload
