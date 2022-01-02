@@ -1,33 +1,31 @@
 ;;; elixir-mode.el --- Major mode for editing Elixir files -*- lexical-binding: t -*-
 
 ;; Version: 1.0.0
-;; Authors: wkirschbaum
+;; Authors: Wilhelm H Kirschbaum
 ;; Keywords: languages elixir
 ;; package-Requires: ((emacs "25.1"))
 
-;; TODO
+;;; Commentary:
 
-;; - comments
-;; - docs
-;; - """ comments
-;; - sexps with @doc before ( to ignore )
-;; - sigils
-;; - start and end of defun levels
-;; - when statements
-;; - font-lock
-
+;; Experimental
 
 ;;; Code:
+
 
 (ignore-errors
   (unload-feature 'elixir-mode))
 
 (require 'smie)
 
-(defgroup elixir-mode nil
-  "Support for Elixir code"
-  :link '(url-link "https://elixir-lang.org")
+(defgroup elixir nil
+  "Major mode for editing Elixir code."
+  :prefix "elixir-"
   :group 'languages)
+
+(defcustom elixir-indent-level 2
+  "Indentation of Elixir statements."
+  :type 'integer
+  :safe 'integerp)
 
 (defvar elixir-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -71,184 +69,183 @@
     table)
   "Syntax table to use in Elixir mode.")
 
+
 (defconst elixir-smie-grammar
   (smie-prec2->grammar
    (smie-merge-prec2s
     (smie-bnf->prec2
-     '((id))
-     '((assoc ";"))))))
+     '((id)
+       (inst (exp)
+             ("def" exp "do" insts "end")
+             ("defmodule" exp "do" insts "end")
+             ("defprotocol" exp "do" insts "end")
+             ("defmacrop" exp "do" insts "end")
+             ("defmacro" exp "do" insts "end")
+             ("quote" "do" insts "end")
+             ("case" exp "do" insts "end")
+             ("fn" matches "end")
+             ("if" exp "do" insts "end")
+             ("if" exp "do" insts "else" insts "end")
+             ("if" short-do-else)
+             ("try" "do" insts "rescue" matches "end")
+             ("try" "do" insts "after" matches "end")
+             ("try" "do" insts "catch" matches "end")
+             ("try" "do" insts "end")
+             ("with" exp "do" insts "end")
+             ("with" exp "do" insts "else" matches "end")
+             ("with" short-do-else))
+       (insts (inst) (insts ";" insts))
+       (short-do-else
+        (exps "," "do:" exp)
+        (short-do-else "," "else:" exp))
+       (match (exp "->" insts))
+       (matches (match) (matches "__stab_op__"  matches))
+       (exp (exp "=" exp))
+       (exps (exp) (exps "," exps))
+       )
+     '((assoc "__stab_op__"))
+     '((assoc ";"))
+     '((assoc ","))
+     '((right "="))
+     ))))
 
+(defun elixir-debug--smie-parent ()
+  (if (boundp 'smie--parent)
+      (nth 2 (smie-indent--parent))
+      nil))
 
-(defconst elixir-block-beg-keywords
-  '("def" "defp" "defmodule" "defprotocol"
-    "defmacro" "defmacrop" "defdelegate"
-    "defexception" "defstruct" "defimpl"
-    "defguard" "defguardp" "defcallback"
-    "defoverridable"))
+(defun elixir-debug--smie-rules (kind token)
+  (let ((parent (elixir-debug--smie-parent))
+        (result (elixir-smie-rules kind token)))
+    (message "\"%s\": (%s %s) -> %s" parent kind token result)
+    result))
 
-(defconst elixir-block-mid-keywords
-  '("do" "else" "rescue" "catch"))
+(defun elixir-smie-rules (kind token)
+  (pcase (cons kind token)
+    ('(:elem . basic) elixir-indent-level)
+    (`(:before . "->") elixir-indent-level)
+    (`(:before . ,(or";" "__stab_op__"))
+     (cond ((smie-rule-parent-p "do" "rescue")
+            (smie-rule-parent elixir-indent-level))
+           (t (smie-rule-parent))))
+    (`(:before . "=") elixir-indent-level)))
 
-(defconst elixir-block-end-keywords
-  '("end"))
+(defconst elixir-smie--doc-start-token "__doc_start__")
+(defconst elixir-smie--stab-op-token "__stab_op__")
 
-(defconst elixir-block-beg-re
-  (regexp-opt elixir-block-beg-keywords))
+(defun whk/elixir-special-delim-p (token)
+  (or
+   (equal token ";")
+   (equal token "__stab_op__")))
 
-(defconst elixir-block-end-re
-  (regexp-opt elixir-block-end-keywords))
+(defun whk/elixir-clear-tokens ()
+  "Debug forward token"
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (let ((token (elixir-smie--forward-token)))
+        (cond ((whk/elixir-special-delim-p token)
+               (delete-char (- (length token))))
+              ((equal token "")
+               (forward-sexp)))))))
 
-(defconst elixir-block-keywords
-  (append
-   '(
-     "fn" "case" "for" "in" "cond" "when"
-     "if" "try" "raise" "do" "else" "true" "false" "with")
-   elixir-block-beg-keywords
-   elixir-block-end-keywords
-   elixir-block-mid-keywords))
+(defun whk/elixir-forward-token-populate ()
+  "Debug forward token"
+  (interactive)
+  (while (not (eobp))
+    (let ((token (elixir-smie--forward-token)))
+      (if (whk/elixir-special-delim-p token)
+          (insert token))
+      (if (equal token "")
+          (forward-sexp)))))
 
-(defconst elixir-block-keywords-re
-  (regexp-opt elixir-block-keywords))
+(defun whk/elixir-backward-token-populate ()
+  "Debug forward token"
+  (interactive)
+  (while (not (bobp))
+    (let ((token (elixir-smie--backward-token)))
+      (if (whk/elixir-special-delim-p token)
+          (save-excursion
+            (insert token)))
+      (if (equal token "")
+          (backward-sexp)))))
+
+(defun whk/elixir-forward-token ()
+  "Debug backward token"
+  (interactive)
+  (let ((token (elixir-smie--forward-token)))
+    (message "f: \"%s\"" token)))
+
+(defun whk/elixir-backward-token ()
+  "Debug backward token"
+  (interactive)
+  (let ((token (elixir-smie--backward-token)))
+    (message "f: \"%s\"" token)))
 
 (defun elixir-smie--implicit-semi-p ()
   "Return t if an implicit semi colon should be added"
   (save-excursion
     (skip-chars-backward " \t")
     (not (or (bolp)
-             (memq (char-before) '(?\[ ?\( ?\{))
              (memq (char-before) '(?, ?= ?+ ?- ?* ?/))
              ;; (and (eq (char-before) ?>)
              ;;      (member (save-excursion (elixir-smie--backward-token))
              ;;              '("->")))
              ))))
 
-(defun wkh/virtual-token-p (token)
-  (cond ((equal token ";") t)
-        ((equal token "stab_line") t)
-        (t nil)))
-
-(defun whk/elixir-forward-token ()
-  "Debug forward token"
-  (interactive)
-  (let ((token (elixir-smie--forward-token)))
-    (progn
-      (message "%s" token))))
-
-(defun whk/elixir-backward-token ()
-  "Debug forward token"
-  (interactive)
-  (let ((token (elixir-smie--backward-token)))
-    (progn
-      (message "%s" token))))
+(defun elixir-smie--stab-op-p ()
+  "Return t if the line contains a stab line without an fn initiator"
+  (and (not (looking-at "[ \t]*fn[ \t]"))
+       (looking-at ".*->$" (line-end-position))))
 
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
   (cond
    ((and
+     (not (eobp))
      (looking-at "[\n#]")
      (elixir-smie--implicit-semi-p))
-    (if (eolp) (forward-char 1) (forward-comment 1))
-    (if (looking-at ".*->$" (line-end-position))
-        "stab_line"
+    (if (eolp) (forward-char 1))
+    (forward-comment (point-max))
+    (if (elixir-smie--stab-op-p)
+        "__stab_op__"
       ";"))
-   (t (smie-default-forward-token))))
+    (t (smie-default-forward-token))))
 
 (defun elixir-smie--backward-token ()
-  (skip-chars-backward " \t")
-  (cond
-   ;; ((and
-   ;;   (save-excursion
-   ;;     (unless (bobp) (backward-char 1))
-   ;;     (elixir-smie--implicit-semi-p)))
-   ;;  (let ((token (if (looking-at ".*->" (line-end-position))
-   ;;             "stab_line"
-   ;;           ";")))
-   ;;    (forward-comment (- (point)))
-   ;;    token))
-   (t (smie-default-backward-token))))
-
-(defvar elixir-font-lock-keywords
-  (append `((,(regexp-opt elixir-block-keywords 'symbols) . font-lock-keyword-face))))
-
-(defun elixir-mode-syntactic-face-function (state)
-  "Return face that distinguishes doc and normal comments in given syntax STATE."
-  'font-lock-string-face
-  (if (nth 3 state) 'font-lock-string-face 'font-lock-comment-face))
-
-(defun elixir-beginning-of-defun (&optional arg)
-  "Move backward to the beginning of the current defun.
-With ARG, move backward multiple defuns.  Negative ARG means
-move forward."
-  (interactive "p")
-  (let ((count (or arg 1)))
-    (if (< count 0)
-        (elixir-end-of-defun (- count))
-      (and (re-search-backward (concat "^\\s *" elixir-block-beg-re "\\_>") nil t count)
-           (beginning-of-line)
-           t
-           ))))
-
-(defun elixir-end-of-defun (&optional arg)
-  "Move point to the end of the current defun.
-The defun begins at or after the point.  This function is called
-by `end-of-defun'."
-  (interactive "p")
-  (let ((count (or arg 1)))
-    (if (< count 0)
-        (elixir-beginning-of-defun (- count))
-      (and (re-search-forward (concat "^\\s *" elixir-block-end-re "\\_>") nil t count)
-           (end-of-line)
-           t
-           ))))
-
-(defcustom elixir-indent-level 2
-  "Indentation of Elixir statements."
-  :type 'integer
-  :safe 'integerp)
-
-(defun elixir-smie-rules(kind token)
-  (pcase (cons kind token)
-    ('(:elem . basic) elixir-indent-level)
-    (`(:before . ,(or ";" "stab_line"))
-     (cond
-      ((apply #'smie-rule-parent-p elixir-block-mid-keywords)
-       (smie-rule-parent elixir-indent-level))))))
+  (let ((pos (point)))
+    ;; Be careful, as the cond order matters below
+    (cond
+     ((progn
+        (skip-chars-backward " \t")
+        (and (bolp) (elixir-smie--stab-op-p)))
+      (forward-comment (- (point)))
+      "__stab_op__")
+     ((progn
+        (forward-comment (- (point)))
+        (and (> pos (line-end-position))
+           (elixir-smie--implicit-semi-p)))
+      ";")
+     (t (smie-default-backward-token)))))
 
 ;;;###autoload
-(define-derived-mode elixir-mode
-  prog-mode "Elixir Custom"
-  "Major mode for elixir."
-  :group 'elixir-mode
+(define-derived-mode elixir-mode prog-mode "Elixir"
   :syntax-table elixir-mode-syntax-table
-
-  ;; (kill-all-local-variables)
-
-  ;; (setq-local smie-indent-basic elixir-indent-level)
 
   (smie-setup elixir-smie-grammar #'elixir-smie-rules
               :forward-token  #'elixir-smie--forward-token
               :backward-token #'elixir-smie--backward-token)
 
-
-  ;; (setq-local beginning-of-defun-function 'elixir-beginning-of-defun)
-  ;; (setq-local end-of-defun-function 'elixir-end-of-defun)
-
-  ;; Comments
-  (setq-local comment-start "#")
+  (setq-local comment-start "# ")
   (setq-local comment-end "")
-  (setq-local comment-start-skip "#+\\s-*")
+  (setq-local comment-start-skip "#+ *")
+  (setq-local parse-sexp-ignore-comments t)
+  (setq-local parse-sexp-lookup-properties t)
+  (setq-local paragraph-start (concat "$\\|" page-delimiter))
+  (setq-local paragraph-separate paragraph-start)
+  (setq-local paragraph-ignore-fill-prefix t))
 
-  ;; Syntax
-  ;; (setq-local parse-sexp-ignore-comments t)
-  ;; (setq-local parse-sexp-lookup-properties t)
-
-  ;; Fonts
-  (setq-local font-lock-defaults
-              '(elixir-font-lock-keywords
-                nil nil nil nil
-                (font-lock-syntactic-face-function
-                 . elixir-mode-syntactic-face-function)))
-  )
 
 ;;;###autoload
 (progn
@@ -258,3 +255,4 @@ by `end-of-defun'."
   (add-to-list 'auto-mode-alist '("mix\\.lock" . elixir-mode)))
 
 (provide 'elixir-mode)
+;;; elixir-mode.el ends here

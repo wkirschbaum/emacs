@@ -1,258 +1,42 @@
-;;; elixir-mode.el --- Major mode for editing Elixir files -*- lexical-binding: t -*-
-
-;; Version: 1.0.0
-;; Authors: Wilhelm H Kirschbaum
-;; Keywords: languages elixir
-;; package-Requires: ((emacs "25.1"))
-
+;;; Package --- elixir-mode -*- lexical-binding: t; -*-
 ;;; Commentary:
-
-;; Experimental
-
 ;;; Code:
 
+(use-package elixir-mode
+  :ensure t
+  :config
+  (global-subword-mode t)
+  :hook (before-save . lsp-format-buffer))
 
-(ignore-errors
-  (unload-feature 'elixir-mode))
+;; (use-package erlang
+;;   :ensure t)
 
-(require 'smie)
+(use-package mix :ensure t)
+(use-package exunit
+  :ensure t
+  :bind
+  ("C-c , a" . exunit-verify-all)
+  ("C-c , s" . exunit-verify-single)
+  ("C-c , v" . exunit-verify)
+  ("C-c , r" . exunit-rerun)
+  ("C-c , t" . exunit-toggle-file-and-test))
 
-(defgroup elixir nil
-  "Major mode for editing Elixir code."
-  :prefix "elixir-"
-  :group 'languages)
-
-(defcustom elixir-indent-level 2
-  "Indentation of Elixir statements."
-  :type 'integer
-  :safe 'integerp)
-
-(defvar elixir-mode-syntax-table
-  (let ((table (make-syntax-table)))
-    ;; Operators
-    (modify-syntax-entry ?< "." table)
-    (modify-syntax-entry ?> "." table)
-    (modify-syntax-entry ?& "." table)
-    (modify-syntax-entry ?| "." table)
-    (modify-syntax-entry ?= "." table)
-    (modify-syntax-entry ?/ "." table)
-    (modify-syntax-entry ?+ "." table)
-    (modify-syntax-entry ?* "." table)
-    (modify-syntax-entry ?- "." table)
-
-    ;; Comments
-    (modify-syntax-entry ?# "<" table)
-    (modify-syntax-entry ?\n ">" table)
-
-    ;; Strings
-    (modify-syntax-entry ?\' "\"'" table)
-    (modify-syntax-entry ?\" "\"\"" table)
-
-    ;; Symbol constituents
-    (modify-syntax-entry ?! "_" table)
-    (modify-syntax-entry ?? "_" table)
-    (modify-syntax-entry ?_ "_" table)
-    (modify-syntax-entry ?@ "_" table)
-    (modify-syntax-entry ?: "_" table)
-
-    ;; expressions
-    (modify-syntax-entry ?\( "()" table)
-    (modify-syntax-entry ?\) ")(" table)
-    (modify-syntax-entry ?\{ "(}" table)
-    (modify-syntax-entry ?\} "){" table)
-    (modify-syntax-entry ?\[ "(]" table)
-    (modify-syntax-entry ?\] ")[" table)
-
-    ;; what to do with you? expression prefix?
-    (modify-syntax-entry ?% "'" table)
-
-    table)
-  "Syntax table to use in Elixir mode.")
-
-
-(defconst elixir-smie-grammar
-  (smie-prec2->grammar
-   (smie-merge-prec2s
-    (smie-bnf->prec2
-     '((id)
-       (inst (exp)
-             ("def" exp "do" insts "end")
-             ("defmodule" exp "do" insts "end")
-             ("defprotocol" exp "do" insts "end")
-             ("defmacrop" exp "do" insts "end")
-             ("defmacro" exp "do" insts "end")
-             ("quote" "do" insts "end")
-             ("case" exp "do" insts "end")
-             ("fn" matches "end")
-             ("if" exp "do" insts "end")
-             ("if" exp "do" insts "else" insts "end")
-             ("if" short-do-else)
-             ("try" "do" insts "rescue" matches "end")
-             ("try" "do" insts "after" matches "end")
-             ("try" "do" insts "catch" matches "end")
-             ("try" "do" insts "end")
-             ("with" exp "do" insts "end")
-             ("with" exp "do" insts "else" matches "end")
-             ("with" short-do-else))
-       (insts (inst) (insts ";" insts))
-       (short-do-else
-        (exps "," "do:" exp)
-        (short-do-else "," "else:" exp))
-       (match (exp "->" insts))
-       (matches (match) (matches "__stab_op__"  matches))
-       (exp (exp "=" exp))
-       (exps (exp) (exps "," exps))
-       )
-     '((assoc "__stab_op__"))
-     '((assoc ";"))
-     '((assoc ","))
-     '((right "="))
-     ))))
-
-(defun elixir-debug--smie-parent ()
-  (if (boundp 'smie--parent)
-      (nth 2 (smie-indent--parent))
-      nil))
-
-(defun elixir-debug--smie-rules (kind token)
-  (let ((parent (elixir-debug--smie-parent))
-        (result (elixir-smie-rules kind token)))
-    (message "\"%s\": (%s %s) -> %s" parent kind token result)
-    result))
-
-(defun elixir-smie-rules (kind token)
-  (pcase (cons kind token)
-    ('(:elem . basic) elixir-indent-level)
-    (`(:before . "->") elixir-indent-level)
-    (`(:before . ,(or";" "__stab_op__"))
-     (cond ((smie-rule-parent-p "do" "rescue")
-            (smie-rule-parent elixir-indent-level))
-           (t (smie-rule-parent))))
-    (`(:before . "=") elixir-indent-level)))
-
-(defconst elixir-smie--doc-start-token "__doc_start__")
-(defconst elixir-smie--stab-op-token "__stab_op__")
-
-(defun whk/elixir-special-delim-p (token)
-  (or
-   (equal token ";")
-   (equal token "__stab_op__")))
-
-(defun whk/elixir-clear-tokens ()
-  "Debug forward token"
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (while (not (eobp))
-      (let ((token (elixir-smie--forward-token)))
-        (cond ((whk/elixir-special-delim-p token)
-               (delete-char (- (length token))))
-              ((equal token "")
-               (forward-sexp)))))))
-
-(defun whk/elixir-forward-token-populate ()
-  "Debug forward token"
-  (interactive)
-  (while (not (eobp))
-    (let ((token (elixir-smie--forward-token)))
-      (if (whk/elixir-special-delim-p token)
-          (insert token))
-      (if (equal token "")
-          (forward-sexp)))))
-
-(defun whk/elixir-backward-token-populate ()
-  "Debug forward token"
-  (interactive)
-  (while (not (bobp))
-    (let ((token (elixir-smie--backward-token)))
-      (if (whk/elixir-special-delim-p token)
-          (save-excursion
-            (insert token)))
-      (if (equal token "")
-          (backward-sexp)))))
-
-(defun whk/elixir-forward-token ()
-  "Debug backward token"
-  (interactive)
-  (let ((token (elixir-smie--forward-token)))
-    (message "f: \"%s\"" token)))
-
-(defun whk/elixir-backward-token ()
-  "Debug backward token"
-  (interactive)
-  (let ((token (elixir-smie--backward-token)))
-    (message "f: \"%s\"" token)))
-
-(defun elixir-smie--implicit-semi-p ()
-  "Return t if an implicit semi colon should be added"
-  (save-excursion
-    (skip-chars-backward " \t")
-    (not (or (bolp)
-             (memq (char-before) '(?, ?= ?+ ?- ?* ?/))
-             ;; (and (eq (char-before) ?>)
-             ;;      (member (save-excursion (elixir-smie--backward-token))
-             ;;              '("->")))
-             ))))
-
-(defun elixir-smie--stab-op-p ()
-  "Return t if the line contains a stab line without an fn initiator"
-  (and (not (looking-at "[ \t]*fn[ \t]"))
-       (looking-at ".*->$" (line-end-position))))
-
-(defun elixir-smie--forward-token ()
-  (skip-chars-forward " \t")
-  (cond
-   ((and
-     (not (eobp))
-     (looking-at "[\n#]")
-     (elixir-smie--implicit-semi-p))
-    (if (eolp) (forward-char 1))
-    (forward-comment (point-max))
-    (if (elixir-smie--stab-op-p)
-        "__stab_op__"
-      ";"))
-    (t (smie-default-forward-token))))
-
-(defun elixir-smie--backward-token ()
-  (let ((pos (point)))
-    ;; Be careful, as the cond order matters below
-    (cond
-     ((progn
-        (skip-chars-backward " \t")
-        (and (bolp) (elixir-smie--stab-op-p)))
-      (forward-comment (- (point)))
-      "__stab_op__")
-     ((progn
-        (forward-comment (- (point)))
-        (and (> pos (line-end-position))
-           (elixir-smie--implicit-semi-p)))
-      ";")
-     (t (smie-default-backward-token)))))
-
-;;;###autoload
-(define-derived-mode elixir-mode prog-mode "Elixir"
-  :syntax-table elixir-mode-syntax-table
-
-  (smie-setup elixir-smie-grammar #'elixir-smie-rules
-              :forward-token  #'elixir-smie--forward-token
-              :backward-token #'elixir-smie--backward-token)
-
-  (setq-local comment-start "# ")
-  (setq-local comment-end "")
-  (setq-local comment-start-skip "#+ *")
-  (setq-local parse-sexp-ignore-comments t)
-  (setq-local parse-sexp-lookup-properties t)
-  (setq-local paragraph-start (concat "$\\|" page-delimiter))
-  (setq-local paragraph-separate paragraph-start)
-  (setq-local paragraph-ignore-fill-prefix t))
-
-
-;;;###autoload
-(progn
-  (add-to-list 'auto-mode-alist '("\\.elixir\\'" . elixir-mode))
-  (add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-mode))
-  (add-to-list 'auto-mode-alist '("\\.exs\\'" . elixir-mode))
-  (add-to-list 'auto-mode-alist '("mix\\.lock" . elixir-mode)))
-
-(provide 'elixir-mode)
-;;; elixir-mode.el ends here
+;; (use-package polymode
+;;   :ensure t
+;;   :mode ("\.ex$" . poly-elixir-web-mode)
+;;   :config
+;;   (define-hostmode poly-elixir-hostmode :mode 'elixir-mode)
+;;   (define-innermode poly-liveview-expr-elixir-innermode
+;;     :mode 'web-mode
+;;     :head-matcher (rx line-start (* space) "~H" (= 3 (char "\"'")) line-end)
+;;     :tail-matcher (rx line-start (* space) (= 3 (char "\"'")) line-end)
+;;     :head-mode 'host
+;;     :tail-mode 'host
+;;     :allow-nested nil
+;;     :keep-in-mode 'host
+;;     :fallback-mode 'host)
+;;   (define-polymode poly-elixir-web-mode
+;;     :hostmode 'poly-elixir-hostmode
+;;     :innermodes '(poly-liveview-expr-elixir-innermode))
+;;   )
+(setq web-mode-engines-alist '(("elixir" . "\\.ex\\'")))
