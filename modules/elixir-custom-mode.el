@@ -77,6 +77,7 @@
      '((id)
        (inst (exp)
              ("def" exp "do" insts "end")
+             ("defp" exp "do" insts "end")
              ("defmodule" exp "do" insts "end")
              ("defprotocol" exp "do" insts "end")
              ("defmacrop" exp "do" insts "end")

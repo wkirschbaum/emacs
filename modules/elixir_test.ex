@@ -1,57 +1,13 @@
-try do
-  foo
-rescue
-  :foo ->
-    "foo"
+defp status(kyc_status) do
+  case kyc_status do
+    a -> b
+    c -> d
+        k -> d
+  end
 
-    "foo"
-    foo
-
-  :bar ->
-    "bar"
-    foo
-    try do
-    rescue
-      :bar ->
-        forr
-
-      :bar ->
-        forr
-    end
-
-  :bar ->
-    "bar"
-
-  :bar ->
-    one
-    two
-    three
-
-    fn foo -> bar end
-
-    fn foo ->
-      bar
-      bar
-    end
-
-    c = fn foo -> doo end
-
-    x = fn foo ->
-          bar
-          bar
-        end
-
-    three
-
-
-  foo ->
-    five = 5
-
-    four =
-      4 +
-        2 + 2
-    six = "six"
-
-    seven = 8
-
+  case kyc_status do
+    %KycStatus{status: :failed} -> :not_started
+    %KycStatus{status: status} -> status
+                                  _ -> :not_started
+  end
 end
