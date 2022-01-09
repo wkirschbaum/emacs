@@ -17,6 +17,7 @@
       '(
         "bootstrap"
         "native"
+        "gnupgp"
         "shared"
         "registers"
         "paredit"
@@ -54,8 +55,7 @@
         "treesitter"
         "slime"
         "experiments"
-        "secret"
-        "email"))
+        "secret"))
 
 (let ((config-path "~/.config/emacs/modules/"))
   (dolist (module whk/modules)
