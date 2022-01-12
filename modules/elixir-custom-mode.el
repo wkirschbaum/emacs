@@ -81,8 +81,10 @@
        (inst (exp)
              ("def" exp-do-block)
              ("def" short-do-else)
+             ("def" short-do-else)
              ("defp" exp-do-block)
              ("defp" short-do-else)
+             ("defmodule" exp-do-block)
              ("defmodule" exp-do-block)
              ("defprotocol" exp-do-block)
              ("defmacrop" exp-do-block)
@@ -229,11 +231,18 @@
     (forward-comment (point-max))
     (if (elixir-smie--stab-op-eol-p) "__stab_op_break__" ";"))
    (t (let ((token (smie-default-forward-token)))
-        ;; if token is not eol stab then treat it as a operator
-        ;; for inline indentation
-        (if (and (equal token "->") (elixir-smie--stab-op-not-inline-p))
-            "."
-          token)))))
+        (cond (
+               ;; if token is not eol stab then treat it as a operator
+               ;; for inline indentation. possible use hanging-p here?
+               (and (equal token "->") (elixir-smie--stab-op-not-inline-p))
+               ".")
+              ((and (equal token "") (looking-at "\"\"\""))
+               (forward-char 2)
+               (forward-sexp)
+               (forward-char 2)
+              "\"")
+              (t token))))))
+
 
 (defun elixir-smie--backward-token ()
   (let ((pos (point)))
