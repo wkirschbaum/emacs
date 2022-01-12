@@ -214,9 +214,7 @@
      (elixir-smie--implicit-semi-p))
     (if (eolp) (forward-char 1))
     (forward-comment (point-max))
-    (if (elixir-smie--stab-op-eol-p)
-        "__stab_op_break__"
-      ";"))
+    (if (elixir-smie--stab-op-eol-p) "__stab_op_break__" ";"))
    (t (let ((token (smie-default-forward-token)))
         ;; if token is not eol stab then treat it as a operator
         ;; for inline indentation
