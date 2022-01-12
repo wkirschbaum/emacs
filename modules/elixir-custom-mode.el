@@ -131,7 +131,11 @@
     ('(:elem . basic) elixir-indent-level)
     (`(:before . ,(or "(" "[" "{")) (if (smie-rule-hanging-p) (smie-rule-parent)))
     (`(:before . "->") elixir-indent-level)
-    (`(:before . ,(or";" "__stab_op_break__"))
+    (`(:before . ,(or"__stab_op_break__"))
+     (cond ((smie-rule-parent-p "case" "else")
+            (smie-rule-parent elixir-indent-level))
+           (t (smie-rule-parent))))
+    (`(:before . ,(or";" "do"))
      (cond ((smie-rule-parent-p "do" "rescue" "[" "{" "(")
             (smie-rule-parent elixir-indent-level))
            (t (smie-rule-parent))))
@@ -252,7 +256,7 @@
 (define-derived-mode elixir-mode prog-mode "Elixir"
   :syntax-table elixir-mode-syntax-table
 
-  (smie-setup elixir-smie-grammar #'elixir-smie-rules
+  (smie-setup elixir-smie-grammar #'elixir-debug--smie-rules
               :forward-token  #'elixir-smie--forward-token
               :backward-token #'elixir-smie--backward-token)
 

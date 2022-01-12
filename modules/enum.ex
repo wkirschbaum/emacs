@@ -1,5 +1,5 @@
 defprotocol Enumerable do
-  @moduledoc """
+              @moduledoc """
   Enumerable protocol used by `Enum` and `Stream` modules.
 
   When you invoke a function in the `Enum` module, the first argument
@@ -37,7 +37,7 @@ defprotocol Enumerable do
   than linear time.
   """
 
-  @typedoc """
+              @typedoc """
   The accumulator value for each step.
 
   It must be a tagged tuple with one of the following "tags":
@@ -53,9 +53,9 @@ defprotocol Enumerable do
   In case a `t:reducer/0` function returns a `:suspend` accumulator,
   it must be explicitly handled by the caller and never leak.
   """
-  @type acc :: {:cont, term} | {:halt, term} | {:suspend, term}
+              @type acc :: {:cont, term} | {:halt, term} | {:suspend, term}
 
-  @typedoc """
+              @typedoc """
   The reducer function.
 
   Should be called with the `enumerable` element and the
@@ -63,9 +63,9 @@ defprotocol Enumerable do
 
   Returns the accumulator for the next enumeration step.
   """
-  @type reducer :: (element :: term, current_acc :: acc -> updated_acc :: acc)
+              @type reducer :: (element :: term, current_acc :: acc -> updated_acc :: acc)
 
-  @typedoc """
+              @typedoc """
   The result of the reduce operation.
 
   It may be *done* when the enumeration is finished by reaching
@@ -85,12 +85,12 @@ defprotocol Enumerable do
   `Stream.zip/2` with `Enum.take_while/2` to test the combination of
   `:suspend` with `:halt`.
   """
-  @type result ::
-          {:done, term}
-          | {:halted, term}
-          | {:suspended, term, continuation}
+              @type result ::
+              {:done, term}
+              | {:halted, term}
+              | {:suspended, term, continuation}
 
-  @typedoc """
+              @typedoc """
   A partially applied reduce function.
 
   The continuation is the closure returned as a result when
@@ -102,9 +102,9 @@ defprotocol Enumerable do
   is tail recursive, all the state is passed as arguments, so
   the continuation is the reducing function partially applied.
   """
-  @type continuation :: (acc -> result)
+              @type continuation :: (acc -> result)
 
-  @typedoc """
+              @typedoc """
   A slicing function that receives the initial position and the
   number of elements in the slice.
 
@@ -116,9 +116,9 @@ defprotocol Enumerable do
   The function should return a non empty list where
   the amount of elements is equal to `length`.
   """
-  @type slicing_fun :: (start :: non_neg_integer, length :: pos_integer -> [term()])
+              @type slicing_fun :: (start :: non_neg_integer, length :: pos_integer -> [term()])
 
-  @doc """
+              @doc """
   Reduces the `enumerable` into an element.
 
   Most of the operations in `Enum` are implemented in terms of reduce.
@@ -139,10 +139,10 @@ defprotocol Enumerable do
       def reduce([head | tail], {:cont, acc}, fun), do: reduce(tail, fun.(head, acc), fun)
 
   """
-  @spec reduce(t, acc, reducer) :: result
-  def reduce(enumerable, acc, fun)
+              @spec reduce(t, acc, reducer) :: result
+              def reduce(enumerable, acc, fun)
 
-  @doc """
+              @doc """
   Retrieves the number of elements in the `enumerable`.
 
   It should return `{:ok, count}` if you can count the number of elements
@@ -151,10 +151,10 @@ defprotocol Enumerable do
   Otherwise it should return `{:error, __MODULE__}` and a default algorithm
   built on top of `reduce/3` that runs in linear time will be used.
   """
-  @spec count(t) :: {:ok, non_neg_integer} | {:error, module}
-  def count(enumerable)
+              @spec count(t) :: {:ok, non_neg_integer} | {:error, module}
+              def count(enumerable)
 
-  @doc """
+              @doc """
   Checks if an `element` exists within the `enumerable`.
 
   It should return `{:ok, boolean}` if you can check the membership of a
@@ -167,10 +167,10 @@ defprotocol Enumerable do
   When called outside guards, the [`in`](`in/2`) and [`not in`](`in/2`)
   operators work by using this function.
   """
-  @spec member?(t, term) :: {:ok, boolean} | {:error, module}
-  def member?(enumerable, element)
+              @spec member?(t, term) :: {:ok, boolean} | {:error, module}
+              def member?(enumerable, element)
 
-  @doc """
+              @doc """
   Returns a function that slices the data structure contiguously.
 
   It should return `{:ok, size, slicing_fun}` if the `enumerable` has
@@ -193,16 +193,16 @@ defprotocol Enumerable do
   implemented whenever you can count the number of elements in the collection without
   traversing it.
   """
-  @spec slice(t) ::
-          {:ok, size :: non_neg_integer(), slicing_fun()}
-          | {:error, module()}
-  def slice(enumerable)
-end
+              @spec slice(t) ::
+              {:ok, size :: non_neg_integer(), slicing_fun()}
+              | {:error, module()}
+              def slice(enumerable)
+              end
 
-defmodule Enum do
-  import Kernel, except: [max: 2, min: 2]
+              defmodule Enum do
+                          import Kernel, except: [max: 2, min: 2]
 
-  @moduledoc """
+                          @moduledoc """
   Provides a set of algorithms to work with enumerables.
 
   In Elixir, an enumerable is any data type that implements the
@@ -250,38 +250,38 @@ defmodule Enum do
   See the `Stream` module for examples and documentation.
   """
 
-  @compile :inline_list_funcs
+                          @compile :inline_list_funcs
 
-  @type t :: Enumerable.t()
-  @type acc :: any
-  @type element :: any
+                          @type t :: Enumerable.t()
+                          @type acc :: any
+                          @type element :: any
 
-  @typedoc "Zero-based index. It can also be a negative integer."
-  @type index :: integer
+                          @typedoc "Zero-based index. It can also be a negative integer."
+                          @type index :: integer
 
-  @type default :: any
+                          @type default :: any
 
-  require Stream.Reducers, as: R
+                          require Stream.Reducers, as: R
 
-  defmacrop skip(acc) do
-    acc
-  end
+                          defmacrop skip(acc) do
+                                      acc
+                          end
 
-  defmacrop next(_, entry, acc) do
-    quote(do: [unquote(entry) | unquote(acc)])
-  end
+                          defmacrop next(_, entry, acc) do
+                                      quote(do: [unquote(entry) | unquote(acc)])
+                          end
 
-  defmacrop acc(head, state, _) do
-    quote(do: {unquote(head), unquote(state)})
-  end
+                          defmacrop acc(head, state, _) do
+                                      quote(do: {unquote(head), unquote(state)})
+                          end
 
-  defmacrop next_with_acc(_, entry, head, state, _) do
-    quote do
-      {[unquote(entry) | unquote(head)], unquote(state)}
-    end
-  end
+                          defmacrop next_with_acc(_, entry, head, state, _) do
+                                      quote do
+                                        {[unquote(entry) | unquote(head)], unquote(state)}
+                          end
+              end
 
-  @doc """
+              @doc """
   Returns `true` if all elements in `enumerable` are truthy.
 
   When an element has a falsy value (`false` or `nil`) iteration stops immediately
@@ -299,19 +299,19 @@ defmodule Enum do
       true
 
   """
-  @spec all?(t) :: boolean
-  def all?(enumerable) when is_list(enumerable) do
-    all_list(enumerable)
-  end
+              @spec all?(t) :: boolean
+              def all?(enumerable) when is_list(enumerable) do
+                    all_list(enumerable)
+              end
 
-  def all?(enumerable) do
-    Enumerable.reduce(enumerable, {:cont, true}, fn entry, _ ->
-      if entry, do: {:cont, true}, else: {:halt, false}
-    end)
-    |> elem(1)
-  end
+              def all?(enumerable) do
+                    Enumerable.reduce(enumerable, {:cont, true}, fn entry, _ ->
+                                                                   if entry, do: {:cont, true}, else: {:halt, false}
+                                                                 end)
+                    |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Returns `true` if `fun.(element)` is truthy for all elements in `enumerable`.
 
   Iterates over `enumerable` and invokes `fun` on each element. If `fun` ever
@@ -335,19 +335,19 @@ defmodule Enum do
   well-defined logical argument for empty collections.
 
   """
-  @spec all?(t, (element -> as_boolean(term))) :: boolean
-  def all?(enumerable, fun) when is_list(enumerable) do
-    all_list(enumerable, fun)
-  end
+              @spec all?(t, (element -> as_boolean(term))) :: boolean
+              def all?(enumerable, fun) when is_list(enumerable) do
+                    all_list(enumerable, fun)
+              end
 
-  def all?(enumerable, fun) do
-    Enumerable.reduce(enumerable, {:cont, true}, fn entry, _ ->
-      if fun.(entry), do: {:cont, true}, else: {:halt, false}
-    end)
-    |> elem(1)
-  end
+              def all?(enumerable, fun) do
+                    Enumerable.reduce(enumerable, {:cont, true}, fn entry, _ ->
+                                                                   if fun.(entry), do: {:cont, true}, else: {:halt, false}
+                                                                 end)
+                    |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Returns `true` if at least one element in `enumerable` is truthy.
 
   When an element has a truthy value (neither `false` nor `nil`) iteration stops
@@ -365,19 +365,19 @@ defmodule Enum do
       false
 
   """
-  @spec any?(t) :: boolean
-  def any?(enumerable) when is_list(enumerable) do
-    any_list(enumerable)
-  end
+              @spec any?(t) :: boolean
+              def any?(enumerable) when is_list(enumerable) do
+                    any_list(enumerable)
+              end
 
-  def any?(enumerable) do
-    Enumerable.reduce(enumerable, {:cont, false}, fn entry, _ ->
-      if entry, do: {:halt, true}, else: {:cont, false}
-    end)
-    |> elem(1)
-  end
+              def any?(enumerable) do
+                    Enumerable.reduce(enumerable, {:cont, false}, fn entry, _ ->
+                                                                    if entry, do: {:halt, true}, else: {:cont, false}
+                                                                  end)
+                    |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Returns `true` if `fun.(element)` is truthy for at least one element in `enumerable`.
 
   Iterates over the `enumerable` and invokes `fun` on each element. When an invocation
@@ -396,19 +396,19 @@ defmodule Enum do
       false
 
   """
-  @spec any?(t, (element -> as_boolean(term))) :: boolean
-  def any?(enumerable, fun) when is_list(enumerable) do
-    any_list(enumerable, fun)
-  end
+              @spec any?(t, (element -> as_boolean(term))) :: boolean
+              def any?(enumerable, fun) when is_list(enumerable) do
+                    any_list(enumerable, fun)
+              end
 
-  def any?(enumerable, fun) do
-    Enumerable.reduce(enumerable, {:cont, false}, fn entry, _ ->
-      if fun.(entry), do: {:halt, true}, else: {:cont, false}
-    end)
-    |> elem(1)
-  end
+              def any?(enumerable, fun) do
+                    Enumerable.reduce(enumerable, {:cont, false}, fn entry, _ ->
+                                                                    if fun.(entry), do: {:halt, true}, else: {:cont, false}
+                                                                  end)
+                    |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Finds the element at the given `index` (zero-based).
 
   Returns `default` if `index` is out of bounds.
@@ -432,38 +432,38 @@ defmodule Enum do
       :none
 
   """
-  @spec at(t, index, default) :: element | default
-  def at(enumerable, index, default \\ nil) when is_integer(index) do
-    case slice_any(enumerable, index, 1) do
-      [value] -> value
-      [] -> default
-    end
-  end
+              @spec at(t, index, default) :: element | default
+              def at(enumerable, index, default \\ nil) when is_integer(index) do
+                    case slice_any(enumerable, index, 1) do
+                           [value] -> value
+                           [] -> default
+                    end
+              end
 
-  @doc false
-  @deprecated "Use Enum.chunk_every/2 instead"
-  def chunk(enumerable, count), do: chunk(enumerable, count, count, nil)
+              @doc false
+              @deprecated "Use Enum.chunk_every/2 instead"
+              def chunk(enumerable, count), do: chunk(enumerable, count, count, nil)
 
-  @doc false
-  @deprecated "Use Enum.chunk_every/3 instead"
-  def chunk(enum, n, step) do
-    chunk_every(enum, n, step, :discard)
-  end
+              @doc false
+              @deprecated "Use Enum.chunk_every/3 instead"
+              def chunk(enum, n, step) do
+                    chunk_every(enum, n, step, :discard)
+              end
 
-  @doc false
-  @deprecated "Use Enum.chunk_every/4 instead"
-  def chunk(enumerable, count, step, leftover) do
-    chunk_every(enumerable, count, step, leftover || :discard)
-  end
+              @doc false
+              @deprecated "Use Enum.chunk_every/4 instead"
+              def chunk(enumerable, count, step, leftover) do
+                    chunk_every(enumerable, count, step, leftover || :discard)
+              end
 
-  @doc """
+              @doc """
   Shortcut to `chunk_every(enumerable, count, count)`.
   """
-  @doc since: "1.5.0"
-  @spec chunk_every(t, pos_integer) :: [list]
-  def chunk_every(enumerable, count), do: chunk_every(enumerable, count, count, [])
+              @doc since: "1.5.0"
+              @spec chunk_every(t, pos_integer) :: [list]
+              def chunk_every(enumerable, count), do: chunk_every(enumerable, count, count, [])
 
-  @doc """
+              @doc """
   Returns list of lists containing `count` elements each, where
   each new chunk starts `step` elements into the `enumerable`.
 
@@ -499,14 +499,14 @@ defmodule Enum do
       [[1, 2], [4, 5]]
 
   """
-  @doc since: "1.5.0"
-  @spec chunk_every(t, pos_integer, pos_integer, t | :discard) :: [list]
-  def chunk_every(enumerable, count, step, leftover \\ [])
-      when is_integer(count) and count > 0 and is_integer(step) and step > 0 do
-    R.chunk_every(&chunk_while/4, enumerable, count, step, leftover)
-  end
+              @doc since: "1.5.0"
+              @spec chunk_every(t, pos_integer, pos_integer, t | :discard) :: [list]
+              def chunk_every(enumerable, count, step, leftover \\ [])
+              when is_integer(count) and count > 0 and is_integer(step) and step > 0 do
+                R.chunk_every(&chunk_while/4, enumerable, count, step, leftover)
+              end
 
-  @doc """
+              @doc """
   Chunks the `enumerable` with fine grained control when every chunk is emitted.
 
   `chunk_fun` receives the current element and the accumulator and must return:
@@ -548,31 +548,31 @@ defmodule Enum do
       [[1, 2], [3, 5, 7]]
 
   """
-  @doc since: "1.5.0"
-  @spec chunk_while(
-          t,
-          acc,
-          (element, acc -> {:cont, chunk, acc} | {:cont, acc} | {:halt, acc}),
-          (acc -> {:cont, chunk, acc} | {:cont, acc})
-        ) :: Enumerable.t()
-        when chunk: any
-  def chunk_while(enumerable, acc, chunk_fun, after_fun) do
-    {_, {res, acc}} =
-      Enumerable.reduce(enumerable, {:cont, {[], acc}}, fn entry, {buffer, acc} ->
-        case chunk_fun.(entry, acc) do
-          {:cont, chunk, acc} -> {:cont, {[chunk | buffer], acc}}
-          {:cont, acc} -> {:cont, {buffer, acc}}
-          {:halt, acc} -> {:halt, {buffer, acc}}
-        end
-      end)
+              @doc since: "1.5.0"
+              @spec chunk_while(
+                t,
+                acc,
+                (element, acc -> {:cont, chunk, acc} | {:cont, acc} | {:halt, acc}),
+                (acc -> {:cont, chunk, acc} | {:cont, acc})
+              ) :: Enumerable.t()
+              when chunk: any
+              def chunk_while(enumerable, acc, chunk_fun, after_fun) do
+                    {_, {res, acc}} =
+                      Enumerable.reduce(enumerable, {:cont, {[], acc}}, fn entry, {buffer, acc} ->
+                                                                          case chunk_fun.(entry, acc) do
+                                                                                 {:cont, chunk, acc} -> {:cont, {[chunk | buffer], acc}}
+                                                                                 {:cont, acc} -> {:cont, {buffer, acc}}
+                                                                                 {:halt, acc} -> {:halt, {buffer, acc}}
+                                                                          end
+                                                                        end)
 
-    case after_fun.(acc) do
-      {:cont, _acc} -> :lists.reverse(res)
-      {:cont, chunk, _acc} -> :lists.reverse([chunk | res])
-    end
-  end
+                    case after_fun.(acc) do
+                           {:cont, _acc} -> :lists.reverse(res)
+                           {:cont, chunk, _acc} -> :lists.reverse([chunk | res])
+                    end
+              end
 
-  @doc """
+              @doc """
   Splits enumerable on every element for which `fun` returns a new
   value.
 
@@ -584,12 +584,12 @@ defmodule Enum do
       [[1], [2, 2], [3], [4, 4, 6], [7, 7]]
 
   """
-  @spec chunk_by(t, (element -> any)) :: [list]
-  def chunk_by(enumerable, fun) do
-    R.chunk_by(&chunk_while/4, enumerable, fun)
-  end
+              @spec chunk_by(t, (element -> any)) :: [list]
+              def chunk_by(enumerable, fun) do
+                    R.chunk_by(&chunk_while/4, enumerable, fun)
+              end
 
-  @doc """
+              @doc """
   Given an enumerable of enumerables, concatenates the `enumerables` into
   a single list.
 
@@ -602,18 +602,18 @@ defmodule Enum do
       [1, [2], 3, 4, 5, 6]
 
   """
-  @spec concat(t) :: t
-  def concat(enumerables)
+              @spec concat(t) :: t
+              def concat(enumerables)
 
-  def concat(list) when is_list(list) do
-    concat_list(list)
-  end
+              def concat(list) when is_list(list) do
+                    concat_list(list)
+              end
 
-  def concat(enums) do
-    concat_enum(enums)
-  end
+              def concat(enums) do
+                    concat_enum(enums)
+              end
 
-  @doc """
+              @doc """
   Concatenates the enumerable on the `right` with the enumerable on the
   `left`.
 
@@ -629,16 +629,16 @@ defmodule Enum do
       [1, 2, 3, 4, 5, 6]
 
   """
-  @spec concat(t, t) :: t
-  def concat(left, right) when is_list(left) and is_list(right) do
-    left ++ right
-  end
+              @spec concat(t, t) :: t
+              def concat(left, right) when is_list(left) and is_list(right) do
+                    left ++ right
+              end
 
-  def concat(left, right) do
-    concat_enum([left, right])
-  end
+              def concat(left, right) do
+                    concat_enum([left, right])
+              end
 
-  @doc """
+              @doc """
   Returns the size of the `enumerable`.
 
   ## Examples
@@ -647,22 +647,22 @@ defmodule Enum do
       3
 
   """
-  @spec count(t) :: non_neg_integer
-  def count(enumerable) when is_list(enumerable) do
-    length(enumerable)
-  end
+              @spec count(t) :: non_neg_integer
+              def count(enumerable) when is_list(enumerable) do
+                    length(enumerable)
+              end
 
-  def count(enumerable) do
-    case Enumerable.count(enumerable) do
-      {:ok, value} when is_integer(value) ->
-        value
+              def count(enumerable) do
+                    case Enumerable.count(enumerable) do
+                    {:ok, value} when is_integer(value) ->
+                      value
 
-      {:error, module} ->
-        enumerable |> module.reduce({:cont, 0}, fn _, acc -> {:cont, acc + 1} end) |> elem(1)
-    end
-  end
+                    {:error, module} ->
+                      enumerable |> module.reduce({:cont, 0}, fn _, acc -> {:cont, acc + 1} end) |> elem(1)
+                    end
+              end
 
-  @doc """
+              @doc """
   Returns the count of elements in the `enumerable` for which `fun` returns
   a truthy value.
 
@@ -672,14 +672,14 @@ defmodule Enum do
       2
 
   """
-  @spec count(t, (element -> as_boolean(term))) :: non_neg_integer
-  def count(enumerable, fun) do
-    reduce(enumerable, 0, fn entry, acc ->
-      if(fun.(entry), do: acc + 1, else: acc)
-    end)
-  end
+              @spec count(t, (element -> as_boolean(term))) :: non_neg_integer
+              def count(enumerable, fun) do
+                    reduce(enumerable, 0, fn entry, acc ->
+                                            if(fun.(entry), do: acc + 1, else: acc)
+                                          end)
+              end
 
-  @doc """
+              @doc """
   Counts the enumerable stopping at `limit`.
 
   This is useful for checking certain properties of the count of an enumerable
@@ -707,32 +707,32 @@ defmodule Enum do
       true
 
   """
-  @doc since: "1.12.0"
-  @spec count_until(t, pos_integer) :: non_neg_integer
-  def count_until(enumerable, limit) when is_integer(limit) and limit > 0 do
-    stop_at = limit - 1
+              @doc since: "1.12.0"
+              @spec count_until(t, pos_integer) :: non_neg_integer
+              def count_until(enumerable, limit) when is_integer(limit) and limit > 0 do
+                    stop_at = limit - 1
 
-    case Enumerable.count(enumerable) do
-      {:ok, value} ->
-        Kernel.min(value, limit)
+                    case Enumerable.count(enumerable) do
+                    {:ok, value} ->
+                      Kernel.min(value, limit)
 
-      {:error, module} ->
-        enumerable
-        |> module.reduce(
-          {:cont, 0},
-          fn
-            _, ^stop_at ->
-              {:halt, limit}
+                    {:error, module} ->
+                      enumerable
+                      |> module.reduce(
+                        {:cont, 0},
+                        fn
+                        _, ^stop_at ->
+                          {:halt, limit}
 
-            _, acc ->
-              {:cont, acc + 1}
-          end
-        )
-        |> elem(1)
-    end
-  end
+                        _, acc ->
+                          {:cont, acc + 1}
+                        end
+                      )
+                      |> elem(1)
+                    end
+              end
 
-  @doc """
+              @doc """
   Counts the elements in the enumerable for which `fun` returns a truthy value, stopping at `limit`.
 
   See `count/2` and `count_until/3` for more information.
@@ -744,30 +744,30 @@ defmodule Enum do
       iex> Enum.count_until(1..20, fn x -> rem(x, 2) == 0 end, 11)
       10
   """
-  @doc since: "1.12.0"
-  @spec count_until(t, (element -> as_boolean(term)), pos_integer) :: non_neg_integer
-  def count_until(enumerable, fun, limit) when is_integer(limit) and limit > 0 do
-    stop_at = limit - 1
+              @doc since: "1.12.0"
+              @spec count_until(t, (element -> as_boolean(term)), pos_integer) :: non_neg_integer
+              def count_until(enumerable, fun, limit) when is_integer(limit) and limit > 0 do
+                    stop_at = limit - 1
 
-    Enumerable.reduce(enumerable, {:cont, 0}, fn
-      entry, ^stop_at ->
-        if fun.(entry) do
-          {:halt, limit}
-        else
-          {:cont, stop_at}
-        end
+                    Enumerable.reduce(enumerable, {:cont, 0}, fn
+                                      entry, ^stop_at ->
+                                        if fun.(entry) do
+                                             {:halt, limit}
+                                           else
+                                           {:cont, stop_at}
+                                      end
 
-      entry, acc ->
-        if fun.(entry) do
-          {:cont, acc + 1}
-        else
-          {:cont, acc}
-        end
-    end)
-    |> elem(1)
-  end
+                                       entry, acc ->
+                                         if fun.(entry) do
+                                              {:cont, acc + 1}
+                                            else
+                                            {:cont, acc}
+                                      end
+                                      end)
+                    |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Enumerates the `enumerable`, returning a list where all consecutive
   duplicated elements are collapsed to a single element.
 
@@ -785,22 +785,22 @@ defmodule Enum do
       [1, 2, 2.0, :three]
 
   """
-  @spec dedup(t) :: list
-  def dedup(enumerable) when is_list(enumerable) do
-    dedup_list(enumerable, []) |> :lists.reverse()
-  end
+              @spec dedup(t) :: list
+              def dedup(enumerable) when is_list(enumerable) do
+                    dedup_list(enumerable, []) |> :lists.reverse()
+              end
 
-  def dedup(enumerable) do
-    Enum.reduce(enumerable, [], fn x, acc ->
-      case acc do
-        [^x | _] -> acc
-        _ -> [x | acc]
-      end
-    end)
-    |> :lists.reverse()
-  end
+              def dedup(enumerable) do
+                    Enum.reduce(enumerable, [], fn x, acc ->
+                                                  case acc do
+                                                         [^x | _] -> acc
+                                                         _ -> [x | acc]
+                                                  end
+                                                end)
+                    |> :lists.reverse()
+              end
 
-  @doc """
+              @doc """
   Enumerates the `enumerable`, returning a list where all consecutive
   duplicated elements are collapsed to a single element.
 
@@ -816,13 +816,13 @@ defmodule Enum do
       [5, 1, 3, 2]
 
   """
-  @spec dedup_by(t, (element -> term)) :: list
-  def dedup_by(enumerable, fun) do
-    {list, _} = reduce(enumerable, {[], []}, R.dedup(fun))
-    :lists.reverse(list)
-  end
+              @spec dedup_by(t, (element -> term)) :: list
+              def dedup_by(enumerable, fun) do
+                    {list, _} = reduce(enumerable, {[], []}, R.dedup(fun))
+                    :lists.reverse(list)
+              end
 
-  @doc """
+              @doc """
   Drops the `amount` of elements from the `enumerable`.
 
   If a negative `amount` is given, the `amount` of last values will be dropped.
@@ -844,29 +844,29 @@ defmodule Enum do
       [1, 2]
 
   """
-  @spec drop(t, integer) :: list
-  def drop(enumerable, amount)
-      when is_list(enumerable) and is_integer(amount) and amount >= 0 do
-    drop_list(enumerable, amount)
-  end
+              @spec drop(t, integer) :: list
+              def drop(enumerable, amount)
+              when is_list(enumerable) and is_integer(amount) and amount >= 0 do
+                drop_list(enumerable, amount)
+              end
 
-  def drop(enumerable, amount) when is_integer(amount) and amount >= 0 do
-    {result, _} = reduce(enumerable, {[], amount}, R.drop())
-    if is_list(result), do: :lists.reverse(result), else: []
-  end
+              def drop(enumerable, amount) when is_integer(amount) and amount >= 0 do
+                    {result, _} = reduce(enumerable, {[], amount}, R.drop())
+                    if is_list(result), do: :lists.reverse(result), else: []
+              end
 
-  def drop(enumerable, amount) when is_integer(amount) and amount < 0 do
-    {count, fun} = slice_count_and_fun(enumerable)
-    amount = Kernel.min(amount + count, count)
+              def drop(enumerable, amount) when is_integer(amount) and amount < 0 do
+                    {count, fun} = slice_count_and_fun(enumerable)
+                    amount = Kernel.min(amount + count, count)
 
-    if amount > 0 do
-      fun.(0, amount)
-    else
-      []
-    end
-  end
+                    if amount > 0 do
+                         fun.(0, amount)
+                       else
+                       []
+              end
+              end
 
-  @doc """
+              @doc """
   Returns a list of every `nth` element in the `enumerable` dropped,
   starting with the first element.
 
@@ -887,19 +887,19 @@ defmodule Enum do
       []
 
   """
-  @spec drop_every(t, non_neg_integer) :: list
-  def drop_every(enumerable, nth)
+              @spec drop_every(t, non_neg_integer) :: list
+              def drop_every(enumerable, nth)
 
-  def drop_every(_enumerable, 1), do: []
-  def drop_every(enumerable, 0), do: to_list(enumerable)
-  def drop_every([], nth) when is_integer(nth), do: []
+              def drop_every(_enumerable, 1), do: []
+              def drop_every(enumerable, 0), do: to_list(enumerable)
+              def drop_every([], nth) when is_integer(nth), do: []
 
-  def drop_every(enumerable, nth) when is_integer(nth) and nth > 1 do
-    {res, _} = reduce(enumerable, {[], :first}, R.drop_every(nth))
-    :lists.reverse(res)
-  end
+              def drop_every(enumerable, nth) when is_integer(nth) and nth > 1 do
+                    {res, _} = reduce(enumerable, {[], :first}, R.drop_every(nth))
+                    :lists.reverse(res)
+              end
 
-  @doc """
+              @doc """
   Drops elements at the beginning of the `enumerable` while `fun` returns a
   truthy value.
 
@@ -909,17 +909,17 @@ defmodule Enum do
       [3, 2, 1]
 
   """
-  @spec drop_while(t, (element -> as_boolean(term))) :: list
-  def drop_while(enumerable, fun) when is_list(enumerable) do
-    drop_while_list(enumerable, fun)
-  end
+              @spec drop_while(t, (element -> as_boolean(term))) :: list
+              def drop_while(enumerable, fun) when is_list(enumerable) do
+                    drop_while_list(enumerable, fun)
+              end
 
-  def drop_while(enumerable, fun) do
-    {res, _} = reduce(enumerable, {[], true}, R.drop_while(fun))
-    :lists.reverse(res)
-  end
+              def drop_while(enumerable, fun) do
+                    {res, _} = reduce(enumerable, {[], true}, R.drop_while(fun))
+                    :lists.reverse(res)
+              end
 
-  @doc """
+              @doc """
   Invokes the given `fun` for each element in the `enumerable`.
 
   Returns `:ok`.
@@ -932,21 +932,21 @@ defmodule Enum do
       #=> :ok
 
   """
-  @spec each(t, (element -> any)) :: :ok
-  def each(enumerable, fun) when is_list(enumerable) do
-    :lists.foreach(fun, enumerable)
-  end
+              @spec each(t, (element -> any)) :: :ok
+              def each(enumerable, fun) when is_list(enumerable) do
+                    :lists.foreach(fun, enumerable)
+              end
 
-  def each(enumerable, fun) do
-    reduce(enumerable, nil, fn entry, _ ->
-      fun.(entry)
-      nil
-    end)
+              def each(enumerable, fun) do
+                    reduce(enumerable, nil, fn entry, _ ->
+                                              fun.(entry)
+                                              nil
+                                            end)
 
-    :ok
-  end
+                    :ok
+              end
 
-  @doc """
+              @doc """
   Determines if the `enumerable` is empty.
 
   Returns `true` if `enumerable` is empty, otherwise `false`.
@@ -960,24 +960,24 @@ defmodule Enum do
       false
 
   """
-  @spec empty?(t) :: boolean
-  def empty?(enumerable) when is_list(enumerable) do
-    enumerable == []
-  end
+              @spec empty?(t) :: boolean
+              def empty?(enumerable) when is_list(enumerable) do
+                    enumerable == []
+              end
 
-  def empty?(enumerable) do
-    case Enumerable.slice(enumerable) do
-      {:ok, value, _} ->
-        value == 0
+              def empty?(enumerable) do
+                    case Enumerable.slice(enumerable) do
+                    {:ok, value, _} ->
+                      value == 0
 
-      {:error, module} ->
-        enumerable
-        |> module.reduce({:cont, true}, fn _, _ -> {:halt, false} end)
-        |> elem(1)
-    end
-  end
+                    {:error, module} ->
+                      enumerable
+                      |> module.reduce({:cont, true}, fn _, _ -> {:halt, false} end)
+                      |> elem(1)
+                    end
+              end
 
-  @doc """
+              @doc """
   Finds the element at the given `index` (zero-based).
 
   Returns `{:ok, element}` if found, otherwise `:error`.
@@ -1001,15 +1001,15 @@ defmodule Enum do
       :error
 
   """
-  @spec fetch(t, index) :: {:ok, element} | :error
-  def fetch(enumerable, index) when is_integer(index) do
-    case slice_any(enumerable, index, 1) do
-      [value] -> {:ok, value}
-      [] -> :error
-    end
-  end
+              @spec fetch(t, index) :: {:ok, element} | :error
+              def fetch(enumerable, index) when is_integer(index) do
+                    case slice_any(enumerable, index, 1) do
+                           [value] -> {:ok, value}
+                           [] -> :error
+                    end
+              end
 
-  @doc """
+              @doc """
   Finds the element at the given `index` (zero-based).
 
   Raises `OutOfBoundsError` if the given `index` is outside the range of
@@ -1027,15 +1027,15 @@ defmodule Enum do
       ** (Enum.OutOfBoundsError) out of bounds error
 
   """
-  @spec fetch!(t, index) :: element
-  def fetch!(enumerable, index) when is_integer(index) do
-    case slice_any(enumerable, index, 1) do
-      [value] -> value
-      [] -> raise Enum.OutOfBoundsError
-    end
-  end
+              @spec fetch!(t, index) :: element
+              def fetch!(enumerable, index) when is_integer(index) do
+                    case slice_any(enumerable, index, 1) do
+                           [value] -> value
+                           [] -> raise Enum.OutOfBoundsError
+                    end
+              end
 
-  @doc """
+              @doc """
   Filters the `enumerable`, i.e. returns only those elements
   for which `fun` returns a truthy value.
 
@@ -1065,28 +1065,28 @@ defmodule Enum do
       end)
 
   """
-  @spec filter(t, (element -> as_boolean(term))) :: list
-  def filter(enumerable, fun) when is_list(enumerable) do
-    filter_list(enumerable, fun)
-  end
+              @spec filter(t, (element -> as_boolean(term))) :: list
+              def filter(enumerable, fun) when is_list(enumerable) do
+                    filter_list(enumerable, fun)
+              end
 
-  def filter(enumerable, fun) do
-    reduce(enumerable, [], R.filter(fun)) |> :lists.reverse()
-  end
+              def filter(enumerable, fun) do
+                    reduce(enumerable, [], R.filter(fun)) |> :lists.reverse()
+              end
 
-  @doc false
-  @deprecated "Use Enum.filter/2 + Enum.map/2 or for comprehensions instead"
-  def filter_map(enumerable, filter, mapper) when is_list(enumerable) do
-    for element <- enumerable, filter.(element), do: mapper.(element)
-  end
+              @doc false
+              @deprecated "Use Enum.filter/2 + Enum.map/2 or for comprehensions instead"
+              def filter_map(enumerable, filter, mapper) when is_list(enumerable) do
+                    for element <- enumerable, filter.(element), do: mapper.(element)
+              end
 
-  def filter_map(enumerable, filter, mapper) do
-    enumerable
-    |> reduce([], R.filter_map(filter, mapper))
-    |> :lists.reverse()
-  end
+              def filter_map(enumerable, filter, mapper) do
+                    enumerable
+                    |> reduce([], R.filter_map(filter, mapper))
+                    |> :lists.reverse()
+              end
 
-  @doc """
+              @doc """
   Returns the first element for which `fun` returns a truthy value.
   If no such element is found, returns `default`.
 
@@ -1101,21 +1101,21 @@ defmodule Enum do
       0
 
   """
-  @spec find(t, default, (element -> any)) :: element | default
-  def find(enumerable, default \\ nil, fun)
+              @spec find(t, default, (element -> any)) :: element | default
+              def find(enumerable, default \\ nil, fun)
 
-  def find(enumerable, default, fun) when is_list(enumerable) do
-    find_list(enumerable, default, fun)
-  end
+              def find(enumerable, default, fun) when is_list(enumerable) do
+                    find_list(enumerable, default, fun)
+              end
 
-  def find(enumerable, default, fun) do
-    Enumerable.reduce(enumerable, {:cont, default}, fn entry, default ->
-      if fun.(entry), do: {:halt, entry}, else: {:cont, default}
-    end)
-    |> elem(1)
-  end
+              def find(enumerable, default, fun) do
+                    Enumerable.reduce(enumerable, {:cont, default}, fn entry, default ->
+                                                                      if fun.(entry), do: {:halt, entry}, else: {:cont, default}
+                                                                    end)
+                    |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Similar to `find/3`, but returns the index (zero-based)
   of the element instead of the element itself.
 
@@ -1128,24 +1128,24 @@ defmodule Enum do
       1
 
   """
-  @spec find_index(t, (element -> any)) :: non_neg_integer | nil
-  def find_index(enumerable, fun) when is_list(enumerable) do
-    find_index_list(enumerable, 0, fun)
-  end
+              @spec find_index(t, (element -> any)) :: non_neg_integer | nil
+              def find_index(enumerable, fun) when is_list(enumerable) do
+                    find_index_list(enumerable, 0, fun)
+              end
 
-  def find_index(enumerable, fun) do
-    result =
-      Enumerable.reduce(enumerable, {:cont, {:not_found, 0}}, fn entry, {_, index} ->
-        if fun.(entry), do: {:halt, {:found, index}}, else: {:cont, {:not_found, index + 1}}
-      end)
+              def find_index(enumerable, fun) do
+                    result =
+                      Enumerable.reduce(enumerable, {:cont, {:not_found, 0}}, fn entry, {_, index} ->
+                                                                                if fun.(entry), do: {:halt, {:found, index}}, else: {:cont, {:not_found, index + 1}}
+                                                                              end)
 
-    case elem(result, 1) do
-      {:found, index} -> index
-      {:not_found, _} -> nil
-    end
-  end
+                    case elem(result, 1) do
+                           {:found, index} -> index
+                           {:not_found, _} -> nil
+                    end
+              end
 
-  @doc """
+              @doc """
   Similar to `find/3`, but returns the value of the function
   invocation instead of the element itself.
 
@@ -1169,22 +1169,22 @@ defmodule Enum do
       "no bools!"
 
   """
-  @spec find_value(t, any, (element -> any)) :: any | nil
-  def find_value(enumerable, default \\ nil, fun)
+              @spec find_value(t, any, (element -> any)) :: any | nil
+              def find_value(enumerable, default \\ nil, fun)
 
-  def find_value(enumerable, default, fun) when is_list(enumerable) do
-    find_value_list(enumerable, default, fun)
-  end
+              def find_value(enumerable, default, fun) when is_list(enumerable) do
+                    find_value_list(enumerable, default, fun)
+              end
 
-  def find_value(enumerable, default, fun) do
-    Enumerable.reduce(enumerable, {:cont, default}, fn entry, default ->
-      fun_entry = fun.(entry)
-      if fun_entry, do: {:halt, fun_entry}, else: {:cont, default}
-    end)
-    |> elem(1)
-  end
+              def find_value(enumerable, default, fun) do
+                    Enumerable.reduce(enumerable, {:cont, default}, fn entry, default ->
+                                                                      fun_entry = fun.(entry)
+                                                                      if fun_entry, do: {:halt, fun_entry}, else: {:cont, default}
+                                                                    end)
+                    |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Maps the given `fun` over `enumerable` and flattens the result.
 
   This function returns a new enumerable built by appending the result of invoking `fun`
@@ -1203,25 +1203,25 @@ defmodule Enum do
       [[:a], [:b], [:c]]
 
   """
-  @spec flat_map(t, (element -> t)) :: list
-  def flat_map(enumerable, fun) when is_list(enumerable) do
-    flat_map_list(enumerable, fun)
-  end
+              @spec flat_map(t, (element -> t)) :: list
+              def flat_map(enumerable, fun) when is_list(enumerable) do
+                    flat_map_list(enumerable, fun)
+              end
 
-  def flat_map(enumerable, fun) do
-    reduce(enumerable, [], fn entry, acc ->
-      case fun.(entry) do
-        list when is_list(list) -> [list | acc]
-        other -> [to_list(other) | acc]
-      end
-    end)
-    |> flat_reverse([])
-  end
+              def flat_map(enumerable, fun) do
+                    reduce(enumerable, [], fn entry, acc ->
+                                             case fun.(entry) do
+                                                    list when is_list(list) -> [list | acc]
+                                                    other -> [to_list(other) | acc]
+                                             end
+                                           end)
+                    |> flat_reverse([])
+              end
 
-  defp flat_reverse([h | t], acc), do: flat_reverse(t, h ++ acc)
-  defp flat_reverse([], acc), do: acc
+              defp flat_reverse([h | t], acc), do: flat_reverse(t, h ++ acc)
+              defp flat_reverse([], acc), do: acc
 
-  @doc """
+              @doc """
   Maps and reduces an `enumerable`, flattening the given results (only one level deep).
 
   It expects an accumulator and a function that receives each enumerable
@@ -1242,30 +1242,30 @@ defmodule Enum do
       {[[1], [2], [3], [4], [5]], 15}
 
   """
-  @spec flat_map_reduce(t, acc, fun) :: {[any], acc}
-        when fun: (element, acc -> {t, acc} | {:halt, acc})
-  def flat_map_reduce(enumerable, acc, fun) do
-    {_, {list, acc}} =
-      Enumerable.reduce(enumerable, {:cont, {[], acc}}, fn entry, {list, acc} ->
-        case fun.(entry, acc) do
-          {:halt, acc} ->
-            {:halt, {list, acc}}
+              @spec flat_map_reduce(t, acc, fun) :: {[any], acc}
+              when fun: (element, acc -> {t, acc} | {:halt, acc})
+              def flat_map_reduce(enumerable, acc, fun) do
+                    {_, {list, acc}} =
+                      Enumerable.reduce(enumerable, {:cont, {[], acc}}, fn entry, {list, acc} ->
+                                                                          case fun.(entry, acc) do
+                                                                          {:halt, acc} ->
+                                                                            {:halt, {list, acc}}
 
-          {[], acc} ->
-            {:cont, {list, acc}}
+                                                                          {[], acc} ->
+                                                                            {:cont, {list, acc}}
 
-          {[entry], acc} ->
-            {:cont, {[entry | list], acc}}
+                                                                          {[entry], acc} ->
+                                                                            {:cont, {[entry | list], acc}}
 
-          {entries, acc} ->
-            {:cont, {reduce(entries, list, &[&1 | &2]), acc}}
-        end
-      end)
+                                                                          {entries, acc} ->
+                                                                            {:cont, {reduce(entries, list, &[&1 | &2]), acc}}
+                                                                          end
+                                                                        end)
 
-    {:lists.reverse(list), acc}
-  end
+                    {:lists.reverse(list), acc}
+              end
 
-  @doc """
+              @doc """
   Returns a map with keys as unique elements of `enumerable` and values
   as the count of every element.
 
@@ -1275,18 +1275,18 @@ defmodule Enum do
       %{"ant" => 3, "buffalo" => 2, "dingo" => 1}
 
   """
-  @doc since: "1.10.0"
-  @spec frequencies(t) :: map
-  def frequencies(enumerable) do
-    reduce(enumerable, %{}, fn key, acc ->
-      case acc do
-        %{^key => value} -> %{acc | key => value + 1}
-        %{} -> Map.put(acc, key, 1)
-      end
-    end)
-  end
+              @doc since: "1.10.0"
+              @spec frequencies(t) :: map
+              def frequencies(enumerable) do
+                    reduce(enumerable, %{}, fn key, acc ->
+                                              case acc do
+                                                     %{^key => value} -> %{acc | key => value + 1}
+                                                     %{} -> Map.put(acc, key, 1)
+                                              end
+                                            end)
+              end
 
-  @doc """
+              @doc """
   Returns a map with keys as unique elements given by `key_fun` and values
   as the count of every element.
 
@@ -1299,20 +1299,20 @@ defmodule Enum do
       %{3 => 2, 2 => 2, 1 => 1}
 
   """
-  @doc since: "1.10.0"
-  @spec frequencies_by(t, (element -> any)) :: map
-  def frequencies_by(enumerable, key_fun) when is_function(key_fun) do
-    reduce(enumerable, %{}, fn entry, acc ->
-      key = key_fun.(entry)
+              @doc since: "1.10.0"
+              @spec frequencies_by(t, (element -> any)) :: map
+              def frequencies_by(enumerable, key_fun) when is_function(key_fun) do
+                    reduce(enumerable, %{}, fn entry, acc ->
+                                              key = key_fun.(entry)
 
-      case acc do
-        %{^key => value} -> %{acc | key => value + 1}
-        %{} -> Map.put(acc, key, 1)
-      end
-    end)
-  end
+                                              case acc do
+                                                     %{^key => value} -> %{acc | key => value + 1}
+                                                     %{} -> Map.put(acc, key, 1)
+                                              end
+                                            end)
+              end
 
-  @doc """
+              @doc """
   Splits the `enumerable` into groups based on `key_fun`.
 
   The result is a map where each key is given by `key_fun`
@@ -1329,36 +1329,36 @@ defmodule Enum do
       %{3 => ["a", "c"], 5 => ["d"], 7 => ["b"]}
 
   """
-  @spec group_by(t, (element -> any), (element -> any)) :: map
-  def group_by(enumerable, key_fun, value_fun \\ fn x -> x end)
+              @spec group_by(t, (element -> any), (element -> any)) :: map
+              def group_by(enumerable, key_fun, value_fun \\ fn x -> x end)
 
-  def group_by(enumerable, key_fun, value_fun) when is_function(key_fun) do
-    reduce(reverse(enumerable), %{}, fn entry, acc ->
-      key = key_fun.(entry)
-      value = value_fun.(entry)
+              def group_by(enumerable, key_fun, value_fun) when is_function(key_fun) do
+                    reduce(reverse(enumerable), %{}, fn entry, acc ->
+                                                       key = key_fun.(entry)
+                                                       value = value_fun.(entry)
 
-      case acc do
-        %{^key => existing} -> %{acc | key => [value | existing]}
-        %{} -> Map.put(acc, key, [value])
-      end
-    end)
-  end
+                                                       case acc do
+                                                              %{^key => existing} -> %{acc | key => [value | existing]}
+                                                              %{} -> Map.put(acc, key, [value])
+                                                       end
+                                                     end)
+              end
 
-  def group_by(enumerable, dict, fun) do
-    IO.warn(
-      "Enum.group_by/3 with a map/dictionary as second element is deprecated. " <>
-        "A map is used by default and it is no longer required to pass one to this function"
-    )
+              def group_by(enumerable, dict, fun) do
+                    IO.warn(
+                      "Enum.group_by/3 with a map/dictionary as second element is deprecated. " <>
+                      "A map is used by default and it is no longer required to pass one to this function"
+                    )
 
-    # Avoid warnings about Dict
-    dict_module = Dict
+                    # Avoid warnings about Dict
+                    dict_module = Dict
 
-    reduce(reverse(enumerable), dict, fn entry, categories ->
-      dict_module.update(categories, fun.(entry), [entry], &[entry | &1])
-    end)
-  end
+                    reduce(reverse(enumerable), dict, fn entry, categories ->
+                                                        dict_module.update(categories, fun.(entry), [entry], &[entry | &1])
+                                                      end)
+              end
 
-  @doc """
+              @doc """
   Intersperses `separator` between each element of the enumeration.
 
   ## Examples
@@ -1373,28 +1373,28 @@ defmodule Enum do
       []
 
   """
-  @spec intersperse(t, element) :: list
-  def intersperse(enumerable, separator) when is_list(enumerable) do
-    case enumerable do
-      [] -> []
-      list -> intersperse_non_empty_list(list, separator)
-    end
-  end
+              @spec intersperse(t, element) :: list
+              def intersperse(enumerable, separator) when is_list(enumerable) do
+                    case enumerable do
+                           [] -> []
+                           list -> intersperse_non_empty_list(list, separator)
+                    end
+              end
 
-  def intersperse(enumerable, separator) do
-    list =
-      enumerable
-      |> reduce([], fn x, acc -> [x, separator | acc] end)
-      |> :lists.reverse()
+              def intersperse(enumerable, separator) do
+                    list =
+                      enumerable
+                    |> reduce([], fn x, acc -> [x, separator | acc] end)
+                    |> :lists.reverse()
 
-    # Head is a superfluous separator
-    case list do
-      [] -> []
-      [_ | t] -> t
-    end
-  end
+                    # Head is a superfluous separator
+                    case list do
+                           [] -> []
+                           [_ | t] -> t
+                    end
+              end
 
-  @doc """
+              @doc """
   Inserts the given `enumerable` into a `collectable`.
 
   Note that passing a non-empty list as the `collectable` is deprecated.
@@ -1417,55 +1417,55 @@ defmodule Enum do
       %{a: 2}
 
   """
-  @spec into(Enumerable.t(), Collectable.t()) :: Collectable.t()
-  def into(enumerable, collectable)
+              @spec into(Enumerable.t(), Collectable.t()) :: Collectable.t()
+              def into(enumerable, collectable)
 
-  def into(enumerable, []) do
-    to_list(enumerable)
-  end
+              def into(enumerable, []) do
+                    to_list(enumerable)
+              end
 
-  def into(%_{} = enumerable, collectable) do
-    into_protocol(enumerable, collectable)
-  end
+              def into(%_{} = enumerable, collectable) do
+                    into_protocol(enumerable, collectable)
+              end
 
-  def into(enumerable, %_{} = collectable) do
-    into_protocol(enumerable, collectable)
-  end
+              def into(enumerable, %_{} = collectable) do
+                    into_protocol(enumerable, collectable)
+              end
 
-  def into(enumerable, %{} = collectable) do
-    if map_size(collectable) == 0 do
-      into_map(enumerable)
-    else
-      into_map(enumerable, collectable)
-    end
-  end
+              def into(enumerable, %{} = collectable) do
+                    if map_size(collectable) == 0 do
+                         into_map(enumerable)
+                       else
+                       into_map(enumerable, collectable)
+              end
+              end
 
-  def into(enumerable, collectable) do
-    into_protocol(enumerable, collectable)
-  end
+              def into(enumerable, collectable) do
+                    into_protocol(enumerable, collectable)
+              end
 
-  defp into_map(%{} = enumerable), do: enumerable
-  defp into_map(enumerable) when is_list(enumerable), do: :maps.from_list(enumerable)
-  defp into_map(enumerable), do: enumerable |> Enum.to_list() |> :maps.from_list()
+              defp into_map(%{} = enumerable), do: enumerable
+              defp into_map(enumerable) when is_list(enumerable), do: :maps.from_list(enumerable)
+              defp into_map(enumerable), do: enumerable |> Enum.to_list() |> :maps.from_list()
 
-  defp into_map(%{} = enumerable, collectable),
-    do: Map.merge(collectable, enumerable)
+              defp into_map(%{} = enumerable, collectable),
+                   do: Map.merge(collectable, enumerable)
 
-  defp into_map(enumerable, collectable) when is_list(enumerable),
-    do: Map.merge(collectable, :maps.from_list(enumerable))
+              defp into_map(enumerable, collectable) when is_list(enumerable),
+                   do: Map.merge(collectable, :maps.from_list(enumerable))
 
-  defp into_map(enumerable, collectable),
-    do: Enum.reduce(enumerable, collectable, fn {key, val}, acc -> Map.put(acc, key, val) end)
+              defp into_map(enumerable, collectable),
+                   do: Enum.reduce(enumerable, collectable, fn {key, val}, acc -> Map.put(acc, key, val) end)
 
-  defp into_protocol(enumerable, collectable) do
-    {initial, fun} = Collectable.into(collectable)
+              defp into_protocol(enumerable, collectable) do
+                     {initial, fun} = Collectable.into(collectable)
 
-    into_protocol(enumerable, initial, fun, fn entry, acc ->
-      fun.(acc, {:cont, entry})
-    end)
-  end
+                     into_protocol(enumerable, initial, fun, fn entry, acc ->
+                                                               fun.(acc, {:cont, entry})
+                                                             end)
+              end
 
-  @doc """
+              @doc """
   Inserts the given `enumerable` into a `collectable` according to the
   transformation function.
 
@@ -1478,55 +1478,55 @@ defmodule Enum do
       %{a: 2, b: 4, c: 3}
 
   """
-  @spec into(Enumerable.t(), Collectable.t(), (term -> term)) :: Collectable.t()
-  def into(enumerable, [], transform) do
-    Enum.map(enumerable, transform)
-  end
+              @spec into(Enumerable.t(), Collectable.t(), (term -> term)) :: Collectable.t()
+              def into(enumerable, [], transform) do
+                    Enum.map(enumerable, transform)
+              end
 
-  def into(%_{} = enumerable, collectable, transform) do
-    into_protocol(enumerable, collectable, transform)
-  end
+              def into(%_{} = enumerable, collectable, transform) do
+                    into_protocol(enumerable, collectable, transform)
+              end
 
-  def into(enumerable, %_{} = collectable, transform) do
-    into_protocol(enumerable, collectable, transform)
-  end
+              def into(enumerable, %_{} = collectable, transform) do
+                    into_protocol(enumerable, collectable, transform)
+              end
 
-  def into(enumerable, %{} = collectable, transform) do
-    if map_size(collectable) == 0 do
-      enumerable |> Enum.map(transform) |> :maps.from_list()
-    else
-      Enum.reduce(enumerable, collectable, fn entry, acc ->
-        {key, val} = transform.(entry)
-        Map.put(acc, key, val)
-      end)
-    end
-  end
+              def into(enumerable, %{} = collectable, transform) do
+                    if map_size(collectable) == 0 do
+                         enumerable |> Enum.map(transform) |> :maps.from_list()
+                       else
+                       Enum.reduce(enumerable, collectable, fn entry, acc ->
+                                                              {key, val} = transform.(entry)
+                                                              Map.put(acc, key, val)
+                                                            end)
+              end
+              end
 
-  def into(enumerable, collectable, transform) do
-    into_protocol(enumerable, collectable, transform)
-  end
+              def into(enumerable, collectable, transform) do
+                    into_protocol(enumerable, collectable, transform)
+              end
 
-  defp into_protocol(enumerable, collectable, transform) do
-    {initial, fun} = Collectable.into(collectable)
+              defp into_protocol(enumerable, collectable, transform) do
+                     {initial, fun} = Collectable.into(collectable)
 
-    into_protocol(enumerable, initial, fun, fn entry, acc ->
-      fun.(acc, {:cont, transform.(entry)})
-    end)
-  end
+                     into_protocol(enumerable, initial, fun, fn entry, acc ->
+                                                               fun.(acc, {:cont, transform.(entry)})
+                                                             end)
+              end
 
-  defp into_protocol(enumerable, initial, fun, callback) do
-    try do
-      reduce(enumerable, initial, callback)
-    catch
-      kind, reason ->
-        fun.(initial, :halt)
-        :erlang.raise(kind, reason, __STACKTRACE__)
-    else
-      acc -> fun.(acc, :done)
-    end
-  end
+              defp into_protocol(enumerable, initial, fun, callback) do
+                     try do
+                       reduce(enumerable, initial, callback)
+                     catch
+                     kind, reason ->
+                       fun.(initial, :halt)
+                       :erlang.raise(kind, reason, __STACKTRACE__)
+                     else
+                     acc -> fun.(acc, :done)
+                     end
+              end
 
-  @doc """
+              @doc """
   Joins the given `enumerable` into a string using `joiner` as a
   separator.
 
@@ -1544,34 +1544,34 @@ defmodule Enum do
       "1 = 2 = 3"
 
   """
-  @spec join(t, String.t()) :: String.t()
-  def join(enumerable, joiner \\ "")
+              @spec join(t, String.t()) :: String.t()
+              def join(enumerable, joiner \\ "")
 
-  def join(enumerable, "") do
-    enumerable
-    |> map(&entry_to_string(&1))
-    |> IO.iodata_to_binary()
-  end
+              def join(enumerable, "") do
+                    enumerable
+                    |> map(&entry_to_string(&1))
+                    |> IO.iodata_to_binary()
+              end
 
-  def join(enumerable, joiner) when is_list(enumerable) and is_binary(joiner) do
-    join_list(enumerable, joiner)
-  end
+              def join(enumerable, joiner) when is_list(enumerable) and is_binary(joiner) do
+                    join_list(enumerable, joiner)
+              end
 
-  def join(enumerable, joiner) when is_binary(joiner) do
-    reduced =
-      reduce(enumerable, :first, fn
-        entry, :first -> entry_to_string(entry)
-        entry, acc -> [acc, joiner | entry_to_string(entry)]
-      end)
+              def join(enumerable, joiner) when is_binary(joiner) do
+                    reduced =
+                      reduce(enumerable, :first, fn
+                             entry, :first -> entry_to_string(entry)
+                             entry, acc -> [acc, joiner | entry_to_string(entry)]
+                             end)
 
-    if reduced == :first do
-      ""
-    else
-      IO.iodata_to_binary(reduced)
-    end
-  end
+                    if reduced == :first do
+                         ""
+                       else
+                       IO.iodata_to_binary(reduced)
+              end
+              end
 
-  @doc """
+              @doc """
   Returns a list where each element is the result of invoking
   `fun` on each corresponding element of `enumerable`.
 
@@ -1586,18 +1586,18 @@ defmodule Enum do
       [a: -1, b: -2]
 
   """
-  @spec map(t, (element -> any)) :: list
-  def map(enumerable, fun)
+              @spec map(t, (element -> any)) :: list
+              def map(enumerable, fun)
 
-  def map(enumerable, fun) when is_list(enumerable) do
-    :lists.map(fun, enumerable)
-  end
+              def map(enumerable, fun) when is_list(enumerable) do
+                    :lists.map(fun, enumerable)
+              end
 
-  def map(enumerable, fun) do
-    reduce(enumerable, [], R.map(fun)) |> :lists.reverse()
-  end
+              def map(enumerable, fun) do
+                    reduce(enumerable, [], R.map(fun)) |> :lists.reverse()
+              end
 
-  @doc """
+              @doc """
   Returns a list of results of invoking `fun` on every `nth`
   element of `enumerable`, starting with the first element.
 
@@ -1624,20 +1624,20 @@ defmodule Enum do
       [1001, 1002, 1003]
 
   """
-  @doc since: "1.4.0"
-  @spec map_every(t, non_neg_integer, (element -> any)) :: list
-  def map_every(enumerable, nth, fun)
+              @doc since: "1.4.0"
+              @spec map_every(t, non_neg_integer, (element -> any)) :: list
+              def map_every(enumerable, nth, fun)
 
-  def map_every(enumerable, 1, fun), do: map(enumerable, fun)
-  def map_every(enumerable, 0, _fun), do: to_list(enumerable)
-  def map_every([], nth, _fun) when is_integer(nth) and nth > 1, do: []
+              def map_every(enumerable, 1, fun), do: map(enumerable, fun)
+              def map_every(enumerable, 0, _fun), do: to_list(enumerable)
+              def map_every([], nth, _fun) when is_integer(nth) and nth > 1, do: []
 
-  def map_every(enumerable, nth, fun) when is_integer(nth) and nth > 1 do
-    {res, _} = reduce(enumerable, {[], :first}, R.map_every(nth, fun))
-    :lists.reverse(res)
-  end
+              def map_every(enumerable, nth, fun) when is_integer(nth) and nth > 1 do
+                    {res, _} = reduce(enumerable, {[], :first}, R.map_every(nth, fun))
+                    :lists.reverse(res)
+              end
 
-  @doc """
+              @doc """
   Maps and intersperses the given enumerable in one pass.
 
   ## Examples
@@ -1645,29 +1645,29 @@ defmodule Enum do
       iex> Enum.map_intersperse([1, 2, 3], :a, &(&1 * 2))
       [2, :a, 4, :a, 6]
   """
-  @doc since: "1.10.0"
-  @spec map_intersperse(t, element(), (element -> any())) :: list()
-  def map_intersperse(enumerable, separator, mapper)
+              @doc since: "1.10.0"
+              @spec map_intersperse(t, element(), (element -> any())) :: list()
+              def map_intersperse(enumerable, separator, mapper)
 
-  def map_intersperse(enumerable, separator, mapper) when is_list(enumerable) do
-    map_intersperse_list(enumerable, separator, mapper)
-  end
+              def map_intersperse(enumerable, separator, mapper) when is_list(enumerable) do
+                    map_intersperse_list(enumerable, separator, mapper)
+              end
 
-  def map_intersperse(enumerable, separator, mapper) do
-    reduced =
-      reduce(enumerable, :first, fn
-        entry, :first -> [mapper.(entry)]
-        entry, acc -> [mapper.(entry), separator | acc]
-      end)
+              def map_intersperse(enumerable, separator, mapper) do
+                    reduced =
+                      reduce(enumerable, :first, fn
+                             entry, :first -> [mapper.(entry)]
+                             entry, acc -> [mapper.(entry), separator | acc]
+                             end)
 
-    if reduced == :first do
-      []
-    else
-      :lists.reverse(reduced)
-    end
-  end
+                    if reduced == :first do
+                         []
+                       else
+                       :lists.reverse(reduced)
+              end
+              end
 
-  @doc """
+              @doc """
   Maps and joins the given `enumerable` in one pass.
 
   If `joiner` is not passed at all, it defaults to an empty string.
@@ -1684,14 +1684,14 @@ defmodule Enum do
       "2 = 4 = 6"
 
   """
-  @spec map_join(t, String.t(), (element -> String.Chars.t())) :: String.t()
-  def map_join(enumerable, joiner \\ "", mapper) when is_binary(joiner) do
-    enumerable
-    |> map_intersperse(joiner, &entry_to_string(mapper.(&1)))
-    |> IO.iodata_to_binary()
-  end
+              @spec map_join(t, String.t(), (element -> String.Chars.t())) :: String.t()
+              def map_join(enumerable, joiner \\ "", mapper) when is_binary(joiner) do
+                    enumerable
+                    |> map_intersperse(joiner, &entry_to_string(mapper.(&1)))
+                    |> IO.iodata_to_binary()
+              end
 
-  @doc """
+              @doc """
   Invokes the given function to each element in the `enumerable` to reduce
   it to a single element, while keeping an accumulator.
 
@@ -1710,36 +1710,36 @@ defmodule Enum do
       {[2, 4, 6], 6}
 
   """
-  @spec map_reduce(t, acc, (element, acc -> {element, acc})) :: {list, acc}
-  def map_reduce(enumerable, acc, fun) when is_list(enumerable) do
-    :lists.mapfoldl(fun, acc, enumerable)
-  end
+              @spec map_reduce(t, acc, (element, acc -> {element, acc})) :: {list, acc}
+              def map_reduce(enumerable, acc, fun) when is_list(enumerable) do
+                    :lists.mapfoldl(fun, acc, enumerable)
+              end
 
-  def map_reduce(enumerable, acc, fun) do
-    {list, acc} =
-      reduce(enumerable, {[], acc}, fn entry, {list, acc} ->
-        {new_entry, acc} = fun.(entry, acc)
-        {[new_entry | list], acc}
-      end)
+              def map_reduce(enumerable, acc, fun) do
+                    {list, acc} =
+                      reduce(enumerable, {[], acc}, fn entry, {list, acc} ->
+                                                      {new_entry, acc} = fun.(entry, acc)
+                                                      {[new_entry | list], acc}
+                                                    end)
 
-    {:lists.reverse(list), acc}
-  end
+                    {:lists.reverse(list), acc}
+              end
 
-  @doc false
-  def max(list = [_ | _]), do: :lists.max(list)
+              @doc false
+              def max(list = [_ | _]), do: :lists.max(list)
 
-  @doc false
-  def max(list = [_ | _], empty_fallback) when is_function(empty_fallback, 0) do
-    :lists.max(list)
-  end
+              @doc false
+              def max(list = [_ | _], empty_fallback) when is_function(empty_fallback, 0) do
+                    :lists.max(list)
+              end
 
-  @doc false
-  @spec max(t, (() -> empty_result)) :: element | empty_result when empty_result: any
-  def max(enumerable, empty_fallback) when is_function(empty_fallback, 0) do
-    max(enumerable, &>=/2, empty_fallback)
-  end
+              @doc false
+              @spec max(t, (() -> empty_result)) :: element | empty_result when empty_result: any
+              def max(enumerable, empty_fallback) when is_function(empty_fallback, 0) do
+                    max(enumerable, &>=/2, empty_fallback)
+              end
 
-  @doc """
+              @doc """
   Returns the maximal element in the `enumerable` according
   to Erlang's term ordering.
 
@@ -1781,32 +1781,32 @@ defmodule Enum do
       0
 
   """
-  @spec max(t, (element, element -> boolean) | module()) ::
-          element | empty_result
-        when empty_result: any
-  @spec max(t, (element, element -> boolean) | module(), (() -> empty_result)) ::
-          element | empty_result
-        when empty_result: any
-  def max(enumerable, sorter \\ &>=/2, empty_fallback \\ fn -> raise Enum.EmptyError end) do
-    aggregate(enumerable, max_sort_fun(sorter), empty_fallback)
-  end
+              @spec max(t, (element, element -> boolean) | module()) ::
+              element | empty_result
+              when empty_result: any
+              @spec max(t, (element, element -> boolean) | module(), (() -> empty_result)) ::
+              element | empty_result
+              when empty_result: any
+              def max(enumerable, sorter \\ &>=/2, empty_fallback \\ fn -> raise Enum.EmptyError end) do
+                    aggregate(enumerable, max_sort_fun(sorter), empty_fallback)
+              end
 
-  defp max_sort_fun(sorter) when is_function(sorter, 2), do: sorter
-  defp max_sort_fun(module) when is_atom(module), do: &(module.compare(&1, &2) != :lt)
+              defp max_sort_fun(sorter) when is_function(sorter, 2), do: sorter
+              defp max_sort_fun(module) when is_atom(module), do: &(module.compare(&1, &2) != :lt)
 
-  @doc false
-  @spec max_by(
-          t,
-          (element -> any),
-          (() -> empty_result) | (element, element -> boolean) | module()
-        ) :: element | empty_result
-        when empty_result: any
-  def max_by(enumerable, fun, empty_fallback)
-      when is_function(fun, 1) and is_function(empty_fallback, 0) do
-    max_by(enumerable, fun, &>=/2, empty_fallback)
-  end
+              @doc false
+              @spec max_by(
+                t,
+                (element -> any),
+                (() -> empty_result) | (element, element -> boolean) | module()
+              ) :: element | empty_result
+              when empty_result: any
+              def max_by(enumerable, fun, empty_fallback)
+              when is_function(fun, 1) and is_function(empty_fallback, 0) do
+                max_by(enumerable, fun, &>=/2, empty_fallback)
+              end
 
-  @doc """
+              @doc """
   Returns the maximal element in the `enumerable` as calculated
   by the given `fun`.
 
@@ -1850,19 +1850,19 @@ defmodule Enum do
       nil
 
   """
-  @spec max_by(
-          t,
-          (element -> any),
-          (element, element -> boolean) | module(),
-          (() -> empty_result)
-        ) :: element | empty_result
-        when empty_result: any
-  def max_by(enumerable, fun, sorter \\ &>=/2, empty_fallback \\ fn -> raise Enum.EmptyError end)
-      when is_function(fun, 1) do
-    aggregate_by(enumerable, fun, max_sort_fun(sorter), empty_fallback)
-  end
+              @spec max_by(
+                t,
+                (element -> any),
+                (element, element -> boolean) | module(),
+                (() -> empty_result)
+              ) :: element | empty_result
+              when empty_result: any
+              def max_by(enumerable, fun, sorter \\ &>=/2, empty_fallback \\ fn -> raise Enum.EmptyError end)
+              when is_function(fun, 1) do
+                aggregate_by(enumerable, fun, max_sort_fun(sorter), empty_fallback)
+              end
 
-  @doc """
+              @doc """
   Checks if `element` exists within the `enumerable`.
 
   Membership is tested with the match (`===/2`) operator.
@@ -1886,40 +1886,40 @@ defmodule Enum do
   When called outside guards, the [`in`](`in/2`) and [`not in`](`in/2`)
   operators work by using this function.
   """
-  @spec member?(t, element) :: boolean
-  def member?(enumerable, element) when is_list(enumerable) do
-    :lists.member(element, enumerable)
-  end
+              @spec member?(t, element) :: boolean
+              def member?(enumerable, element) when is_list(enumerable) do
+                    :lists.member(element, enumerable)
+              end
 
-  def member?(enumerable, element) do
-    case Enumerable.member?(enumerable, element) do
-      {:ok, element} when is_boolean(element) ->
-        element
+              def member?(enumerable, element) do
+                    case Enumerable.member?(enumerable, element) do
+                    {:ok, element} when is_boolean(element) ->
+                      element
 
-      {:error, module} ->
-        module.reduce(enumerable, {:cont, false}, fn
-          v, _ when v === element -> {:halt, true}
-          _, _ -> {:cont, false}
-        end)
-        |> elem(1)
-    end
-  end
+                    {:error, module} ->
+                      module.reduce(enumerable, {:cont, false}, fn
+                                    v, _ when v === element -> {:halt, true}
+                                    _, _ -> {:cont, false}
+                                    end)
+                      |> elem(1)
+                    end
+              end
 
-  @doc false
-  def min(list = [_ | _]), do: :lists.min(list)
+              @doc false
+              def min(list = [_ | _]), do: :lists.min(list)
 
-  @doc false
-  def min(list = [_ | _], empty_fallback) when is_function(empty_fallback, 0) do
-    :lists.min(list)
-  end
+              @doc false
+              def min(list = [_ | _], empty_fallback) when is_function(empty_fallback, 0) do
+                    :lists.min(list)
+              end
 
-  @doc false
-  @spec min(t, (() -> empty_result)) :: element | empty_result when empty_result: any
-  def min(enumerable, empty_fallback) when is_function(empty_fallback, 0) do
-    min(enumerable, &<=/2, empty_fallback)
-  end
+              @doc false
+              @spec min(t, (() -> empty_result)) :: element | empty_result when empty_result: any
+              def min(enumerable, empty_fallback) when is_function(empty_fallback, 0) do
+                    min(enumerable, &<=/2, empty_fallback)
+              end
 
-  @doc """
+              @doc """
   Returns the minimal element in the `enumerable` according
   to Erlang's term ordering.
 
@@ -1961,32 +1961,32 @@ defmodule Enum do
       0
 
   """
-  @spec min(t, (element, element -> boolean) | module()) ::
-          element | empty_result
-        when empty_result: any
-  @spec min(t, (element, element -> boolean) | module(), (() -> empty_result)) ::
-          element | empty_result
-        when empty_result: any
-  def min(enumerable, sorter \\ &<=/2, empty_fallback \\ fn -> raise Enum.EmptyError end) do
-    aggregate(enumerable, min_sort_fun(sorter), empty_fallback)
-  end
+              @spec min(t, (element, element -> boolean) | module()) ::
+              element | empty_result
+              when empty_result: any
+              @spec min(t, (element, element -> boolean) | module(), (() -> empty_result)) ::
+              element | empty_result
+              when empty_result: any
+              def min(enumerable, sorter \\ &<=/2, empty_fallback \\ fn -> raise Enum.EmptyError end) do
+                    aggregate(enumerable, min_sort_fun(sorter), empty_fallback)
+              end
 
-  defp min_sort_fun(sorter) when is_function(sorter, 2), do: sorter
-  defp min_sort_fun(module) when is_atom(module), do: &(module.compare(&1, &2) != :gt)
+              defp min_sort_fun(sorter) when is_function(sorter, 2), do: sorter
+              defp min_sort_fun(module) when is_atom(module), do: &(module.compare(&1, &2) != :gt)
 
-  @doc false
-  @spec min_by(
-          t,
-          (element -> any),
-          (() -> empty_result) | (element, element -> boolean) | module()
-        ) :: element | empty_result
-        when empty_result: any
-  def min_by(enumerable, fun, empty_fallback)
-      when is_function(fun, 1) and is_function(empty_fallback, 0) do
-    min_by(enumerable, fun, &<=/2, empty_fallback)
-  end
+              @doc false
+              @spec min_by(
+                t,
+                (element -> any),
+                (() -> empty_result) | (element, element -> boolean) | module()
+              ) :: element | empty_result
+              when empty_result: any
+              def min_by(enumerable, fun, empty_fallback)
+              when is_function(fun, 1) and is_function(empty_fallback, 0) do
+                min_by(enumerable, fun, &<=/2, empty_fallback)
+              end
 
-  @doc """
+              @doc """
   Returns the minimal element in the `enumerable` as calculated
   by the given `fun`.
 
@@ -2030,19 +2030,19 @@ defmodule Enum do
       nil
 
   """
-  @spec min_by(
-          t,
-          (element -> any),
-          (element, element -> boolean) | module(),
-          (() -> empty_result)
-        ) :: element | empty_result
-        when empty_result: any
-  def min_by(enumerable, fun, sorter \\ &<=/2, empty_fallback \\ fn -> raise Enum.EmptyError end)
-      when is_function(fun, 1) do
-    aggregate_by(enumerable, fun, min_sort_fun(sorter), empty_fallback)
-  end
+              @spec min_by(
+                t,
+                (element -> any),
+                (element, element -> boolean) | module(),
+                (() -> empty_result)
+              ) :: element | empty_result
+              when empty_result: any
+              def min_by(enumerable, fun, sorter \\ &<=/2, empty_fallback \\ fn -> raise Enum.EmptyError end)
+              when is_function(fun, 1) do
+                aggregate_by(enumerable, fun, min_sort_fun(sorter), empty_fallback)
+              end
 
-  @doc """
+              @doc """
   Returns a tuple with the minimal and the maximal elements in the
   enumerable according to Erlang's term ordering.
 
@@ -2061,43 +2061,43 @@ defmodule Enum do
       {nil, nil}
 
   """
-  @spec min_max(t, (() -> empty_result)) :: {element, element} | empty_result
-        when empty_result: any
-  def min_max(enumerable, empty_fallback \\ fn -> raise Enum.EmptyError end)
+              @spec min_max(t, (() -> empty_result)) :: {element, element} | empty_result
+              when empty_result: any
+              def min_max(enumerable, empty_fallback \\ fn -> raise Enum.EmptyError end)
 
-  def min_max(first..last//step = range, empty_fallback) when is_function(empty_fallback, 0) do
-    case Range.size(range) do
-      0 ->
-        empty_fallback.()
+              def min_max(first..last//step = range, empty_fallback) when is_function(empty_fallback, 0) do
+                    case Range.size(range) do
+                    0 ->
+                      empty_fallback.()
 
-      _ ->
-        last = last - rem(last - first, step)
-        {Kernel.min(first, last), Kernel.max(first, last)}
-    end
-  end
+                    _ ->
+                      last = last - rem(last - first, step)
+                      {Kernel.min(first, last), Kernel.max(first, last)}
+                    end
+              end
 
-  def min_max(enumerable, empty_fallback) when is_function(empty_fallback, 0) do
-    first_fun = &[&1 | &1]
+              def min_max(enumerable, empty_fallback) when is_function(empty_fallback, 0) do
+                    first_fun = &[&1 | &1]
 
-    reduce_fun = fn entry, [min | max] ->
-      [Kernel.min(min, entry) | Kernel.max(max, entry)]
-    end
+                    reduce_fun = fn entry, [min | max] ->
+                                   [Kernel.min(min, entry) | Kernel.max(max, entry)]
+                                 end
 
-    case reduce_by(enumerable, first_fun, reduce_fun) do
-      :empty -> empty_fallback.()
-      [min | max] -> {min, max}
-    end
-  end
+                    case reduce_by(enumerable, first_fun, reduce_fun) do
+                           :empty -> empty_fallback.()
+                           [min | max] -> {min, max}
+                    end
+              end
 
-  @doc false
-  @spec min_max_by(t, (element -> any), (() -> empty_result)) :: {element, element} | empty_result
-        when empty_result: any
-  def min_max_by(enumerable, fun, empty_fallback)
-      when is_function(fun, 1) and is_function(empty_fallback, 0) do
-    min_max_by(enumerable, fun, &</2, empty_fallback)
-  end
+              @doc false
+              @spec min_max_by(t, (element -> any), (() -> empty_result)) :: {element, element} | empty_result
+              when empty_result: any
+              def min_max_by(enumerable, fun, empty_fallback)
+              when is_function(fun, 1) and is_function(empty_fallback, 0) do
+                min_max_by(enumerable, fun, &</2, empty_fallback)
+              end
 
-  @doc """
+              @doc """
   Returns a tuple with the minimal and the maximal elements in the
   enumerable as calculated by the given function.
 
@@ -2141,59 +2141,59 @@ defmodule Enum do
       nil
 
   """
-  @spec min_max_by(t, (element -> any), (element, element -> boolean) | module()) ::
-          {element, element} | empty_result
-        when empty_result: any
-  @spec min_max_by(
-          t,
-          (element -> any),
-          (element, element -> boolean) | module(),
-          (() -> empty_result)
-        ) :: {element, element} | empty_result
-        when empty_result: any
-  def min_max_by(
-        enumerable,
-        fun,
-        sorter_or_empty_fallback \\ &</2,
-        empty_fallback \\ fn -> raise Enum.EmptyError end
-      )
+              @spec min_max_by(t, (element -> any), (element, element -> boolean) | module()) ::
+              {element, element} | empty_result
+              when empty_result: any
+              @spec min_max_by(
+                t,
+                (element -> any),
+                (element, element -> boolean) | module(),
+                (() -> empty_result)
+              ) :: {element, element} | empty_result
+              when empty_result: any
+              def min_max_by(
+                  enumerable,
+                  fun,
+                  sorter_or_empty_fallback \\ &</2,
+                  empty_fallback \\ fn -> raise Enum.EmptyError end
+                )
 
-  def min_max_by(enumerable, fun, sorter, empty_fallback)
-      when is_function(fun, 1) and is_atom(sorter) and is_function(empty_fallback, 0) do
-    min_max_by(enumerable, fun, min_max_by_sort_fun(sorter), empty_fallback)
-  end
+              def min_max_by(enumerable, fun, sorter, empty_fallback)
+              when is_function(fun, 1) and is_atom(sorter) and is_function(empty_fallback, 0) do
+                min_max_by(enumerable, fun, min_max_by_sort_fun(sorter), empty_fallback)
+              end
 
-  def min_max_by(enumerable, fun, sorter, empty_fallback)
-      when is_function(fun, 1) and is_function(sorter, 2) and is_function(empty_fallback, 0) do
-    first_fun = fn entry ->
-      fun_entry = fun.(entry)
-      {entry, entry, fun_entry, fun_entry}
-    end
+              def min_max_by(enumerable, fun, sorter, empty_fallback)
+              when is_function(fun, 1) and is_function(sorter, 2) and is_function(empty_fallback, 0) do
+                first_fun = fn entry ->
+                              fun_entry = fun.(entry)
+                              {entry, entry, fun_entry, fun_entry}
+                            end
 
-    reduce_fun = fn entry, {prev_min, prev_max, fun_min, fun_max} = acc ->
-      fun_entry = fun.(entry)
+                reduce_fun = fn entry, {prev_min, prev_max, fun_min, fun_max} = acc ->
+                               fun_entry = fun.(entry)
 
-      cond do
-        sorter.(fun_entry, fun_min) ->
-          {entry, prev_max, fun_entry, fun_max}
+                               cond do
+                             sorter.(fun_entry, fun_min) ->
+                               {entry, prev_max, fun_entry, fun_max}
 
-        sorter.(fun_max, fun_entry) ->
-          {prev_min, entry, fun_min, fun_entry}
+                             sorter.(fun_max, fun_entry) ->
+                               {prev_min, entry, fun_min, fun_entry}
 
-        true ->
-          acc
-      end
-    end
+                             true ->
+                               acc
+                             end
+              end
 
-    case reduce_by(enumerable, first_fun, reduce_fun) do
-      :empty -> empty_fallback.()
-      {min, max, _, _} -> {min, max}
-    end
-  end
+              case reduce_by(enumerable, first_fun, reduce_fun) do
+                     :empty -> empty_fallback.()
+                     {min, max, _, _} -> {min, max}
+              end
+              end
 
-  defp min_max_by_sort_fun(module) when is_atom(module), do: &(module.compare(&1, &2) == :lt)
+              defp min_max_by_sort_fun(module) when is_atom(module), do: &(module.compare(&1, &2) == :lt)
 
-  @doc """
+              @doc """
   Splits the `enumerable` in two lists according to the given function `fun`.
 
   Splits the given `enumerable` in two lists by calling `fun` with each element
@@ -2221,28 +2221,28 @@ defmodule Enum do
       {[], []}
 
   """
-  @doc since: "1.4.0"
-  @spec split_with(t, (element -> as_boolean(term))) :: {list, list}
-  def split_with(enumerable, fun) do
-    {acc1, acc2} =
-      reduce(enumerable, {[], []}, fn entry, {acc1, acc2} ->
-        if fun.(entry) do
-          {[entry | acc1], acc2}
-        else
-          {acc1, [entry | acc2]}
-        end
-      end)
+              @doc since: "1.4.0"
+              @spec split_with(t, (element -> as_boolean(term))) :: {list, list}
+              def split_with(enumerable, fun) do
+                    {acc1, acc2} =
+                      reduce(enumerable, {[], []}, fn entry, {acc1, acc2} ->
+                                                     if fun.(entry) do
+                                                          {[entry | acc1], acc2}
+                                                        else
+                                                        {acc1, [entry | acc2]}
+                                                   end
+                             end)
 
-    {:lists.reverse(acc1), :lists.reverse(acc2)}
-  end
+                    {:lists.reverse(acc1), :lists.reverse(acc2)}
+              end
 
-  @doc false
-  @deprecated "Use Enum.split_with/2 instead"
-  def partition(enumerable, fun) do
-    split_with(enumerable, fun)
-  end
+              @doc false
+              @deprecated "Use Enum.split_with/2 instead"
+              def partition(enumerable, fun) do
+                    split_with(enumerable, fun)
+              end
 
-  @doc """
+              @doc """
   Returns a random element of an `enumerable`.
 
   Raises `Enum.EmptyError` if `enumerable` is empty.
@@ -2276,36 +2276,36 @@ defmodule Enum do
       309
 
   """
-  @spec random(t) :: element
-  def random(enumerable)
+              @spec random(t) :: element
+              def random(enumerable)
 
-  def random(enumerable) when is_list(enumerable) do
-    case length(enumerable) do
-      0 -> raise Enum.EmptyError
-      length -> enumerable |> drop_list(random_integer(0, length - 1)) |> hd()
-    end
-  end
+              def random(enumerable) when is_list(enumerable) do
+                    case length(enumerable) do
+                           0 -> raise Enum.EmptyError
+                           length -> enumerable |> drop_list(random_integer(0, length - 1)) |> hd()
+                    end
+              end
 
-  def random(enumerable) do
-    result =
-      case Enumerable.slice(enumerable) do
-        {:ok, 0, _} ->
-          []
+              def random(enumerable) do
+                    result =
+                      case Enumerable.slice(enumerable) do
+                      {:ok, 0, _} ->
+                        []
 
-        {:ok, count, fun} when is_function(fun) ->
-          fun.(random_integer(0, count - 1), 1)
+                      {:ok, count, fun} when is_function(fun) ->
+                        fun.(random_integer(0, count - 1), 1)
 
-        {:error, _} ->
-          take_random(enumerable, 1)
-      end
+                      {:error, _} ->
+                        take_random(enumerable, 1)
+                      end
 
-    case result do
-      [] -> raise Enum.EmptyError
-      [elem] -> elem
-    end
-  end
+                    case result do
+                           [] -> raise Enum.EmptyError
+                           [elem] -> elem
+                    end
+              end
 
-  @doc """
+              @doc """
   Invokes `fun` for each element in the `enumerable` with the
   accumulator.
 
@@ -2331,30 +2331,30 @@ defmodule Enum do
       24
 
   """
-  @spec reduce(t, (element, acc -> acc)) :: acc
-  def reduce(enumerable, fun)
+              @spec reduce(t, (element, acc -> acc)) :: acc
+              def reduce(enumerable, fun)
 
-  def reduce([h | t], fun) do
-    reduce(t, h, fun)
-  end
+              def reduce([h | t], fun) do
+                    reduce(t, h, fun)
+              end
 
-  def reduce([], _fun) do
-    raise Enum.EmptyError
-  end
+              def reduce([], _fun) do
+                    raise Enum.EmptyError
+              end
 
-  def reduce(enumerable, fun) do
-    Enumerable.reduce(enumerable, {:cont, :first}, fn
-      x, {:acc, acc} -> {:cont, {:acc, fun.(x, acc)}}
-      x, :first -> {:cont, {:acc, x}}
-    end)
-    |> elem(1)
-    |> case do
-      :first -> raise Enum.EmptyError
-      {:acc, acc} -> acc
-    end
-  end
+              def reduce(enumerable, fun) do
+                    Enumerable.reduce(enumerable, {:cont, :first}, fn
+                                      x, {:acc, acc} -> {:cont, {:acc, fun.(x, acc)}}
+                                      x, :first -> {:cont, {:acc, x}}
+                                      end)
+                    |> elem(1)
+                    |> case do
+                              :first -> raise Enum.EmptyError
+                              {:acc, acc} -> acc
+                       end
+              end
 
-  @doc """
+              @doc """
   Invokes `fun` for each element in the `enumerable` with the accumulator.
 
   The initial value of the accumulator is `acc`. The function is invoked for
@@ -2391,28 +2391,28 @@ defmodule Enum do
   operation cannot be expressed by any of the functions in the `Enum`
   module, developers will most likely resort to `reduce/3`.
   """
-  @spec reduce(t, acc, (element, acc -> acc)) :: acc
-  def reduce(enumerable, acc, fun) when is_list(enumerable) do
-    :lists.foldl(fun, acc, enumerable)
-  end
+              @spec reduce(t, acc, (element, acc -> acc)) :: acc
+              def reduce(enumerable, acc, fun) when is_list(enumerable) do
+                    :lists.foldl(fun, acc, enumerable)
+              end
 
-  def reduce(first..last//step, acc, fun) do
-    reduce_range(first, last, step, acc, fun)
-  end
+              def reduce(first..last//step, acc, fun) do
+                    reduce_range(first, last, step, acc, fun)
+              end
 
-  def reduce(%_{} = enumerable, acc, fun) do
-    reduce_enumerable(enumerable, acc, fun)
-  end
+              def reduce(%_{} = enumerable, acc, fun) do
+                    reduce_enumerable(enumerable, acc, fun)
+              end
 
-  def reduce(%{} = enumerable, acc, fun) do
-    :maps.fold(fn k, v, acc -> fun.({k, v}, acc) end, acc, enumerable)
-  end
+              def reduce(%{} = enumerable, acc, fun) do
+                    :maps.fold(fn k, v, acc -> fun.({k, v}, acc) end, acc, enumerable)
+              end
 
-  def reduce(enumerable, acc, fun) do
-    reduce_enumerable(enumerable, acc, fun)
-  end
+              def reduce(enumerable, acc, fun) do
+                    reduce_enumerable(enumerable, acc, fun)
+              end
 
-  @doc """
+              @doc """
   Reduces `enumerable` until `fun` returns `{:halt, term}`.
 
   The return value for `fun` is expected to be
@@ -2437,12 +2437,12 @@ defmodule Enum do
       5050
 
   """
-  @spec reduce_while(t, any, (element, any -> {:cont, any} | {:halt, any})) :: any
-  def reduce_while(enumerable, acc, fun) do
-    Enumerable.reduce(enumerable, {:cont, acc}, fun) |> elem(1)
-  end
+              @spec reduce_while(t, any, (element, any -> {:cont, any} | {:halt, any})) :: any
+              def reduce_while(enumerable, acc, fun) do
+                    Enumerable.reduce(enumerable, {:cont, acc}, fun) |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Returns a list of elements in `enumerable` excluding those for which the function `fun` returns
   a truthy value.
 
@@ -2454,16 +2454,16 @@ defmodule Enum do
       [1, 3]
 
   """
-  @spec reject(t, (element -> as_boolean(term))) :: list
-  def reject(enumerable, fun) when is_list(enumerable) do
-    reject_list(enumerable, fun)
-  end
+              @spec reject(t, (element -> as_boolean(term))) :: list
+              def reject(enumerable, fun) when is_list(enumerable) do
+                    reject_list(enumerable, fun)
+              end
 
-  def reject(enumerable, fun) do
-    reduce(enumerable, [], R.reject(fun)) |> :lists.reverse()
-  end
+              def reject(enumerable, fun) do
+                    reduce(enumerable, [], R.reject(fun)) |> :lists.reverse()
+              end
 
-  @doc """
+              @doc """
   Returns a list of elements in `enumerable` in reverse order.
 
   ## Examples
@@ -2472,16 +2472,16 @@ defmodule Enum do
       [3, 2, 1]
 
   """
-  @spec reverse(t) :: list
-  def reverse(enumerable)
+              @spec reverse(t) :: list
+              def reverse(enumerable)
 
-  def reverse([]), do: []
-  def reverse([_] = list), do: list
-  def reverse([element1, element2]), do: [element2, element1]
-  def reverse([element1, element2 | rest]), do: :lists.reverse(rest, [element2, element1])
-  def reverse(enumerable), do: reduce(enumerable, [], &[&1 | &2])
+              def reverse([]), do: []
+              def reverse([_] = list), do: list
+              def reverse([element1, element2]), do: [element2, element1]
+              def reverse([element1, element2 | rest]), do: :lists.reverse(rest, [element2, element1])
+              def reverse(enumerable), do: reduce(enumerable, [], &[&1 | &2])
 
-  @doc """
+              @doc """
   Reverses the elements in `enumerable`, appends the `tail`, and returns
   it as a list.
 
@@ -2494,18 +2494,18 @@ defmodule Enum do
       [3, 2, 1, 4, 5, 6]
 
   """
-  @spec reverse(t, t) :: list
-  def reverse(enumerable, tail) when is_list(enumerable) do
-    :lists.reverse(enumerable, to_list(tail))
-  end
+              @spec reverse(t, t) :: list
+              def reverse(enumerable, tail) when is_list(enumerable) do
+                    :lists.reverse(enumerable, to_list(tail))
+              end
 
-  def reverse(enumerable, tail) do
-    reduce(enumerable, to_list(tail), fn entry, acc ->
-      [entry | acc]
-    end)
-  end
+              def reverse(enumerable, tail) do
+                    reduce(enumerable, to_list(tail), fn entry, acc ->
+                                                        [entry | acc]
+                                                      end)
+              end
 
-  @doc """
+              @doc """
   Reverses the `enumerable` in the range from initial `start_index`
   through `count` elements.
 
@@ -2518,21 +2518,21 @@ defmodule Enum do
       [1, 2, 6, 5, 4, 3]
 
   """
-  @spec reverse_slice(t, non_neg_integer, non_neg_integer) :: list
-  def reverse_slice(enumerable, start_index, count)
-      when is_integer(start_index) and start_index >= 0 and is_integer(count) and count >= 0 do
-    list = reverse(enumerable)
-    length = length(list)
-    count = Kernel.min(count, length - start_index)
+              @spec reverse_slice(t, non_neg_integer, non_neg_integer) :: list
+              def reverse_slice(enumerable, start_index, count)
+              when is_integer(start_index) and start_index >= 0 and is_integer(count) and count >= 0 do
+                list = reverse(enumerable)
+                length = length(list)
+                count = Kernel.min(count, length - start_index)
 
-    if count > 0 do
-      reverse_slice(list, length, start_index + count, count, [])
-    else
-      :lists.reverse(list)
-    end
-  end
+                if count > 0 do
+                     reverse_slice(list, length, start_index + count, count, [])
+                   else
+                   :lists.reverse(list)
+              end
+              end
 
-  @doc """
+              @doc """
   Slides a single or multiple elements given by `range_or_single_index` from `enumerable`
   to `insertion_index`.
 
@@ -2578,124 +2578,124 @@ defmodule Enum do
       [:a, :b, :c, :e, :f, :g, :d]
 
   """
-  @doc since: "1.13.0"
-  def slide(enumerable, range_or_single_index, insertion_index)
+              @doc since: "1.13.0"
+              def slide(enumerable, range_or_single_index, insertion_index)
 
-  def slide(enumerable, single_index, insertion_index) when is_integer(single_index) do
-    slide(enumerable, single_index..single_index, insertion_index)
-  end
+              def slide(enumerable, single_index, insertion_index) when is_integer(single_index) do
+                    slide(enumerable, single_index..single_index, insertion_index)
+              end
 
-  # This matches the behavior of Enum.slice/2
-  def slide(_, _.._//step = index_range, _insertion_index) when step != 1 do
-    raise ArgumentError,
-          "Enum.slide/3 does not accept ranges with custom steps, got: #{inspect(index_range)}"
-  end
+              # This matches the behavior of Enum.slice/2
+              def slide(_, _.._//step = index_range, _insertion_index) when step != 1 do
+                    raise ArgumentError,
+                    "Enum.slide/3 does not accept ranges with custom steps, got: #{inspect(index_range)}"
+              end
 
-  # Normalize negative input ranges like Enum.slice/2
-  def slide(enumerable, first..last, insertion_index)
-      when first < 0 or last < 0 or insertion_index < 0 do
-    count = Enum.count(enumerable)
-    normalized_first = if first >= 0, do: first, else: first + count
-    normalized_last = if last >= 0, do: last, else: last + count
+              # Normalize negative input ranges like Enum.slice/2
+              def slide(enumerable, first..last, insertion_index)
+              when first < 0 or last < 0 or insertion_index < 0 do
+                count = Enum.count(enumerable)
+                normalized_first = if first >= 0, do: first, else: first + count
+                normalized_last = if last >= 0, do: last, else: last + count
 
-    normalized_insertion_index =
-      if insertion_index >= 0, do: insertion_index, else: insertion_index + count
+                normalized_insertion_index =
+                  if insertion_index >= 0, do: insertion_index, else: insertion_index + count
 
-    if normalized_first >= 0 and normalized_first < count and
-         normalized_first != normalized_insertion_index do
-      normalized_range = normalized_first..normalized_last//1
-      slide(enumerable, normalized_range, normalized_insertion_index)
-    else
-      Enum.to_list(enumerable)
-    end
-  end
+                if normalized_first >= 0 and normalized_first < count and
+                normalized_first != normalized_insertion_index do
+                  normalized_range = normalized_first..normalized_last//1
+                  slide(enumerable, normalized_range, normalized_insertion_index)
+                else
+                Enum.to_list(enumerable)
+              end
+              end
 
-  def slide(enumerable, insertion_index.._, insertion_index) do
-    Enum.to_list(enumerable)
-  end
+              def slide(enumerable, insertion_index.._, insertion_index) do
+                    Enum.to_list(enumerable)
+              end
 
-  def slide(_, first..last, insertion_index)
-      when insertion_index > first and insertion_index <= last do
-    raise "Insertion index for slide must be outside the range being moved " <>
-            "(tried to insert #{first}..#{last} at #{insertion_index})"
-  end
+              def slide(_, first..last, insertion_index)
+              when insertion_index > first and insertion_index <= last do
+                raise "Insertion index for slide must be outside the range being moved " <>
+                "(tried to insert #{first}..#{last} at #{insertion_index})"
+              end
 
-  # Guarantees at this point: step size == 1 and first <= last and (insertion_index < first or insertion_index > last)
-  def slide(enumerable, first..last, insertion_index) do
-    impl = if is_list(enumerable), do: &slide_list_start/4, else: &slide_any/4
+              # Guarantees at this point: step size == 1 and first <= last and (insertion_index < first or insertion_index > last)
+              def slide(enumerable, first..last, insertion_index) do
+                    impl = if is_list(enumerable), do: &slide_list_start/4, else: &slide_any/4
 
-    cond do
-      insertion_index <= first -> impl.(enumerable, insertion_index, first, last)
-      insertion_index > last -> impl.(enumerable, first, last + 1, insertion_index)
-    end
-  end
+                    cond do
+                      insertion_index <= first -> impl.(enumerable, insertion_index, first, last)
+                      insertion_index > last -> impl.(enumerable, first, last + 1, insertion_index)
+              end
+              end
 
-  # Takes the range from middle..last and moves it to be in front of index start
-  defp slide_any(enumerable, start, middle, last) do
-    # We're going to deal with 4 "chunks" of the enumerable:
-    # 0. "Head," before the start index
-    # 1. "Slide back," between start (inclusive) and middle (exclusive)
-    # 2. "Slide front," between middle (inclusive) and last (inclusive)
-    # 3. "Tail," after last
-    #
-    # But, we're going to accumulate these into only two lists: pre and post.
-    # We'll reverse-accumulate the head into our pre list, then "slide back" into post,
-    # then "slide front" into pre, then "tail" into post.
-    #
-    # Then at the end, we're going to reassemble and reverse them, and end up with the
-    # chunks in the correct order.
-    {_size, pre, post} =
-      Enum.reduce(enumerable, {0, [], []}, fn item, {index, pre, post} ->
-        {pre, post} =
-          cond do
-            index < start -> {[item | pre], post}
-            index >= start and index < middle -> {pre, [item | post]}
-            index >= middle and index <= last -> {[item | pre], post}
-            true -> {pre, [item | post]}
-          end
+              # Takes the range from middle..last and moves it to be in front of index start
+              defp slide_any(enumerable, start, middle, last) do
+                     # We're going to deal with 4 "chunks" of the enumerable:
+                     # 0. "Head," before the start index
+                     # 1. "Slide back," between start (inclusive) and middle (exclusive)
+                     # 2. "Slide front," between middle (inclusive) and last (inclusive)
+                     # 3. "Tail," after last
+                     #
+                     # But, we're going to accumulate these into only two lists: pre and post.
+                     # We'll reverse-accumulate the head into our pre list, then "slide back" into post,
+                     # then "slide front" into pre, then "tail" into post.
+                     #
+                     # Then at the end, we're going to reassemble and reverse them, and end up with the
+                     # chunks in the correct order.
+                     {_size, pre, post} =
+                       Enum.reduce(enumerable, {0, [], []}, fn item, {index, pre, post} ->
+                                                              {pre, post} =
+                                                                cond do
+                                                                index < start -> {[item | pre], post}
+                                                                index >= start and index < middle -> {pre, [item | post]}
+                                                                index >= middle and index <= last -> {[item | pre], post}
+                                                                true -> {pre, [item | post]}
+                                                            end
 
-        {index + 1, pre, post}
-      end)
+                                    {index + 1, pre, post}
+                                   end)
 
-    :lists.reverse(pre, :lists.reverse(post))
-  end
+                     :lists.reverse(pre, :lists.reverse(post))
+              end
 
-  # Like slide_any/4 above, this optimized implementation of slide for lists depends
-  # on the indices being sorted such that we're moving middle..last to be in front of start.
-  defp slide_list_start([h | t], start, middle, last)
-       when start > 0 and start <= middle and middle <= last do
-    [h | slide_list_start(t, start - 1, middle - 1, last - 1)]
-  end
+              # Like slide_any/4 above, this optimized implementation of slide for lists depends
+              # on the indices being sorted such that we're moving middle..last to be in front of start.
+              defp slide_list_start([h | t], start, middle, last)
+              when start > 0 and start <= middle and middle <= last do
+                [h | slide_list_start(t, start - 1, middle - 1, last - 1)]
+              end
 
-  defp slide_list_start(list, 0, middle, last), do: slide_list_middle(list, middle, last, [])
+              defp slide_list_start(list, 0, middle, last), do: slide_list_middle(list, middle, last, [])
 
-  defp slide_list_middle([h | t], middle, last, acc) when middle > 0 do
-    slide_list_middle(t, middle - 1, last - 1, [h | acc])
-  end
+              defp slide_list_middle([h | t], middle, last, acc) when middle > 0 do
+                     slide_list_middle(t, middle - 1, last - 1, [h | acc])
+              end
 
-  defp slide_list_middle(list, 0, last, start_to_middle) do
-    {slid_range, tail} = slide_list_last(list, last + 1, [])
-    slid_range ++ :lists.reverse(start_to_middle, tail)
-  end
+              defp slide_list_middle(list, 0, last, start_to_middle) do
+                     {slid_range, tail} = slide_list_last(list, last + 1, [])
+                     slid_range ++ :lists.reverse(start_to_middle, tail)
+              end
 
-  # You asked for a middle index off the end of the list... you get what we've got
-  defp slide_list_middle([], _, _, acc) do
-    :lists.reverse(acc)
-  end
+              # You asked for a middle index off the end of the list... you get what we've got
+              defp slide_list_middle([], _, _, acc) do
+                     :lists.reverse(acc)
+              end
 
-  defp slide_list_last([h | t], last, acc) when last > 0 do
-    slide_list_last(t, last - 1, [h | acc])
-  end
+              defp slide_list_last([h | t], last, acc) when last > 0 do
+                     slide_list_last(t, last - 1, [h | acc])
+              end
 
-  defp slide_list_last(rest, 0, acc) do
-    {:lists.reverse(acc), rest}
-  end
+              defp slide_list_last(rest, 0, acc) do
+                     {:lists.reverse(acc), rest}
+              end
 
-  defp slide_list_last([], _, acc) do
-    {:lists.reverse(acc), []}
-  end
+              defp slide_list_last([], _, acc) do
+                     {:lists.reverse(acc), []}
+              end
 
-  @doc """
+              @doc """
   Applies the given function to each element in the `enumerable`,
   storing the result in a list and passing it as the accumulator
   for the next computation. Uses the first element in the `enumerable`
@@ -2707,22 +2707,22 @@ defmodule Enum do
       [1, 3, 6, 10, 15]
 
   """
-  @spec scan(t, (element, any -> any)) :: list
-  def scan(enumerable, fun)
+              @spec scan(t, (element, any -> any)) :: list
+              def scan(enumerable, fun)
 
-  def scan([], _fun), do: []
+              def scan([], _fun), do: []
 
-  def scan([elem | rest], fun) do
-    scanned = scan_list(rest, elem, fun)
-    [elem | scanned]
-  end
+              def scan([elem | rest], fun) do
+                    scanned = scan_list(rest, elem, fun)
+                    [elem | scanned]
+              end
 
-  def scan(enumerable, fun) do
-    {res, _} = reduce(enumerable, {[], :first}, R.scan2(fun))
-    :lists.reverse(res)
-  end
+              def scan(enumerable, fun) do
+                    {res, _} = reduce(enumerable, {[], :first}, R.scan2(fun))
+                    :lists.reverse(res)
+              end
 
-  @doc """
+              @doc """
   Applies the given function to each element in the `enumerable`,
   storing the result in a list and passing it as the accumulator
   for the next computation. Uses the given `acc` as the starting value.
@@ -2733,17 +2733,17 @@ defmodule Enum do
       [1, 3, 6, 10, 15]
 
   """
-  @spec scan(t, any, (element, any -> any)) :: list
-  def scan(enumerable, acc, fun) when is_list(enumerable) do
-    scan_list(enumerable, acc, fun)
-  end
+              @spec scan(t, any, (element, any -> any)) :: list
+              def scan(enumerable, acc, fun) when is_list(enumerable) do
+                    scan_list(enumerable, acc, fun)
+              end
 
-  def scan(enumerable, acc, fun) do
-    {res, _} = reduce(enumerable, {[], acc}, R.scan3(fun))
-    :lists.reverse(res)
-  end
+              def scan(enumerable, acc, fun) do
+                    {res, _} = reduce(enumerable, {[], acc}, R.scan3(fun))
+                    :lists.reverse(res)
+              end
 
-  @doc """
+              @doc """
   Returns a list with the elements of `enumerable` shuffled.
 
   This function uses Erlang's [`:rand` module](`:rand`) to calculate
@@ -2763,17 +2763,17 @@ defmodule Enum do
       [2, 1, 3]
 
   """
-  @spec shuffle(t) :: list
-  def shuffle(enumerable) do
-    randomized =
-      reduce(enumerable, [], fn x, acc ->
-        [{:rand.uniform(), x} | acc]
-      end)
+              @spec shuffle(t) :: list
+              def shuffle(enumerable) do
+                    randomized =
+                      reduce(enumerable, [], fn x, acc ->
+                                               [{:rand.uniform(), x} | acc]
+                                             end)
 
-    shuffle_unwrap(:lists.keysort(1, randomized), [])
-  end
+                    shuffle_unwrap(:lists.keysort(1, randomized), [])
+              end
 
-  @doc """
+              @doc """
   Returns a subset list of the given `enumerable` by `index_range`.
 
   `index_range` must be a `Range`. Given an `enumerable`, it drops
@@ -2818,47 +2818,47 @@ defmodule Enum do
       []
 
   """
-  @doc since: "1.6.0"
-  @spec slice(t, Range.t()) :: list
-  def slice(enumerable, first..last//step = index_range) do
-    # TODO: Deprecate negative steps on Elixir v1.16
-    # TODO: There are two features we can add to slicing ranges:
-    # 1. We can allow the step to be any positive number
-    # 2. We can allow slice and reverse at the same time. However, we can't
-    #    implement so right now. First we will have to raise if a decreasing
-    #    range is given on Elixir v2.0.
-    if step == 1 or (step == -1 and first > last) do
-      slice_range(enumerable, first, last)
-    else
-      raise ArgumentError,
-            "Enum.slice/2 does not accept ranges with custom steps, got: #{inspect(index_range)}"
-    end
-  end
+              @doc since: "1.6.0"
+              @spec slice(t, Range.t()) :: list
+              def slice(enumerable, first..last//step = index_range) do
+                    # TODO: Deprecate negative steps on Elixir v1.16
+                    # TODO: There are two features we can add to slicing ranges:
+                    # 1. We can allow the step to be any positive number
+                    # 2. We can allow slice and reverse at the same time. However, we can't
+                    #    implement so right now. First we will have to raise if a decreasing
+                    #    range is given on Elixir v2.0.
+                    if step == 1 or (step == -1 and first > last) do
+                         slice_range(enumerable, first, last)
+                       else
+                       raise ArgumentError,
+                       "Enum.slice/2 does not accept ranges with custom steps, got: #{inspect(index_range)}"
+              end
+              end
 
-  # TODO: Remove me on v2.0
-  def slice(enumerable, %{__struct__: Range, first: first, last: last} = index_range) do
-    step = if first <= last, do: 1, else: -1
-    slice(enumerable, Map.put(index_range, :step, step))
-  end
+              # TODO: Remove me on v2.0
+              def slice(enumerable, %{__struct__: Range, first: first, last: last} = index_range) do
+                    step = if first <= last, do: 1, else: -1
+                    slice(enumerable, Map.put(index_range, :step, step))
+              end
 
-  defp slice_range(enumerable, first, last) when last >= first and last >= 0 and first >= 0 do
-    slice_any(enumerable, first, last - first + 1)
-  end
+              defp slice_range(enumerable, first, last) when last >= first and last >= 0 and first >= 0 do
+                     slice_any(enumerable, first, last - first + 1)
+              end
 
-  defp slice_range(enumerable, first, last) do
-    {count, fun} = slice_count_and_fun(enumerable)
-    first = if first >= 0, do: first, else: first + count
-    last = if last >= 0, do: last, else: last + count
-    amount = last - first + 1
+              defp slice_range(enumerable, first, last) do
+                     {count, fun} = slice_count_and_fun(enumerable)
+                     first = if first >= 0, do: first, else: first + count
+                     last = if last >= 0, do: last, else: last + count
+                     amount = last - first + 1
 
-    if first >= 0 and first < count and amount > 0 do
-      fun.(first, Kernel.min(amount, count - first))
-    else
-      []
-    end
-  end
+                     if first >= 0 and first < count and amount > 0 do
+                          fun.(first, Kernel.min(amount, count - first))
+                        else
+                        []
+              end
+              end
 
-  @doc """
+              @doc """
   Returns a subset list of the given `enumerable`, from `start_index` (zero-based)
   with `amount` number of elements if available.
 
@@ -2897,15 +2897,15 @@ defmodule Enum do
       []
 
   """
-  @spec slice(t, index, non_neg_integer) :: list
-  def slice(_enumerable, start_index, 0) when is_integer(start_index), do: []
+              @spec slice(t, index, non_neg_integer) :: list
+              def slice(_enumerable, start_index, 0) when is_integer(start_index), do: []
 
-  def slice(enumerable, start_index, amount)
-      when is_integer(start_index) and is_integer(amount) and amount >= 0 do
-    slice_any(enumerable, start_index, amount)
-  end
+              def slice(enumerable, start_index, amount)
+              when is_integer(start_index) and is_integer(amount) and amount >= 0 do
+                slice_any(enumerable, start_index, amount)
+              end
 
-  @doc """
+              @doc """
   Sorts the `enumerable` according to Erlang's term ordering.
 
   This function uses the merge sort algorithm. Do not use this
@@ -2917,16 +2917,16 @@ defmodule Enum do
       [1, 2, 3]
 
   """
-  @spec sort(t) :: list
-  def sort(enumerable) when is_list(enumerable) do
-    :lists.sort(enumerable)
-  end
+              @spec sort(t) :: list
+              def sort(enumerable) when is_list(enumerable) do
+                    :lists.sort(enumerable)
+              end
 
-  def sort(enumerable) do
-    sort(enumerable, &(&1 <= &2))
-  end
+              def sort(enumerable) do
+                    sort(enumerable, &(&1 <= &2))
+              end
 
-  @doc """
+              @doc """
   Sorts the `enumerable` by the given function.
 
   This function uses the merge sort algorithm. The given function should compare
@@ -2998,29 +2998,29 @@ defmodule Enum do
       [~D[2020-03-02], ~D[2019-06-06], ~D[2019-01-01]]
 
   """
-  @spec sort(
-          t,
-          (element, element -> boolean) | :asc | :desc | module() | {:asc | :desc, module()}
-        ) :: list
-  def sort(enumerable, fun) when is_list(enumerable) do
-    :lists.sort(to_sort_fun(fun), enumerable)
-  end
+              @spec sort(
+                t,
+                (element, element -> boolean) | :asc | :desc | module() | {:asc | :desc, module()}
+              ) :: list
+              def sort(enumerable, fun) when is_list(enumerable) do
+                    :lists.sort(to_sort_fun(fun), enumerable)
+              end
 
-  def sort(enumerable, fun) do
-    fun = to_sort_fun(fun)
+              def sort(enumerable, fun) do
+                    fun = to_sort_fun(fun)
 
-    reduce(enumerable, [], &sort_reducer(&1, &2, fun))
-    |> sort_terminator(fun)
-  end
+                    reduce(enumerable, [], &sort_reducer(&1, &2, fun))
+                    |> sort_terminator(fun)
+              end
 
-  defp to_sort_fun(sorter) when is_function(sorter, 2), do: sorter
-  defp to_sort_fun(:asc), do: &<=/2
-  defp to_sort_fun(:desc), do: &>=/2
-  defp to_sort_fun(module) when is_atom(module), do: &(module.compare(&1, &2) != :gt)
-  defp to_sort_fun({:asc, module}) when is_atom(module), do: &(module.compare(&1, &2) != :gt)
-  defp to_sort_fun({:desc, module}) when is_atom(module), do: &(module.compare(&1, &2) != :lt)
+              defp to_sort_fun(sorter) when is_function(sorter, 2), do: sorter
+              defp to_sort_fun(:asc), do: &<=/2
+              defp to_sort_fun(:desc), do: &>=/2
+              defp to_sort_fun(module) when is_atom(module), do: &(module.compare(&1, &2) != :gt)
+              defp to_sort_fun({:asc, module}) when is_atom(module), do: &(module.compare(&1, &2) != :gt)
+              defp to_sort_fun({:desc, module}) when is_atom(module), do: &(module.compare(&1, &2) != :lt)
 
-  @doc """
+              @doc """
   Sorts the mapped results of the `enumerable` according to the provided `sorter`
   function.
 
@@ -3082,39 +3082,39 @@ defmodule Enum do
       ]
 
   """
-  @spec sort_by(
-          t,
-          (element -> mapped_element),
-          (element, element -> boolean) | :asc | :desc | module() | {:asc | :desc, module()}
-        ) ::
-          list
-        when mapped_element: element
-  def sort_by(enumerable, mapper, sorter \\ &<=/2) do
-    enumerable
-    |> map(&{&1, mapper.(&1)})
-    |> sort(to_sort_by_fun(sorter))
-    |> map(&elem(&1, 0))
-  end
+              @spec sort_by(
+                t,
+                (element -> mapped_element),
+                (element, element -> boolean) | :asc | :desc | module() | {:asc | :desc, module()}
+              ) ::
+              list
+              when mapped_element: element
+              def sort_by(enumerable, mapper, sorter \\ &<=/2) do
+                    enumerable
+                    |> map(&{&1, mapper.(&1)})
+                    |> sort(to_sort_by_fun(sorter))
+                    |> map(&elem(&1, 0))
+              end
 
-  defp to_sort_by_fun(sorter) when is_function(sorter, 2),
-    do: &sorter.(elem(&1, 1), elem(&2, 1))
+              defp to_sort_by_fun(sorter) when is_function(sorter, 2),
+                   do: &sorter.(elem(&1, 1), elem(&2, 1))
 
-  defp to_sort_by_fun(:asc),
-    do: &(elem(&1, 1) <= elem(&2, 1))
+              defp to_sort_by_fun(:asc),
+                   do: &(elem(&1, 1) <= elem(&2, 1))
 
-  defp to_sort_by_fun(:desc),
-    do: &(elem(&1, 1) >= elem(&2, 1))
+              defp to_sort_by_fun(:desc),
+                   do: &(elem(&1, 1) >= elem(&2, 1))
 
-  defp to_sort_by_fun(module) when is_atom(module),
-    do: &(module.compare(elem(&1, 1), elem(&2, 1)) != :gt)
+              defp to_sort_by_fun(module) when is_atom(module),
+                   do: &(module.compare(elem(&1, 1), elem(&2, 1)) != :gt)
 
-  defp to_sort_by_fun({:asc, module}) when is_atom(module),
-    do: &(module.compare(elem(&1, 1), elem(&2, 1)) != :gt)
+              defp to_sort_by_fun({:asc, module}) when is_atom(module),
+                   do: &(module.compare(elem(&1, 1), elem(&2, 1)) != :gt)
 
-  defp to_sort_by_fun({:desc, module}) when is_atom(module),
-    do: &(module.compare(elem(&1, 1), elem(&2, 1)) != :lt)
+              defp to_sort_by_fun({:desc, module}) when is_atom(module),
+                   do: &(module.compare(elem(&1, 1), elem(&2, 1)) != :lt)
 
-  @doc """
+              @doc """
   Splits the `enumerable` into two enumerables, leaving `count`
   elements in the first one.
 
@@ -3143,29 +3143,29 @@ defmodule Enum do
       {[], [1, 2, 3]}
 
   """
-  @spec split(t, integer) :: {list, list}
-  def split(enumerable, count) when is_list(enumerable) and is_integer(count) and count >= 0 do
-    split_list(enumerable, count, [])
-  end
+              @spec split(t, integer) :: {list, list}
+              def split(enumerable, count) when is_list(enumerable) and is_integer(count) and count >= 0 do
+                    split_list(enumerable, count, [])
+              end
 
-  def split(enumerable, count) when is_integer(count) and count >= 0 do
-    {_, list1, list2} =
-      reduce(enumerable, {count, [], []}, fn entry, {counter, acc1, acc2} ->
-        if counter > 0 do
-          {counter - 1, [entry | acc1], acc2}
-        else
-          {counter, acc1, [entry | acc2]}
-        end
-      end)
+              def split(enumerable, count) when is_integer(count) and count >= 0 do
+                    {_, list1, list2} =
+                      reduce(enumerable, {count, [], []}, fn entry, {counter, acc1, acc2} ->
+                                                            if counter > 0 do
+                                                                 {counter - 1, [entry | acc1], acc2}
+                                                               else
+                                                               {counter, acc1, [entry | acc2]}
+                                                          end
+                             end)
 
-    {:lists.reverse(list1), :lists.reverse(list2)}
-  end
+                    {:lists.reverse(list1), :lists.reverse(list2)}
+              end
 
-  def split(enumerable, count) when is_integer(count) and count < 0 do
-    split_reverse_list(reverse(enumerable), -count, [])
-  end
+              def split(enumerable, count) when is_integer(count) and count < 0 do
+                    split_reverse_list(reverse(enumerable), -count, [])
+              end
 
-  @doc """
+              @doc """
   Splits enumerable in two at the position of the element for which
   `fun` returns a falsy value (`false` or `nil`) for the first time.
 
@@ -3184,25 +3184,25 @@ defmodule Enum do
       {[1, 2, 3, 4], []}
 
   """
-  @spec split_while(t, (element -> as_boolean(term))) :: {list, list}
-  def split_while(enumerable, fun) when is_list(enumerable) do
-    split_while_list(enumerable, fun, [])
-  end
+              @spec split_while(t, (element -> as_boolean(term))) :: {list, list}
+              def split_while(enumerable, fun) when is_list(enumerable) do
+                    split_while_list(enumerable, fun, [])
+              end
 
-  def split_while(enumerable, fun) do
-    {list1, list2} =
-      reduce(enumerable, {[], []}, fn
-        entry, {acc1, []} ->
-          if(fun.(entry), do: {[entry | acc1], []}, else: {acc1, [entry]})
+              def split_while(enumerable, fun) do
+                    {list1, list2} =
+                      reduce(enumerable, {[], []}, fn
+                             entry, {acc1, []} ->
+                               if(fun.(entry), do: {[entry | acc1], []}, else: {acc1, [entry]})
 
-        entry, {acc1, acc2} ->
-          {acc1, [entry | acc2]}
-      end)
+                             entry, {acc1, acc2} ->
+                               {acc1, [entry | acc2]}
+                             end)
 
-    {:lists.reverse(list1), :lists.reverse(list2)}
-  end
+                    {:lists.reverse(list1), :lists.reverse(list2)}
+              end
 
-  @doc """
+              @doc """
   Returns the sum of all elements.
 
   Raises `ArithmeticError` if `enumerable` contains a non-numeric value.
@@ -3219,21 +3219,21 @@ defmodule Enum do
       25
 
   """
-  @spec sum(t) :: number
-  def sum(enumerable)
+              @spec sum(t) :: number
+              def sum(enumerable)
 
-  def sum(first..last//step = range) do
-    range
-    |> Range.size()
-    |> Kernel.*(first + last - rem(last - first, step))
-    |> div(2)
-  end
+              def sum(first..last//step = range) do
+                    range
+                    |> Range.size()
+                    |> Kernel.*(first + last - rem(last - first, step))
+                    |> div(2)
+              end
 
-  def sum(enumerable) do
-    reduce(enumerable, 0, &+/2)
-  end
+              def sum(enumerable) do
+                    reduce(enumerable, 0, &+/2)
+              end
 
-  @doc """
+              @doc """
   Returns the product of all elements.
 
   Raises `ArithmeticError` if `enumerable` contains a non-numeric value.
@@ -3248,13 +3248,13 @@ defmodule Enum do
       24.0
 
   """
-  @doc since: "1.12.0"
-  @spec product(t) :: number
-  def product(enumerable) do
-    reduce(enumerable, 1, &*/2)
-  end
+              @doc since: "1.12.0"
+              @spec product(t) :: number
+              def product(enumerable) do
+                    reduce(enumerable, 1, &*/2)
+              end
 
-  @doc """
+              @doc """
   Takes an `amount` of elements from the beginning or the end of the `enumerable`.
 
   If a positive `amount` is given, it takes the `amount` elements from the
@@ -3281,35 +3281,35 @@ defmodule Enum do
       [3]
 
   """
-  @spec take(t, integer) :: list
-  def take(enumerable, amount)
+              @spec take(t, integer) :: list
+              def take(enumerable, amount)
 
-  def take(_enumerable, 0), do: []
+              def take(_enumerable, 0), do: []
 
-  def take(enumerable, amount)
-      when is_list(enumerable) and is_integer(amount) and amount > 0 do
-    take_list(enumerable, amount)
-  end
+              def take(enumerable, amount)
+              when is_list(enumerable) and is_integer(amount) and amount > 0 do
+                take_list(enumerable, amount)
+              end
 
-  def take(enumerable, amount) when is_integer(amount) and amount > 0 do
-    {_, {res, _}} =
-      Enumerable.reduce(enumerable, {:cont, {[], amount}}, fn entry, {list, n} ->
-        case n do
-          1 -> {:halt, {[entry | list], n - 1}}
-          _ -> {:cont, {[entry | list], n - 1}}
-        end
-      end)
+              def take(enumerable, amount) when is_integer(amount) and amount > 0 do
+                    {_, {res, _}} =
+                      Enumerable.reduce(enumerable, {:cont, {[], amount}}, fn entry, {list, n} ->
+                                                                             case n do
+                                                                                    1 -> {:halt, {[entry | list], n - 1}}
+                                                                                    _ -> {:cont, {[entry | list], n - 1}}
+                                                                             end
+                                                                           end)
 
-    :lists.reverse(res)
-  end
+                    :lists.reverse(res)
+              end
 
-  def take(enumerable, amount) when is_integer(amount) and amount < 0 do
-    {count, fun} = slice_count_and_fun(enumerable)
-    first = Kernel.max(amount + count, 0)
-    fun.(first, count - first)
-  end
+              def take(enumerable, amount) when is_integer(amount) and amount < 0 do
+                    {count, fun} = slice_count_and_fun(enumerable)
+                    first = Kernel.max(amount + count, 0)
+                    fun.(first, count - first)
+              end
 
-  @doc """
+              @doc """
   Returns a list of every `nth` element in the `enumerable`,
   starting with the first element.
 
@@ -3330,19 +3330,19 @@ defmodule Enum do
       [1, 2, 3]
 
   """
-  @spec take_every(t, non_neg_integer) :: list
-  def take_every(enumerable, nth)
+              @spec take_every(t, non_neg_integer) :: list
+              def take_every(enumerable, nth)
 
-  def take_every(enumerable, 1), do: to_list(enumerable)
-  def take_every(_enumerable, 0), do: []
-  def take_every([], nth) when is_integer(nth) and nth > 1, do: []
+              def take_every(enumerable, 1), do: to_list(enumerable)
+              def take_every(_enumerable, 0), do: []
+              def take_every([], nth) when is_integer(nth) and nth > 1, do: []
 
-  def take_every(enumerable, nth) when is_integer(nth) and nth > 1 do
-    {res, _} = reduce(enumerable, {[], :first}, R.take_every(nth))
-    :lists.reverse(res)
-  end
+              def take_every(enumerable, nth) when is_integer(nth) and nth > 1 do
+                    {res, _} = reduce(enumerable, {[], :first}, R.take_every(nth))
+                    :lists.reverse(res)
+              end
 
-  @doc """
+              @doc """
   Takes `count` random elements from `enumerable`.
 
   Note that this function will traverse the whole `enumerable` to
@@ -3360,94 +3360,94 @@ defmodule Enum do
       'mikel'
 
   """
-  @spec take_random(t, non_neg_integer) :: list
-  def take_random(enumerable, count)
-  def take_random(_enumerable, 0), do: []
+              @spec take_random(t, non_neg_integer) :: list
+              def take_random(enumerable, count)
+              def take_random(_enumerable, 0), do: []
 
-  def take_random([], _), do: []
-  def take_random([h | t], 1), do: take_random_list_one(t, h, 1)
+              def take_random([], _), do: []
+              def take_random([h | t], 1), do: take_random_list_one(t, h, 1)
 
-  def take_random(enumerable, 1) do
-    enumerable
-    |> reduce([], fn
-      x, [current | index] ->
-        if :rand.uniform(index + 1) == 1 do
-          [x | index + 1]
-        else
-          [current | index + 1]
-        end
+              def take_random(enumerable, 1) do
+                    enumerable
+                    |> reduce([], fn
+                              x, [current | index] ->
+                                if :rand.uniform(index + 1) == 1 do
+                                     [x | index + 1]
+                                   else
+                                   [current | index + 1]
+                              end
 
-      x, [] ->
-        [x | 1]
-    end)
-    |> case do
-      [] -> []
-      [current | _index] -> [current]
-    end
-  end
+                               x, [] ->
+                                 [x | 1]
+                              end)
+                    |> case do
+                              [] -> []
+                              [current | _index] -> [current]
+                       end
+              end
 
-  def take_random(enumerable, count) when is_integer(count) and count in 0..128 do
-    sample = Tuple.duplicate(nil, count)
+              def take_random(enumerable, count) when is_integer(count) and count in 0..128 do
+                    sample = Tuple.duplicate(nil, count)
 
-    reducer = fn elem, {idx, sample} ->
-      jdx = random_integer(0, idx)
+                    reducer = fn elem, {idx, sample} ->
+                                jdx = random_integer(0, idx)
 
-      cond do
-        idx < count ->
-          value = elem(sample, jdx)
-          {idx + 1, put_elem(sample, idx, value) |> put_elem(jdx, elem)}
+                                cond do
+                              idx < count ->
+                                value = elem(sample, jdx)
+                                {idx + 1, put_elem(sample, idx, value) |> put_elem(jdx, elem)}
 
-        jdx < count ->
-          {idx + 1, put_elem(sample, jdx, elem)}
+                              jdx < count ->
+                                {idx + 1, put_elem(sample, jdx, elem)}
 
-        true ->
-          {idx + 1, sample}
-      end
-    end
+                              true ->
+                                {idx + 1, sample}
+                              end
+              end
 
-    {size, sample} = reduce(enumerable, {0, sample}, reducer)
-    sample |> Tuple.to_list() |> take(Kernel.min(count, size))
-  end
+              {size, sample} = reduce(enumerable, {0, sample}, reducer)
+              sample |> Tuple.to_list() |> take(Kernel.min(count, size))
+              end
 
-  def take_random(enumerable, count) when is_integer(count) and count >= 0 do
-    reducer = fn elem, {idx, sample} ->
-      jdx = random_integer(0, idx)
+              def take_random(enumerable, count) when is_integer(count) and count >= 0 do
+                    reducer = fn elem, {idx, sample} ->
+                                jdx = random_integer(0, idx)
 
-      cond do
-        idx < count ->
-          value = Map.get(sample, jdx)
-          {idx + 1, Map.put(sample, idx, value) |> Map.put(jdx, elem)}
+                                cond do
+                              idx < count ->
+                                value = Map.get(sample, jdx)
+                                {idx + 1, Map.put(sample, idx, value) |> Map.put(jdx, elem)}
 
-        jdx < count ->
-          {idx + 1, Map.put(sample, jdx, elem)}
+                              jdx < count ->
+                                {idx + 1, Map.put(sample, jdx, elem)}
 
-        true ->
-          {idx + 1, sample}
-      end
-    end
+                              true ->
+                                {idx + 1, sample}
+                              end
+              end
 
-    {size, sample} = reduce(enumerable, {0, %{}}, reducer)
-    take_random(sample, Kernel.min(count, size), [])
-  end
+              {size, sample} = reduce(enumerable, {0, %{}}, reducer)
+              take_random(sample, Kernel.min(count, size), [])
+              end
 
-  defp take_random(_sample, 0, acc), do: acc
+              defp take_random(_sample, 0, acc), do: acc
 
-  defp take_random(sample, position, acc) do
-    position = position - 1
-    take_random(sample, position, [Map.get(sample, position) | acc])
-  end
+              defp take_random(sample, position, acc) do
+                     position = position - 1
+                     take_random(sample, position, [Map.get(sample, position) | acc])
+              end
 
-  defp take_random_list_one([h | t], current, index) do
-    if :rand.uniform(index + 1) == 1 do
-      take_random_list_one(t, h, index + 1)
-    else
-      take_random_list_one(t, current, index + 1)
-    end
-  end
+              defp take_random_list_one([h | t], current, index) do
+                     if :rand.uniform(index + 1) == 1 do
+                          take_random_list_one(t, h, index + 1)
+                        else
+                        take_random_list_one(t, current, index + 1)
+              end
+              end
 
-  defp take_random_list_one([], current, _), do: [current]
+              defp take_random_list_one([], current, _), do: [current]
 
-  @doc """
+              @doc """
   Takes the elements from the beginning of the `enumerable` while `fun` returns
   a truthy value.
 
@@ -3457,25 +3457,25 @@ defmodule Enum do
       [1, 2]
 
   """
-  @spec take_while(t, (element -> as_boolean(term))) :: list
-  def take_while(enumerable, fun) when is_list(enumerable) do
-    take_while_list(enumerable, fun)
-  end
+              @spec take_while(t, (element -> as_boolean(term))) :: list
+              def take_while(enumerable, fun) when is_list(enumerable) do
+                    take_while_list(enumerable, fun)
+              end
 
-  def take_while(enumerable, fun) do
-    {_, res} =
-      Enumerable.reduce(enumerable, {:cont, []}, fn entry, acc ->
-        if fun.(entry) do
-          {:cont, [entry | acc]}
-        else
-          {:halt, acc}
-        end
-      end)
+              def take_while(enumerable, fun) do
+                    {_, res} =
+                      Enumerable.reduce(enumerable, {:cont, []}, fn entry, acc ->
+                                                                   if fun.(entry) do
+                                                                        {:cont, [entry | acc]}
+                                                                      else
+                                                                      {:halt, acc}
+                                                                 end
+                                        end)
 
-    :lists.reverse(res)
-  end
+                    :lists.reverse(res)
+              end
 
-  @doc """
+              @doc """
   Converts `enumerable` to a list.
 
   ## Examples
@@ -3484,13 +3484,13 @@ defmodule Enum do
       [1, 2, 3]
 
   """
-  @spec to_list(t) :: [element]
-  def to_list(enumerable) when is_list(enumerable), do: enumerable
-  def to_list(%_{} = enumerable), do: reverse(enumerable) |> :lists.reverse()
-  def to_list(%{} = enumerable), do: Map.to_list(enumerable)
-  def to_list(enumerable), do: reverse(enumerable) |> :lists.reverse()
+              @spec to_list(t) :: [element]
+              def to_list(enumerable) when is_list(enumerable), do: enumerable
+              def to_list(%_{} = enumerable), do: reverse(enumerable) |> :lists.reverse()
+              def to_list(%{} = enumerable), do: Map.to_list(enumerable)
+              def to_list(enumerable), do: reverse(enumerable) |> :lists.reverse()
 
-  @doc """
+              @doc """
   Enumerates the `enumerable`, removing all duplicated elements.
 
   ## Examples
@@ -3499,18 +3499,18 @@ defmodule Enum do
       [1, 2, 3]
 
   """
-  @spec uniq(t) :: list
-  def uniq(enumerable) do
-    uniq_by(enumerable, fn x -> x end)
-  end
+              @spec uniq(t) :: list
+              def uniq(enumerable) do
+                    uniq_by(enumerable, fn x -> x end)
+              end
 
-  @doc false
-  @deprecated "Use Enum.uniq_by/2 instead"
-  def uniq(enumerable, fun) do
-    uniq_by(enumerable, fun)
-  end
+              @doc false
+              @deprecated "Use Enum.uniq_by/2 instead"
+              def uniq(enumerable, fun) do
+                    uniq_by(enumerable, fun)
+              end
 
-  @doc """
+              @doc """
   Enumerates the `enumerable`, by removing the elements for which
   function `fun` returned duplicate elements.
 
@@ -3529,18 +3529,18 @@ defmodule Enum do
       [a: {:tea, 2}, c: {:coffee, 1}]
 
   """
-  @spec uniq_by(t, (element -> term)) :: list
+              @spec uniq_by(t, (element -> term)) :: list
 
-  def uniq_by(enumerable, fun) when is_list(enumerable) do
-    uniq_list(enumerable, %{}, fun)
-  end
+              def uniq_by(enumerable, fun) when is_list(enumerable) do
+                    uniq_list(enumerable, %{}, fun)
+              end
 
-  def uniq_by(enumerable, fun) do
-    {list, _} = reduce(enumerable, {[], %{}}, R.uniq_by(fun))
-    :lists.reverse(list)
-  end
+              def uniq_by(enumerable, fun) do
+                    {list, _} = reduce(enumerable, {[], %{}}, R.uniq_by(fun))
+                    :lists.reverse(list)
+              end
 
-  @doc """
+              @doc """
   Opposite of `zip/2`. Extracts two-element tuples from the
   given `enumerable` and groups them together.
 
@@ -3560,34 +3560,34 @@ defmodule Enum do
       {[:a, :b], [1, 2]}
 
   """
-  @spec unzip(t) :: {[element], [element]}
+              @spec unzip(t) :: {[element], [element]}
 
-  def unzip([_ | _] = list) do
-    :lists.reverse(list) |> unzip([], [])
-  end
+              def unzip([_ | _] = list) do
+                    :lists.reverse(list) |> unzip([], [])
+              end
 
-  def unzip([]) do
-    {[], []}
-  end
+              def unzip([]) do
+                    {[], []}
+              end
 
-  def unzip(enumerable) do
-    {list1, list2} =
-      reduce(enumerable, {[], []}, fn {el1, el2}, {list1, list2} ->
-        {[el1 | list1], [el2 | list2]}
-      end)
+              def unzip(enumerable) do
+                    {list1, list2} =
+                      reduce(enumerable, {[], []}, fn {el1, el2}, {list1, list2} ->
+                                                     {[el1 | list1], [el2 | list2]}
+                                                   end)
 
-    {:lists.reverse(list1), :lists.reverse(list2)}
-  end
+                    {:lists.reverse(list1), :lists.reverse(list2)}
+              end
 
-  defp unzip([{el1, el2} | reversed_list], list1, list2) do
-    unzip(reversed_list, [el1 | list1], [el2 | list2])
-  end
+              defp unzip([{el1, el2} | reversed_list], list1, list2) do
+                     unzip(reversed_list, [el1 | list1], [el2 | list2])
+              end
 
-  defp unzip([], list1, list2) do
-    {list1, list2}
-  end
+              defp unzip([], list1, list2) do
+                     {list1, list2}
+              end
 
-  @doc """
+              @doc """
   Returns the `enumerable` with each element wrapped in a tuple
   alongside its index.
 
@@ -3611,23 +3611,23 @@ defmodule Enum do
       [{0, :a}, {1, :b}, {2, :c}]
 
   """
-  @spec with_index(t, integer) :: [{term, integer}]
-  @spec with_index(t, (element, index -> value)) :: [value] when value: any
-  def with_index(enumerable, fun_or_offset \\ 0)
+              @spec with_index(t, integer) :: [{term, integer}]
+              @spec with_index(t, (element, index -> value)) :: [value] when value: any
+              def with_index(enumerable, fun_or_offset \\ 0)
 
-  def with_index(enumerable, offset) when is_integer(offset) do
-    enumerable
-    |> map_reduce(offset, fn x, i -> {{x, i}, i + 1} end)
-    |> elem(0)
-  end
+              def with_index(enumerable, offset) when is_integer(offset) do
+                    enumerable
+                    |> map_reduce(offset, fn x, i -> {{x, i}, i + 1} end)
+                    |> elem(0)
+              end
 
-  def with_index(enumerable, fun) when is_function(fun, 2) do
-    enumerable
-    |> map_reduce(0, fn x, i -> {fun.(x, i), i + 1} end)
-    |> elem(0)
-  end
+              def with_index(enumerable, fun) when is_function(fun, 2) do
+                    enumerable
+                    |> map_reduce(0, fn x, i -> {fun.(x, i), i + 1} end)
+                    |> elem(0)
+              end
 
-  @doc """
+              @doc """
   Zips corresponding elements from two enumerables into a list
   of tuples.
 
@@ -3642,16 +3642,16 @@ defmodule Enum do
       [{1, :a}, {2, :b}, {3, :c}]
 
   """
-  @spec zip(t, t) :: [{any, any}]
-  def zip(enumerable1, enumerable2) when is_list(enumerable1) and is_list(enumerable2) do
-    zip_list(enumerable1, enumerable2, [])
-  end
+              @spec zip(t, t) :: [{any, any}]
+              def zip(enumerable1, enumerable2) when is_list(enumerable1) and is_list(enumerable2) do
+                    zip_list(enumerable1, enumerable2, [])
+              end
 
-  def zip(enumerable1, enumerable2) do
-    zip([enumerable1, enumerable2])
-  end
+              def zip(enumerable1, enumerable2) do
+                    zip([enumerable1, enumerable2])
+              end
 
-  @doc """
+              @doc """
   Zips corresponding elements from a finite collection of enumerables
   into a list of tuples.
 
@@ -3666,16 +3666,16 @@ defmodule Enum do
       [{1, :a}, {2, :b}, {3, :c}]
 
   """
-  @doc since: "1.4.0"
-  @spec zip(enumerables) :: [tuple()] when enumerables: [t()] | t()
-  def zip([]), do: []
+              @doc since: "1.4.0"
+              @spec zip(enumerables) :: [tuple()] when enumerables: [t()] | t()
+              def zip([]), do: []
 
-  def zip(enumerables) do
-    zip_reduce(enumerables, [], &[List.to_tuple(&1) | &2])
-    |> :lists.reverse()
-  end
+              def zip(enumerables) do
+                    zip_reduce(enumerables, [], &[List.to_tuple(&1) | &2])
+                    |> :lists.reverse()
+              end
 
-  @doc """
+              @doc """
   Zips corresponding elements from two enumerables into a list, transforming them with
   the `zip_fun` function as it goes.
 
@@ -3713,19 +3713,19 @@ defmodule Enum do
       [4, 6]
 
   """
-  @doc since: "1.12.0"
-  @spec zip_with(t, t, (enum1_elem :: term, enum2_elem :: term -> term)) :: [term]
-  def zip_with(enumerable1, enumerable2, zip_fun)
-      when is_list(enumerable1) and is_list(enumerable2) and is_function(zip_fun, 2) do
-    zip_with_list(enumerable1, enumerable2, zip_fun)
-  end
+              @doc since: "1.12.0"
+              @spec zip_with(t, t, (enum1_elem :: term, enum2_elem :: term -> term)) :: [term]
+              def zip_with(enumerable1, enumerable2, zip_fun)
+              when is_list(enumerable1) and is_list(enumerable2) and is_function(zip_fun, 2) do
+                zip_with_list(enumerable1, enumerable2, zip_fun)
+              end
 
-  def zip_with(enumerable1, enumerable2, zip_fun) when is_function(zip_fun, 2) do
-    zip_reduce(enumerable1, enumerable2, [], fn l, r, acc -> [zip_fun.(l, r) | acc] end)
-    |> :lists.reverse()
-  end
+              def zip_with(enumerable1, enumerable2, zip_fun) when is_function(zip_fun, 2) do
+                    zip_reduce(enumerable1, enumerable2, [], fn l, r, acc -> [zip_fun.(l, r) | acc] end)
+                    |> :lists.reverse()
+              end
 
-  @doc """
+              @doc """
   Zips corresponding elements from a finite collection of enumerables
   into list, transforming them with the `zip_fun` function as it goes.
 
@@ -3746,16 +3746,16 @@ defmodule Enum do
       [4, 6]
 
   """
-  @doc since: "1.12.0"
-  @spec zip_with(t, ([term] -> term)) :: [term]
-  def zip_with([], _fun), do: []
+              @doc since: "1.12.0"
+              @spec zip_with(t, ([term] -> term)) :: [term]
+              def zip_with([], _fun), do: []
 
-  def zip_with(enumerables, zip_fun) do
-    zip_reduce(enumerables, [], fn values, acc -> [zip_fun.(values) | acc] end)
-    |> :lists.reverse()
-  end
+              def zip_with(enumerables, zip_fun) do
+                    zip_reduce(enumerables, [], fn values, acc -> [zip_fun.(values) | acc] end)
+                    |> :lists.reverse()
+              end
 
-  @doc """
+              @doc """
   Reduces over two enumerables halting as soon as either enumerable is empty.
 
   In practice, the behaviour provided by this function can be achieved with:
@@ -3772,20 +3772,20 @@ defmodule Enum do
       iex> Enum.zip_reduce([1, 2], [3, 4], [], fn x, y, acc -> [x + y | acc] end)
       [6, 4]
   """
-  @doc since: "1.12.0"
-  @spec zip_reduce(t, t, acc, (enum1_elem :: term, enum2_elem :: term, acc -> acc)) :: acc
-        when acc: term
-  def zip_reduce(left, right, acc, reducer)
-      when is_list(left) and is_list(right) and is_function(reducer, 3) do
-    zip_reduce_list(left, right, acc, reducer)
-  end
+              @doc since: "1.12.0"
+              @spec zip_reduce(t, t, acc, (enum1_elem :: term, enum2_elem :: term, acc -> acc)) :: acc
+              when acc: term
+              def zip_reduce(left, right, acc, reducer)
+              when is_list(left) and is_list(right) and is_function(reducer, 3) do
+                zip_reduce_list(left, right, acc, reducer)
+              end
 
-  def zip_reduce(left, right, acc, reducer) when is_function(reducer, 3) do
-    reduce = fn [l, r], acc -> {:cont, reducer.(l, r, acc)} end
-    Stream.zip_with([left, right], & &1).({:cont, acc}, reduce) |> elem(1)
-  end
+              def zip_reduce(left, right, acc, reducer) when is_function(reducer, 3) do
+                    reduce = fn [l, r], acc -> {:cont, reducer.(l, r, acc)} end
+                    Stream.zip_with([left, right], & &1).({:cont, acc}, reduce) |> elem(1)
+              end
 
-  @doc """
+              @doc """
   Reduces over all of the given enumerables, halting as soon as any enumerable is
   empty.
 
@@ -3812,714 +3812,714 @@ defmodule Enum do
       ...> end)
       [{2, {:b, 4}, 6}, {1, {:a, 3}, 5}]
   """
-  @doc since: "1.12.0"
-  @spec zip_reduce(t, acc, ([term], acc -> acc)) :: acc when acc: term
-  def zip_reduce([], acc, reducer) when is_function(reducer, 2), do: acc
-
-  def zip_reduce(enums, acc, reducer) when is_function(reducer, 2) do
-    Stream.zip_with(enums, & &1).({:cont, acc}, &{:cont, reducer.(&1, &2)}) |> elem(1)
-  end
-
-  ## Helpers
-
-  @compile {:inline, entry_to_string: 1, reduce: 3, reduce_by: 3, reduce_enumerable: 3}
-
-  defp entry_to_string(entry) when is_binary(entry), do: entry
-  defp entry_to_string(entry), do: String.Chars.to_string(entry)
-
-  defp aggregate([head | tail], fun, _empty) do
-    aggregate_list(tail, head, fun)
-  end
-
-  defp aggregate([], _fun, empty) do
-    empty.()
-  end
-
-  defp aggregate(first..last//step = range, fun, empty) do
-    case Range.size(range) do
-      0 ->
-        empty.()
-
-      _ ->
-        last = last - rem(last - first, step)
-
-        case fun.(first, last) do
-          true -> first
-          false -> last
-        end
-    end
-  end
-
-  defp aggregate(enumerable, fun, empty) do
-    ref = make_ref()
-
-    enumerable
-    |> reduce(ref, fn
-      element, ^ref ->
-        element
-
-      element, acc ->
-        case fun.(acc, element) do
-          true -> acc
-          false -> element
-        end
-    end)
-    |> case do
-      ^ref -> empty.()
-      result -> result
-    end
-  end
-
-  defp aggregate_list([head | tail], acc, fun) do
-    acc =
-      case fun.(acc, head) do
-        true -> acc
-        false -> head
-      end
-
-    aggregate_list(tail, acc, fun)
-  end
-
-  defp aggregate_list([], acc, _fun), do: acc
-
-  defp aggregate_by(enumerable, fun, sorter, empty_fallback) do
-    first_fun = &[&1 | fun.(&1)]
-
-    reduce_fun = fn entry, [_ | fun_ref] = old ->
-      fun_entry = fun.(entry)
-
-      case sorter.(fun_ref, fun_entry) do
-        true -> old
-        false -> [entry | fun_entry]
-      end
-    end
-
-    case reduce_by(enumerable, first_fun, reduce_fun) do
-      :empty -> empty_fallback.()
-      [entry | _] -> entry
-    end
-  end
-
-  defp reduce_by([head | tail], first, fun) do
-    :lists.foldl(fun, first.(head), tail)
-  end
-
-  defp reduce_by([], _first, _fun) do
-    :empty
-  end
-
-  defp reduce_by(enumerable, first, fun) do
-    reduce(enumerable, :empty, fn
-      element, :empty -> first.(element)
-      element, acc -> fun.(element, acc)
-    end)
-  end
-
-  defp random_integer(limit, limit) when is_integer(limit) do
-    limit
-  end
-
-  defp random_integer(lower_limit, upper_limit) when upper_limit < lower_limit do
-    random_integer(upper_limit, lower_limit)
-  end
-
-  defp random_integer(lower_limit, upper_limit) do
-    lower_limit + :rand.uniform(upper_limit - lower_limit + 1) - 1
-  end
-
-  ## Implementations
-
-  ## all?
-
-  defp all_list([h | t]) do
-    if h do
-      all_list(t)
-    else
-      false
-    end
-  end
-
-  defp all_list([]) do
-    true
-  end
-
-  defp all_list([h | t], fun) do
-    if fun.(h) do
-      all_list(t, fun)
-    else
-      false
-    end
-  end
-
-  defp all_list([], _) do
-    true
-  end
-
-  ## any?
-
-  defp any_list([h | t]) do
-    if h do
-      true
-    else
-      any_list(t)
-    end
-  end
-
-  defp any_list([]) do
-    false
-  end
-
-  defp any_list([h | t], fun) do
-    if fun.(h) do
-      true
-    else
-      any_list(t, fun)
-    end
-  end
-
-  defp any_list([], _) do
-    false
-  end
-
-  ## concat
-
-  defp concat_list([h | t]) when is_list(h), do: h ++ concat_list(t)
-  defp concat_list([h | t]), do: concat_enum([h | t])
-  defp concat_list([]), do: []
-
-  defp concat_enum(enum) do
-    fun = &[&1 | &2]
-    enum |> reduce([], &reduce(&1, &2, fun)) |> :lists.reverse()
-  end
-
-  # dedup
-
-  defp dedup_list([value | tail], acc) do
-    acc =
-      case acc do
-        [^value | _] -> acc
-        _ -> [value | acc]
-      end
-
-    dedup_list(tail, acc)
-  end
-
-  defp dedup_list([], acc) do
-    acc
-  end
-
-  ## drop
-
-  defp drop_list(list, 0), do: list
-  defp drop_list([_ | tail], counter), do: drop_list(tail, counter - 1)
-  defp drop_list([], _), do: []
-
-  ## drop_while
-
-  defp drop_while_list([head | tail], fun) do
-    if fun.(head) do
-      drop_while_list(tail, fun)
-    else
-      [head | tail]
-    end
-  end
-
-  defp drop_while_list([], _) do
-    []
-  end
-
-  ## filter
-
-  defp filter_list([head | tail], fun) do
-    if fun.(head) do
-      [head | filter_list(tail, fun)]
-    else
-      filter_list(tail, fun)
-    end
-  end
-
-  defp filter_list([], _fun) do
-    []
-  end
-
-  ## find
-
-  defp find_list([head | tail], default, fun) do
-    if fun.(head) do
-      head
-    else
-      find_list(tail, default, fun)
-    end
-  end
-
-  defp find_list([], default, _) do
-    default
-  end
-
-  ## find_index
-
-  defp find_index_list([head | tail], counter, fun) do
-    if fun.(head) do
-      counter
-    else
-      find_index_list(tail, counter + 1, fun)
-    end
-  end
-
-  defp find_index_list([], _, _) do
-    nil
-  end
-
-  ## find_value
+              @doc since: "1.12.0"
+              @spec zip_reduce(t, acc, ([term], acc -> acc)) :: acc when acc: term
+              def zip_reduce([], acc, reducer) when is_function(reducer, 2), do: acc
+
+              def zip_reduce(enums, acc, reducer) when is_function(reducer, 2) do
+                    Stream.zip_with(enums, & &1).({:cont, acc}, &{:cont, reducer.(&1, &2)}) |> elem(1)
+              end
+
+              ## Helpers
+
+              @compile {:inline, entry_to_string: 1, reduce: 3, reduce_by: 3, reduce_enumerable: 3}
+
+              defp entry_to_string(entry) when is_binary(entry), do: entry
+              defp entry_to_string(entry), do: String.Chars.to_string(entry)
+
+              defp aggregate([head | tail], fun, _empty) do
+                     aggregate_list(tail, head, fun)
+              end
+
+              defp aggregate([], _fun, empty) do
+                     empty.()
+              end
+
+              defp aggregate(first..last//step = range, fun, empty) do
+                     case Range.size(range) do
+                     0 ->
+                       empty.()
+
+                     _ ->
+                       last = last - rem(last - first, step)
+
+                       case fun.(first, last) do
+                              true -> first
+                              false -> last
+                       end
+                     end
+              end
+
+              defp aggregate(enumerable, fun, empty) do
+                     ref = make_ref()
+
+                     enumerable
+                     |> reduce(ref, fn
+                               element, ^ref ->
+                                 element
+
+                               element, acc ->
+                                 case fun.(acc, element) do
+                                        true -> acc
+                                        false -> element
+                                 end
+                               end)
+                     |> case do
+                               ^ref -> empty.()
+                               result -> result
+                        end
+              end
+
+              defp aggregate_list([head | tail], acc, fun) do
+                     acc =
+                       case fun.(acc, head) do
+                              true -> acc
+                              false -> head
+                       end
+
+                     aggregate_list(tail, acc, fun)
+              end
+
+              defp aggregate_list([], acc, _fun), do: acc
+
+              defp aggregate_by(enumerable, fun, sorter, empty_fallback) do
+                     first_fun = &[&1 | fun.(&1)]
+
+                     reduce_fun = fn entry, [_ | fun_ref] = old ->
+                                    fun_entry = fun.(entry)
+
+                                    case sorter.(fun_ref, fun_entry) do
+                                           true -> old
+                                           false -> [entry | fun_entry]
+                                    end
+                                  end
+
+                     case reduce_by(enumerable, first_fun, reduce_fun) do
+                            :empty -> empty_fallback.()
+                            [entry | _] -> entry
+                     end
+              end
+
+              defp reduce_by([head | tail], first, fun) do
+                     :lists.foldl(fun, first.(head), tail)
+              end
+
+              defp reduce_by([], _first, _fun) do
+                     :empty
+              end
+
+              defp reduce_by(enumerable, first, fun) do
+                     reduce(enumerable, :empty, fn
+                            element, :empty -> first.(element)
+                            element, acc -> fun.(element, acc)
+                            end)
+              end
+
+              defp random_integer(limit, limit) when is_integer(limit) do
+                     limit
+              end
+
+              defp random_integer(lower_limit, upper_limit) when upper_limit < lower_limit do
+                     random_integer(upper_limit, lower_limit)
+              end
+
+              defp random_integer(lower_limit, upper_limit) do
+                     lower_limit + :rand.uniform(upper_limit - lower_limit + 1) - 1
+              end
+
+              ## Implementations
+
+              ## all?
+
+              defp all_list([h | t]) do
+                     if h do
+                          all_list(t)
+                        else
+                        false
+              end
+              end
+
+              defp all_list([]) do
+                     true
+              end
+
+              defp all_list([h | t], fun) do
+                     if fun.(h) do
+                          all_list(t, fun)
+                        else
+                        false
+              end
+              end
+
+              defp all_list([], _) do
+                     true
+              end
+
+              ## any?
+
+              defp any_list([h | t]) do
+                     if h do
+                          true
+                        else
+                        any_list(t)
+              end
+              end
+
+              defp any_list([]) do
+                     false
+              end
+
+              defp any_list([h | t], fun) do
+                     if fun.(h) do
+                          true
+                        else
+                        any_list(t, fun)
+              end
+              end
+
+              defp any_list([], _) do
+                     false
+              end
+
+              ## concat
+
+              defp concat_list([h | t]) when is_list(h), do: h ++ concat_list(t)
+              defp concat_list([h | t]), do: concat_enum([h | t])
+              defp concat_list([]), do: []
+
+              defp concat_enum(enum) do
+                     fun = &[&1 | &2]
+                     enum |> reduce([], &reduce(&1, &2, fun)) |> :lists.reverse()
+              end
+
+              # dedup
+
+              defp dedup_list([value | tail], acc) do
+                     acc =
+                       case acc do
+                              [^value | _] -> acc
+                              _ -> [value | acc]
+                       end
+
+                     dedup_list(tail, acc)
+              end
+
+              defp dedup_list([], acc) do
+                     acc
+              end
+
+              ## drop
+
+              defp drop_list(list, 0), do: list
+              defp drop_list([_ | tail], counter), do: drop_list(tail, counter - 1)
+              defp drop_list([], _), do: []
+
+              ## drop_while
+
+              defp drop_while_list([head | tail], fun) do
+                     if fun.(head) do
+                          drop_while_list(tail, fun)
+                        else
+                        [head | tail]
+              end
+              end
+
+              defp drop_while_list([], _) do
+                     []
+              end
+
+              ## filter
+
+              defp filter_list([head | tail], fun) do
+                     if fun.(head) do
+                          [head | filter_list(tail, fun)]
+                        else
+                        filter_list(tail, fun)
+              end
+              end
+
+              defp filter_list([], _fun) do
+                     []
+              end
+
+              ## find
+
+              defp find_list([head | tail], default, fun) do
+                     if fun.(head) do
+                          head
+                        else
+                        find_list(tail, default, fun)
+              end
+              end
+
+              defp find_list([], default, _) do
+                     default
+              end
+
+              ## find_index
+
+              defp find_index_list([head | tail], counter, fun) do
+                     if fun.(head) do
+                          counter
+                        else
+                        find_index_list(tail, counter + 1, fun)
+              end
+              end
+
+              defp find_index_list([], _, _) do
+                     nil
+              end
+
+              ## find_value
 
-  defp find_value_list([head | tail], default, fun) do
-    fun.(head) || find_value_list(tail, default, fun)
-  end
+              defp find_value_list([head | tail], default, fun) do
+                     fun.(head) || find_value_list(tail, default, fun)
+              end
 
-  defp find_value_list([], default, _) do
-    default
-  end
+              defp find_value_list([], default, _) do
+                     default
+              end
 
-  ## flat_map
+              ## flat_map
 
-  defp flat_map_list([head | tail], fun) do
-    case fun.(head) do
-      list when is_list(list) -> list ++ flat_map_list(tail, fun)
-      other -> to_list(other) ++ flat_map_list(tail, fun)
-    end
-  end
+              defp flat_map_list([head | tail], fun) do
+                     case fun.(head) do
+                            list when is_list(list) -> list ++ flat_map_list(tail, fun)
+                            other -> to_list(other) ++ flat_map_list(tail, fun)
+                     end
+              end
 
-  defp flat_map_list([], _fun) do
-    []
-  end
+              defp flat_map_list([], _fun) do
+                     []
+              end
 
-  ## intersperse
+              ## intersperse
 
-  defp intersperse_non_empty_list([head], _separator), do: [head]
+              defp intersperse_non_empty_list([head], _separator), do: [head]
 
-  defp intersperse_non_empty_list([head | rest], separator) do
-    [head, separator | intersperse_non_empty_list(rest, separator)]
-  end
+              defp intersperse_non_empty_list([head | rest], separator) do
+                     [head, separator | intersperse_non_empty_list(rest, separator)]
+              end
 
-  ## join
+              ## join
 
-  defp join_list([], _joiner), do: ""
+              defp join_list([], _joiner), do: ""
 
-  defp join_list(list, joiner) do
-    join_non_empty_list(list, joiner, [])
-    |> :lists.reverse()
-    |> IO.iodata_to_binary()
-  end
+              defp join_list(list, joiner) do
+                     join_non_empty_list(list, joiner, [])
+                     |> :lists.reverse()
+                     |> IO.iodata_to_binary()
+              end
 
-  defp join_non_empty_list([first], _joiner, acc), do: [entry_to_string(first) | acc]
+              defp join_non_empty_list([first], _joiner, acc), do: [entry_to_string(first) | acc]
 
-  defp join_non_empty_list([first | rest], joiner, acc) do
-    join_non_empty_list(rest, joiner, [joiner, entry_to_string(first) | acc])
-  end
+              defp join_non_empty_list([first | rest], joiner, acc) do
+                     join_non_empty_list(rest, joiner, [joiner, entry_to_string(first) | acc])
+              end
 
-  ## map_intersperse
+              ## map_intersperse
 
-  defp map_intersperse_list([], _, _),
-    do: []
+              defp map_intersperse_list([], _, _),
+                   do: []
 
-  defp map_intersperse_list([last], _, mapper),
-    do: [mapper.(last)]
+              defp map_intersperse_list([last], _, mapper),
+                   do: [mapper.(last)]
 
-  defp map_intersperse_list([head | rest], separator, mapper),
-    do: [mapper.(head), separator | map_intersperse_list(rest, separator, mapper)]
+              defp map_intersperse_list([head | rest], separator, mapper),
+                   do: [mapper.(head), separator | map_intersperse_list(rest, separator, mapper)]
 
-  ## reduce
+              ## reduce
 
-  defp reduce_range(first, last, step, acc, fun)
-       when step > 0 and first <= last
-       when step < 0 and first >= last do
-    reduce_range(first + step, last, step, fun.(first, acc), fun)
-  end
+              defp reduce_range(first, last, step, acc, fun)
+              when step > 0 and first <= last
+              when step < 0 and first >= last do
+                reduce_range(first + step, last, step, fun.(first, acc), fun)
+              end
 
-  defp reduce_range(_first, _last, _step, acc, _fun) do
-    acc
-  end
+              defp reduce_range(_first, _last, _step, acc, _fun) do
+                     acc
+              end
 
-  defp reduce_enumerable(enumerable, acc, fun) do
-    Enumerable.reduce(enumerable, {:cont, acc}, fn x, acc -> {:cont, fun.(x, acc)} end) |> elem(1)
-  end
+              defp reduce_enumerable(enumerable, acc, fun) do
+                     Enumerable.reduce(enumerable, {:cont, acc}, fn x, acc -> {:cont, fun.(x, acc)} end) |> elem(1)
+              end
 
-  ## reject
+              ## reject
 
-  defp reject_list([head | tail], fun) do
-    if fun.(head) do
-      reject_list(tail, fun)
-    else
-      [head | reject_list(tail, fun)]
-    end
-  end
-
-  defp reject_list([], _fun) do
-    []
-  end
-
-  ## reverse_slice
+              defp reject_list([head | tail], fun) do
+                     if fun.(head) do
+                          reject_list(tail, fun)
+                        else
+                        [head | reject_list(tail, fun)]
+              end
+              end
+
+              defp reject_list([], _fun) do
+                     []
+              end
+
+              ## reverse_slice
 
-  defp reverse_slice(rest, idx, idx, count, acc) do
-    {slice, rest} = head_slice(rest, count, [])
-    :lists.reverse(rest, :lists.reverse(slice, acc))
-  end
+              defp reverse_slice(rest, idx, idx, count, acc) do
+                     {slice, rest} = head_slice(rest, count, [])
+                     :lists.reverse(rest, :lists.reverse(slice, acc))
+              end
 
-  defp reverse_slice([elem | rest], idx, start, count, acc) do
-    reverse_slice(rest, idx - 1, start, count, [elem | acc])
-  end
+              defp reverse_slice([elem | rest], idx, start, count, acc) do
+                     reverse_slice(rest, idx - 1, start, count, [elem | acc])
+              end
 
-  defp head_slice(rest, 0, acc), do: {acc, rest}
+              defp head_slice(rest, 0, acc), do: {acc, rest}
 
-  defp head_slice([elem | rest], count, acc) do
-    head_slice(rest, count - 1, [elem | acc])
-  end
+              defp head_slice([elem | rest], count, acc) do
+                     head_slice(rest, count - 1, [elem | acc])
+              end
 
-  ## scan
+              ## scan
 
-  defp scan_list([], _acc, _fun), do: []
+              defp scan_list([], _acc, _fun), do: []
 
-  defp scan_list([elem | rest], acc, fun) do
-    acc = fun.(elem, acc)
-    [acc | scan_list(rest, acc, fun)]
-  end
+              defp scan_list([elem | rest], acc, fun) do
+                     acc = fun.(elem, acc)
+                     [acc | scan_list(rest, acc, fun)]
+              end
 
-  ## shuffle
+              ## shuffle
 
-  defp shuffle_unwrap([{_, h} | enumerable], t) do
-    shuffle_unwrap(enumerable, [h | t])
-  end
+              defp shuffle_unwrap([{_, h} | enumerable], t) do
+                     shuffle_unwrap(enumerable, [h | t])
+              end
 
-  defp shuffle_unwrap([], t), do: t
+              defp shuffle_unwrap([], t), do: t
 
-  ## slice
+              ## slice
 
-  defp slice_any(enumerable, start, amount) when start < 0 do
-    {count, fun} = slice_count_and_fun(enumerable)
-    start = count + start
+              defp slice_any(enumerable, start, amount) when start < 0 do
+                     {count, fun} = slice_count_and_fun(enumerable)
+                     start = count + start
 
-    if start >= 0 do
-      fun.(start, Kernel.min(amount, count - start))
-    else
-      []
-    end
-  end
+                     if start >= 0 do
+                          fun.(start, Kernel.min(amount, count - start))
+                        else
+                        []
+              end
+              end
 
-  defp slice_any(list, start, amount) when is_list(list) do
-    list |> drop_list(start) |> take_list(amount)
-  end
+              defp slice_any(list, start, amount) when is_list(list) do
+                     list |> drop_list(start) |> take_list(amount)
+              end
 
-  defp slice_any(enumerable, start, amount) do
-    case Enumerable.slice(enumerable) do
-      {:ok, count, _} when start >= count ->
-        []
+              defp slice_any(enumerable, start, amount) do
+                     case Enumerable.slice(enumerable) do
+                     {:ok, count, _} when start >= count ->
+                       []
 
-      {:ok, count, fun} when is_function(fun) ->
-        fun.(start, Kernel.min(amount, count - start))
+                     {:ok, count, fun} when is_function(fun) ->
+                       fun.(start, Kernel.min(amount, count - start))
 
-      {:error, module} ->
-        slice_enum(enumerable, module, start, amount)
-    end
-  end
+                     {:error, module} ->
+                       slice_enum(enumerable, module, start, amount)
+                     end
+              end
 
-  defp slice_enum(enumerable, module, start, amount) do
-    {_, {_, _, slice}} =
-      module.reduce(enumerable, {:cont, {start, amount, []}}, fn
-        _entry, {start, amount, _list} when start > 0 ->
-          {:cont, {start - 1, amount, []}}
+              defp slice_enum(enumerable, module, start, amount) do
+                     {_, {_, _, slice}} =
+                       module.reduce(enumerable, {:cont, {start, amount, []}}, fn
+                                     _entry, {start, amount, _list} when start > 0 ->
+                                       {:cont, {start - 1, amount, []}}
 
-        entry, {start, amount, list} when amount > 1 ->
-          {:cont, {start, amount - 1, [entry | list]}}
+                                     entry, {start, amount, list} when amount > 1 ->
+                                       {:cont, {start, amount - 1, [entry | list]}}
 
-        entry, {start, amount, list} ->
-          {:halt, {start, amount, [entry | list]}}
-      end)
+                                     entry, {start, amount, list} ->
+                                       {:halt, {start, amount, [entry | list]}}
+                                     end)
 
-    :lists.reverse(slice)
-  end
+                     :lists.reverse(slice)
+              end
 
-  defp slice_count_and_fun(enumerable) when is_list(enumerable) do
-    length = length(enumerable)
-    {length, &Enumerable.List.slice(enumerable, &1, &2, length)}
-  end
+              defp slice_count_and_fun(enumerable) when is_list(enumerable) do
+                     length = length(enumerable)
+                     {length, &Enumerable.List.slice(enumerable, &1, &2, length)}
+              end
 
-  defp slice_count_and_fun(enumerable) do
-    case Enumerable.slice(enumerable) do
-      {:ok, count, fun} when is_function(fun, 2) ->
-        {count, fun}
+              defp slice_count_and_fun(enumerable) do
+                     case Enumerable.slice(enumerable) do
+                     {:ok, count, fun} when is_function(fun, 2) ->
+                       {count, fun}
 
-      {:error, module} ->
-        {_, {list, count}} =
-          module.reduce(enumerable, {:cont, {[], 0}}, fn elem, {acc, count} ->
-            {:cont, {[elem | acc], count + 1}}
-          end)
+                     {:error, module} ->
+                       {_, {list, count}} =
+                         module.reduce(enumerable, {:cont, {[], 0}}, fn elem, {acc, count} ->
+                                                                       {:cont, {[elem | acc], count + 1}}
+                                                                     end)
 
-        {count, &Enumerable.List.slice(:lists.reverse(list), &1, &2, count)}
-    end
-  end
+                       {count, &Enumerable.List.slice(:lists.reverse(list), &1, &2, count)}
+                     end
+              end
 
-  ## sort
+              ## sort
 
-  defp sort_reducer(entry, {:split, y, x, r, rs, bool}, fun) do
-    cond do
-      fun.(y, entry) == bool ->
-        {:split, entry, y, [x | r], rs, bool}
+              defp sort_reducer(entry, {:split, y, x, r, rs, bool}, fun) do
+                     cond do
+              fun.(y, entry) == bool ->
+                {:split, entry, y, [x | r], rs, bool}
 
-      fun.(x, entry) == bool ->
-        {:split, y, entry, [x | r], rs, bool}
+              fun.(x, entry) == bool ->
+                {:split, y, entry, [x | r], rs, bool}
 
-      r == [] ->
-        {:split, y, x, [entry], rs, bool}
+              r == [] ->
+                {:split, y, x, [entry], rs, bool}
 
-      true ->
-        {:pivot, y, x, r, rs, entry, bool}
-    end
-  end
+              true ->
+                {:pivot, y, x, r, rs, entry, bool}
+              end
+              end
 
-  defp sort_reducer(entry, {:pivot, y, x, r, rs, s, bool}, fun) do
-    cond do
-      fun.(y, entry) == bool ->
-        {:pivot, entry, y, [x | r], rs, s, bool}
+              defp sort_reducer(entry, {:pivot, y, x, r, rs, s, bool}, fun) do
+                     cond do
+              fun.(y, entry) == bool ->
+                {:pivot, entry, y, [x | r], rs, s, bool}
 
-      fun.(x, entry) == bool ->
-        {:pivot, y, entry, [x | r], rs, s, bool}
+              fun.(x, entry) == bool ->
+                {:pivot, y, entry, [x | r], rs, s, bool}
 
-      fun.(s, entry) == bool ->
-        {:split, entry, s, [], [[y, x | r] | rs], bool}
+              fun.(s, entry) == bool ->
+                {:split, entry, s, [], [[y, x | r] | rs], bool}
 
-      true ->
-        {:split, s, entry, [], [[y, x | r] | rs], bool}
-    end
-  end
+              true ->
+                {:split, s, entry, [], [[y, x | r] | rs], bool}
+              end
+              end
 
-  defp sort_reducer(entry, [x], fun) do
-    {:split, entry, x, [], [], fun.(x, entry)}
-  end
+              defp sort_reducer(entry, [x], fun) do
+                     {:split, entry, x, [], [], fun.(x, entry)}
+              end
 
-  defp sort_reducer(entry, acc, _fun) do
-    [entry | acc]
-  end
+              defp sort_reducer(entry, acc, _fun) do
+                     [entry | acc]
+              end
 
-  defp sort_terminator({:split, y, x, r, rs, bool}, fun) do
-    sort_merge([[y, x | r] | rs], fun, bool)
-  end
+              defp sort_terminator({:split, y, x, r, rs, bool}, fun) do
+                     sort_merge([[y, x | r] | rs], fun, bool)
+              end
 
-  defp sort_terminator({:pivot, y, x, r, rs, s, bool}, fun) do
-    sort_merge([[s], [y, x | r] | rs], fun, bool)
-  end
+              defp sort_terminator({:pivot, y, x, r, rs, s, bool}, fun) do
+                     sort_merge([[s], [y, x | r] | rs], fun, bool)
+              end
 
-  defp sort_terminator(acc, _fun) do
-    acc
-  end
+              defp sort_terminator(acc, _fun) do
+                     acc
+              end
 
-  defp sort_merge(list, fun, true), do: reverse_sort_merge(list, [], fun, true)
+              defp sort_merge(list, fun, true), do: reverse_sort_merge(list, [], fun, true)
 
-  defp sort_merge(list, fun, false), do: sort_merge(list, [], fun, false)
+              defp sort_merge(list, fun, false), do: sort_merge(list, [], fun, false)
 
-  defp sort_merge([t1, [h2 | t2] | l], acc, fun, true),
-    do: sort_merge(l, [sort_merge1(t1, h2, t2, [], fun, false) | acc], fun, true)
+              defp sort_merge([t1, [h2 | t2] | l], acc, fun, true),
+                   do: sort_merge(l, [sort_merge1(t1, h2, t2, [], fun, false) | acc], fun, true)
 
-  defp sort_merge([[h2 | t2], t1 | l], acc, fun, false),
-    do: sort_merge(l, [sort_merge1(t1, h2, t2, [], fun, false) | acc], fun, false)
+              defp sort_merge([[h2 | t2], t1 | l], acc, fun, false),
+                   do: sort_merge(l, [sort_merge1(t1, h2, t2, [], fun, false) | acc], fun, false)
 
-  defp sort_merge([l], [], _fun, _bool), do: l
+              defp sort_merge([l], [], _fun, _bool), do: l
 
-  defp sort_merge([l], acc, fun, bool),
-    do: reverse_sort_merge([:lists.reverse(l, []) | acc], [], fun, bool)
+              defp sort_merge([l], acc, fun, bool),
+                   do: reverse_sort_merge([:lists.reverse(l, []) | acc], [], fun, bool)
 
-  defp sort_merge([], acc, fun, bool), do: reverse_sort_merge(acc, [], fun, bool)
+              defp sort_merge([], acc, fun, bool), do: reverse_sort_merge(acc, [], fun, bool)
 
-  defp reverse_sort_merge([[h2 | t2], t1 | l], acc, fun, true),
-    do: reverse_sort_merge(l, [sort_merge1(t1, h2, t2, [], fun, true) | acc], fun, true)
+              defp reverse_sort_merge([[h2 | t2], t1 | l], acc, fun, true),
+                   do: reverse_sort_merge(l, [sort_merge1(t1, h2, t2, [], fun, true) | acc], fun, true)
 
-  defp reverse_sort_merge([t1, [h2 | t2] | l], acc, fun, false),
-    do: reverse_sort_merge(l, [sort_merge1(t1, h2, t2, [], fun, true) | acc], fun, false)
+              defp reverse_sort_merge([t1, [h2 | t2] | l], acc, fun, false),
+                   do: reverse_sort_merge(l, [sort_merge1(t1, h2, t2, [], fun, true) | acc], fun, false)
 
-  defp reverse_sort_merge([l], acc, fun, bool),
-    do: sort_merge([:lists.reverse(l, []) | acc], [], fun, bool)
+              defp reverse_sort_merge([l], acc, fun, bool),
+                   do: sort_merge([:lists.reverse(l, []) | acc], [], fun, bool)
 
-  defp reverse_sort_merge([], acc, fun, bool), do: sort_merge(acc, [], fun, bool)
+              defp reverse_sort_merge([], acc, fun, bool), do: sort_merge(acc, [], fun, bool)
 
-  defp sort_merge1([h1 | t1], h2, t2, m, fun, bool) do
-    if fun.(h1, h2) == bool do
-      sort_merge2(h1, t1, t2, [h2 | m], fun, bool)
-    else
-      sort_merge1(t1, h2, t2, [h1 | m], fun, bool)
-    end
-  end
+              defp sort_merge1([h1 | t1], h2, t2, m, fun, bool) do
+                     if fun.(h1, h2) == bool do
+                          sort_merge2(h1, t1, t2, [h2 | m], fun, bool)
+                        else
+                        sort_merge1(t1, h2, t2, [h1 | m], fun, bool)
+              end
+              end
 
-  defp sort_merge1([], h2, t2, m, _fun, _bool), do: :lists.reverse(t2, [h2 | m])
+              defp sort_merge1([], h2, t2, m, _fun, _bool), do: :lists.reverse(t2, [h2 | m])
 
-  defp sort_merge2(h1, t1, [h2 | t2], m, fun, bool) do
-    if fun.(h1, h2) == bool do
-      sort_merge2(h1, t1, t2, [h2 | m], fun, bool)
-    else
-      sort_merge1(t1, h2, t2, [h1 | m], fun, bool)
-    end
-  end
+              defp sort_merge2(h1, t1, [h2 | t2], m, fun, bool) do
+                     if fun.(h1, h2) == bool do
+                          sort_merge2(h1, t1, t2, [h2 | m], fun, bool)
+                        else
+                        sort_merge1(t1, h2, t2, [h1 | m], fun, bool)
+              end
+              end
 
-  defp sort_merge2(h1, t1, [], m, _fun, _bool), do: :lists.reverse(t1, [h1 | m])
+              defp sort_merge2(h1, t1, [], m, _fun, _bool), do: :lists.reverse(t1, [h1 | m])
 
-  ## split
+              ## split
 
-  defp split_list([head | tail], counter, acc) when counter > 0 do
-    split_list(tail, counter - 1, [head | acc])
-  end
+              defp split_list([head | tail], counter, acc) when counter > 0 do
+                     split_list(tail, counter - 1, [head | acc])
+              end
 
-  defp split_list(list, 0, acc) do
-    {:lists.reverse(acc), list}
-  end
+              defp split_list(list, 0, acc) do
+                     {:lists.reverse(acc), list}
+              end
 
-  defp split_list([], _, acc) do
-    {:lists.reverse(acc), []}
-  end
+              defp split_list([], _, acc) do
+                     {:lists.reverse(acc), []}
+              end
 
-  defp split_reverse_list([head | tail], counter, acc) when counter > 0 do
-    split_reverse_list(tail, counter - 1, [head | acc])
-  end
+              defp split_reverse_list([head | tail], counter, acc) when counter > 0 do
+                     split_reverse_list(tail, counter - 1, [head | acc])
+              end
 
-  defp split_reverse_list(list, 0, acc) do
-    {:lists.reverse(list), acc}
-  end
+              defp split_reverse_list(list, 0, acc) do
+                     {:lists.reverse(list), acc}
+              end
 
-  defp split_reverse_list([], _, acc) do
-    {[], acc}
-  end
+              defp split_reverse_list([], _, acc) do
+                     {[], acc}
+              end
 
-  ## split_while
+              ## split_while
 
-  defp split_while_list([head | tail], fun, acc) do
-    if fun.(head) do
-      split_while_list(tail, fun, [head | acc])
-    else
-      {:lists.reverse(acc), [head | tail]}
-    end
-  end
+              defp split_while_list([head | tail], fun, acc) do
+                     if fun.(head) do
+                          split_while_list(tail, fun, [head | acc])
+                        else
+                        {:lists.reverse(acc), [head | tail]}
+              end
+              end
 
-  defp split_while_list([], _, acc) do
-    {:lists.reverse(acc), []}
-  end
+              defp split_while_list([], _, acc) do
+                     {:lists.reverse(acc), []}
+              end
 
-  ## take
+              ## take
 
-  defp take_list([head | _], 1), do: [head]
-  defp take_list([head | tail], counter), do: [head | take_list(tail, counter - 1)]
-  defp take_list([], _counter), do: []
+              defp take_list([head | _], 1), do: [head]
+              defp take_list([head | tail], counter), do: [head | take_list(tail, counter - 1)]
+              defp take_list([], _counter), do: []
 
-  ## take_while
+              ## take_while
 
-  defp take_while_list([head | tail], fun) do
-    if fun.(head) do
-      [head | take_while_list(tail, fun)]
-    else
-      []
-    end
-  end
+              defp take_while_list([head | tail], fun) do
+                     if fun.(head) do
+                          [head | take_while_list(tail, fun)]
+                        else
+                        []
+              end
+              end
 
-  defp take_while_list([], _) do
-    []
-  end
+              defp take_while_list([], _) do
+                     []
+              end
 
-  ## uniq
+              ## uniq
 
-  defp uniq_list([head | tail], set, fun) do
-    value = fun.(head)
+              defp uniq_list([head | tail], set, fun) do
+                     value = fun.(head)
 
-    case set do
-      %{^value => true} -> uniq_list(tail, set, fun)
-      %{} -> [head | uniq_list(tail, Map.put(set, value, true), fun)]
-    end
-  end
+                     case set do
+                            %{^value => true} -> uniq_list(tail, set, fun)
+                            %{} -> [head | uniq_list(tail, Map.put(set, value, true), fun)]
+                     end
+              end
 
-  defp uniq_list([], _set, _fun) do
-    []
-  end
+              defp uniq_list([], _set, _fun) do
+                     []
+              end
 
-  ## zip
+              ## zip
 
-  defp zip_list([head1 | next1], [head2 | next2], acc) do
-    zip_list(next1, next2, [{head1, head2} | acc])
-  end
+              defp zip_list([head1 | next1], [head2 | next2], acc) do
+                     zip_list(next1, next2, [{head1, head2} | acc])
+              end
 
-  defp zip_list([], _, acc), do: :lists.reverse(acc)
-  defp zip_list(_, [], acc), do: :lists.reverse(acc)
+              defp zip_list([], _, acc), do: :lists.reverse(acc)
+              defp zip_list(_, [], acc), do: :lists.reverse(acc)
 
-  defp zip_with_list([head1 | next1], [head2 | next2], fun) do
-    [fun.(head1, head2) | zip_with_list(next1, next2, fun)]
-  end
+              defp zip_with_list([head1 | next1], [head2 | next2], fun) do
+                     [fun.(head1, head2) | zip_with_list(next1, next2, fun)]
+              end
 
-  defp zip_with_list(_, [], _fun), do: []
-  defp zip_with_list([], _, _fun), do: []
+              defp zip_with_list(_, [], _fun), do: []
+              defp zip_with_list([], _, _fun), do: []
 
-  defp zip_reduce_list([head1 | next1], [head2 | next2], acc, fun) do
-    zip_reduce_list(next1, next2, fun.(head1, head2, acc), fun)
-  end
+              defp zip_reduce_list([head1 | next1], [head2 | next2], acc, fun) do
+                     zip_reduce_list(next1, next2, fun.(head1, head2, acc), fun)
+              end
 
-  defp zip_reduce_list(_, [], acc, _fun), do: acc
-  defp zip_reduce_list([], _, acc, _fun), do: acc
-end
+              defp zip_reduce_list(_, [], acc, _fun), do: acc
+              defp zip_reduce_list([], _, acc, _fun), do: acc
+              end
 
-defimpl Enumerable, for: List do
-  def count([]), do: {:ok, 0}
-  def count(_list), do: {:error, __MODULE__}
+              defimpl Enumerable, for: List do
+                                    def count([]), do: {:ok, 0}
+                                    def count(_list), do: {:error, __MODULE__}
 
-  def member?([], _value), do: {:ok, false}
-  def member?(_list, _value), do: {:error, __MODULE__}
+                                    def member?([], _value), do: {:ok, false}
+                                    def member?(_list, _value), do: {:error, __MODULE__}
 
-  def slice([]), do: {:ok, 0, fn _, _ -> [] end}
-  def slice(_list), do: {:error, __MODULE__}
+                                    def slice([]), do: {:ok, 0, fn _, _ -> [] end}
+                                    def slice(_list), do: {:error, __MODULE__}
 
-  def reduce(_list, {:halt, acc}, _fun), do: {:halted, acc}
-  def reduce(list, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(list, &1, fun)}
-  def reduce([], {:cont, acc}, _fun), do: {:done, acc}
-  def reduce([head | tail], {:cont, acc}, fun), do: reduce(tail, fun.(head, acc), fun)
+                                    def reduce(_list, {:halt, acc}, _fun), do: {:halted, acc}
+                                    def reduce(list, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(list, &1, fun)}
+                                    def reduce([], {:cont, acc}, _fun), do: {:done, acc}
+                                    def reduce([head | tail], {:cont, acc}, fun), do: reduce(tail, fun.(head, acc), fun)
 
-  @doc false
-  def slice(_list, _start, 0, _size), do: []
-  def slice(list, start, count, size) when start + count == size, do: list |> drop(start)
-  def slice(list, start, count, _size), do: list |> drop(start) |> take(count)
+                                    @doc false
+                                    def slice(_list, _start, 0, _size), do: []
+                                    def slice(list, start, count, size) when start + count == size, do: list |> drop(start)
+                                    def slice(list, start, count, _size), do: list |> drop(start) |> take(count)
 
-  defp drop(list, 0), do: list
-  defp drop([_ | tail], count), do: drop(tail, count - 1)
+                                    defp drop(list, 0), do: list
+                                    defp drop([_ | tail], count), do: drop(tail, count - 1)
 
-  defp take(_list, 0), do: []
-  defp take([head | tail], count), do: [head | take(tail, count - 1)]
-end
+                                    defp take(_list, 0), do: []
+                                    defp take([head | tail], count), do: [head | take(tail, count - 1)]
+                                    end
 
-defimpl Enumerable, for: Map do
-  def count(map) do
-    {:ok, map_size(map)}
-  end
+                                    defimpl Enumerable, for: Map do
+                                                          def count(map) do
+                                                                {:ok, map_size(map)}
+                                                          end
 
-  def member?(map, {key, value}) do
-    {:ok, match?(%{^key => ^value}, map)}
-  end
+                                                          def member?(map, {key, value}) do
+                                                                {:ok, match?(%{^key => ^value}, map)}
+                                                          end
 
-  def member?(_map, _other) do
-    {:ok, false}
-  end
+                                                          def member?(_map, _other) do
+                                                                {:ok, false}
+                                                          end
 
-  def slice(map) do
-    size = map_size(map)
-    {:ok, size, &Enumerable.List.slice(:maps.to_list(map), &1, &2, size)}
-  end
+                                                          def slice(map) do
+                                                                size = map_size(map)
+                                                                {:ok, size, &Enumerable.List.slice(:maps.to_list(map), &1, &2, size)}
+                                                          end
 
-  def reduce(map, acc, fun) do
-    Enumerable.List.reduce(:maps.to_list(map), acc, fun)
-  end
-end
+                                                          def reduce(map, acc, fun) do
+                                                                Enumerable.List.reduce(:maps.to_list(map), acc, fun)
+                                                          end
+                                    end
 
-defimpl Enumerable, for: Function do
-  def count(_function), do: {:error, __MODULE__}
-  def member?(_function, _value), do: {:error, __MODULE__}
-  def slice(_function), do: {:error, __MODULE__}
+                                    defimpl Enumerable, for: Function do
+                                                          def count(_function), do: {:error, __MODULE__}
+                                                          def member?(_function, _value), do: {:error, __MODULE__}
+                                                          def slice(_function), do: {:error, __MODULE__}
 
-  def reduce(function, acc, fun) when is_function(function, 2), do: function.(acc, fun)
+                                                          def reduce(function, acc, fun) when is_function(function, 2), do: function.(acc, fun)
 
-  def reduce(function, _acc, _fun) do
-    raise Protocol.UndefinedError,
-      protocol: @protocol,
-      value: function,
-      description: "only anonymous functions of arity 2 are enumerable"
-  end
-end
+                                                          def reduce(function, _acc, _fun) do
+                                                                raise Protocol.UndefinedError,
+                                                                protocol: @protocol,
+                                                                value: function,
+                                                                description: "only anonymous functions of arity 2 are enumerable"
+                                                          end
+                                                          end
