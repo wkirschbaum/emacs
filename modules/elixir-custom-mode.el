@@ -63,6 +63,9 @@
     (modify-syntax-entry ?\[ "(]" table)
     (modify-syntax-entry ?\] ")[" table)
 
+    ;; escape character
+    ;; (modify-syntax-entry ?# "\\" table)
+
     ;; what to do with you? expression prefix?
     (modify-syntax-entry ?% "'" table)
 

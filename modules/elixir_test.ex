@@ -6,8 +6,8 @@ Somecomment here
 defmodule Foo.Bar do
   def foo() do
     x = %{
-      foo: :bar
-    }
+        foo: :bar
+      }
   end
 end
 
@@ -17,11 +17,13 @@ def foo
 bar
 end
 """
+# foo bar
 defp status(kyc_status) do
   case kyc_status do
     a ->
       b
       asdf
+      "foo #{foo = bar}"
 
       x = [
         "one",
@@ -41,7 +43,7 @@ defp status(kyc_status) do
       d
   end
 
-  # foo bar
+# foo bar
   case kyc_status do
     %KycStatus{status: status} ->
       status
