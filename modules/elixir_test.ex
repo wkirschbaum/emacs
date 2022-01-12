@@ -1,5 +1,11 @@
 @foo "bar"
 
+defp zip_with_list([head1 | next1], [head2 | next2], fun) do
+  [
+    fun.(head1, head2) | zip_with_list(next1, next2, fun)
+  ]
+end
+
 @moduledoc """
 Somecomment here
 """
@@ -43,7 +49,7 @@ defp status(kyc_status) do
       d
   end
 
-# foo bar
+  # foo bar
   case kyc_status do
     %KycStatus{status: status} ->
       status

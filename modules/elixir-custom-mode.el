@@ -127,7 +127,7 @@
 (defun elixir-smie-rules (kind token)
   (pcase (cons kind token)
     ('(:elem . basic) elixir-indent-level)
-    (`(:before . ,(or "(" "[" "{")) (smie-rule-parent))
+    (`(:before . ,(or "(" "[" "{")) (if (smie-rule-hanging-p) (smie-rule-parent)))
     (`(:before . "->") elixir-indent-level)
     (`(:before . ,(or";" "__stab_op_break__"))
      (cond ((smie-rule-parent-p "do" "rescue" "[" "{" "(")
