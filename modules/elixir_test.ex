@@ -2,7 +2,7 @@ x = 5
 
 defmodule Foo.Bar do
   @moduledoc """
-  Somecomment here
+    Somecomment here
   """
 
   def reduce(function, acc, fun) when is_function(function, 2), do: function.(acc, fun)
@@ -11,13 +11,15 @@ defmodule Foo.Bar do
   foo = 1 + 3
 
   bar = fn foo ->
-    bar
-  end
+          bar
+        end
+
+  x = 5
 
   def foo() do
     x = %{
-      foo: :bar
-    }
+        foo: :bar
+      }
   end
 
   "
