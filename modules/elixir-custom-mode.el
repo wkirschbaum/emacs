@@ -100,11 +100,11 @@
         (exps "," "do:" exp)
         (short-do-else "," "else:" exp))
        (match (exp "->" insts))
-       (matches (match) (matches "__stab_op__"  matches))
+       (matches (match) (matches "__stab_op_break__"  matches))
        (exp (exp "=" exp))
        (exps (exp) (exps "," exps))
        )
-     '((assoc "__stab_op__"))
+     '((assoc "__stab_op_break__"))
      '((assoc ";"))
      '((assoc ","))
      '((right "="))
@@ -125,19 +125,16 @@
   (pcase (cons kind token)
     ('(:elem . basic) elixir-indent-level)
     (`(:before . "->") elixir-indent-level)
-    (`(:before . ,(or";" "__stab_op__"))
+    (`(:before . ,(or";" "__stab_op_break__"))
      (cond ((smie-rule-parent-p "do" "rescue")
             (smie-rule-parent elixir-indent-level))
            (t (smie-rule-parent))))
     (`(:before . "=") elixir-indent-level)))
 
-(defconst elixir-smie--doc-start-token "__doc_start__")
-(defconst elixir-smie--stab-op-token "__stab_op__")
-
 (defun whk/elixir-special-delim-p (token)
   (or
    (equal token ";")
-   (equal token "__stab_op__")))
+   (equal token "__stab_op_break__")))
 
 (defun whk/elixir-clear-tokens ()
   "Debug forward token"
@@ -195,14 +192,21 @@
              ;;              '("->")))
              ))))
 
-(defun elixir-smie--stab-op-p ()
+(defun elixir-smie--stab-op-eol-p ()
   "Return t if the line contains a stab line without an fn initiator"
   (save-excursion
     (goto-char (line-end-position))
     (and (eq (char-before) ?>)
-         (member (elixir-smie--backward-token) '("->"))
+         (member (smie-default-backward-token) '("->"))
          (not (looking-back ".*fn[ \t].*"
                         (line-beginning-position))))))
+
+(defun elixir-smie--stab-op-not-inline-p ()
+  "Return t if the line contains a stab line without an fn initiator"
+  (save-excursion
+    (goto-char (line-end-position))
+    (not (and (eq (char-before) ?>)
+         (member (smie-default-backward-token) '("->"))))))
 
 (defun elixir-smie--forward-token ()
   (skip-chars-forward " \t")
@@ -213,10 +217,15 @@
      (elixir-smie--implicit-semi-p))
     (if (eolp) (forward-char 1))
     (forward-comment (point-max))
-    (if (elixir-smie--stab-op-p)
-        "__stab_op__"
+    (if (elixir-smie--stab-op-eol-p)
+        "__stab_op_break__"
       ";"))
-    (t (smie-default-forward-token))))
+   (t (let ((token (smie-default-forward-token)))
+        ;; if token is not eol stab then treat it as a operator
+        ;; for inline indentation
+        (if (and (equal token "->") (elixir-smie--stab-op-not-inline-p))
+            "."
+          token)))))
 
 (defun elixir-smie--backward-token ()
   (let ((pos (point)))
@@ -224,15 +233,20 @@
     (cond
      ((progn
         (skip-chars-backward " \t")
-        (and (bolp) (elixir-smie--stab-op-p)))
+        (and (bolp) (elixir-smie--stab-op-eol-p)))
       (forward-comment (- (point)))
-      "__stab_op__")
+      "__stab_op_break__")
      ((progn
         (forward-comment (- (point)))
         (and (> pos (line-end-position))
            (elixir-smie--implicit-semi-p)))
       ";")
-     (t (smie-default-backward-token)))))
+     (t (let ((token (smie-default-backward-token)))
+        ;; if token is not eol stab then treat it as a operator
+        ;; for inline indentation
+        (if (and (equal token "->") (elixir-smie--stab-op-not-inline-p))
+            "."
+          token))))))
 
 ;;;###autoload
 (define-derived-mode elixir-mode prog-mode "Elixir"
