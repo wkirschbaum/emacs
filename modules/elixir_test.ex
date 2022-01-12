@@ -49,10 +49,14 @@ defp status(kyc_status) do
 
     _ ->
       :foo
-      _ -> :not_started
 
-      _ -> :not_started
+    _ ->
+      :not_started
 
-      _ -> :not_started
+    _ ->
+      :not_started
+
+    _ ->
+      :not_started
   end
 end

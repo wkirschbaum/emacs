@@ -124,9 +124,10 @@
 (defun elixir-smie-rules (kind token)
   (pcase (cons kind token)
     ('(:elem . basic) elixir-indent-level)
+    (`(:before . ,(or "(" "[" "{")) (smie-rule-parent))
     (`(:before . "->") elixir-indent-level)
     (`(:before . ,(or";" "__stab_op_break__"))
-     (cond ((smie-rule-parent-p "do" "rescue")
+     (cond ((smie-rule-parent-p "do" "rescue" "[" "{" "(")
             (smie-rule-parent elixir-indent-level))
            (t (smie-rule-parent))))
     (`(:before . "=") elixir-indent-level)))
@@ -186,11 +187,7 @@
   (save-excursion
     (skip-chars-backward " \t")
     (not (or (bolp)
-             (memq (char-before) '(?, ?= ?+ ?- ?* ?/))
-             ;; (and (eq (char-before) ?>)
-             ;;      (member (save-excursion (elixir-smie--backward-token))
-             ;;              '("->")))
-             ))))
+             (memq (char-before) '(?, ?= ?+ ?- ?* ?/))))))
 
 (defun elixir-smie--stab-op-eol-p ()
   "Return t if the line contains a stab line without an fn initiator"
