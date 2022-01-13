@@ -1,118 +1,35 @@
-x = 5
-
-defmodule Foo.Bar do
-  @moduledoc """
-    Somecomment here
-  """
-
-  def reduce(function, acc, fun) when is_function(function, 2), do: function.(acc, fun)
-  def foo, do: boo, else: boo
-
-  foo = 1 + 3
-
-  bar = fn foo ->
-          bar
-        end
-
-  x = 5
-
-  def foo() do
-    x = %{
-        foo: :bar
-      }
-  end
-
-  "
-  afooo
-  "
-
-  @moduledoc """
-    Somecomment here
-
-    def foolproof do
-    bookBody
-      end
-  """
-  defmodule Bar do
-  end
+def all?(enumerable) do
+  Enumerable.reduce(enumerable, {:cont, true}, fn entry, _ ->
+                                                 if entry, do: {:cont, true}, else: {:halt, false}
+                                                 end)
+  |> elem(1)
 end
 
-@doc """
-Hello world
-def foo
-bar
+foo
+
+{a, b, c, d, e, g, h, p, k, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t} =
+  9
+
+def foo do
+  fsdafd
 end
-"""
-# foo bar
-defp status(kyc_status) do
-  case kyc_status do
-    a ->
-      b
-      asdf
-      "foo #{foo = bar}"
 
-      x = [
-        "one",
-        "two"
-      ]
+@type foo ::
+  String.t()
 
-      sdf
 
-      fn foo ->
-        moo
-      end
+    @type result ::
+    {:done, term}
+      | {:halted, term}
+      | {:suspended, term, continuation}
 
-    c ->
-      d
+      4 = 5
 
-    k ->
-      d
-  end
+      x =
+        5 +
+          5 -
+          6 * 4
 
-  # foo bar
-  case kyc_status do
-    %KycStatus{status: status} ->
-      status
-
-    %KycStatus{status: status} ->
-      status
-
-    _ ->
-      :foo
-
-    _ ->
-      :not_started
-
-    _ ->
-      :not_started
-
-    _ ->
-      :not_started
-  end
-
-  case kyc_status do
-    %KycStatus{status: :failed} -> :not_started
-    %KycStatus{status: status} -> status
-    _ -> :foo
-    _ -> :not_started
-    _ -> :not_started
-    _ -> :not_started
-  end
-
-  case kyc_status do
-    %KycStatus{status: status} ->
-      status
-
-    _ ->
-      :foo
-
-    _ ->
-      :not_started
-
-    _ ->
-      :not_started
-
-    _ ->
-      :not_started
-  end
-end
+      5
+      |> time
+      |> IO.puts()
