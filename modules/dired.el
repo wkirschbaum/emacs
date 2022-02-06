@@ -12,10 +12,6 @@
   :after dired
   :config (bind-key "<tab>" #'dired-subtree-toggle dired-mode-map))
 
-(use-package dired-collapse
-  :ensure t
-  :hook (dired-mode . dired-collapse-mode))
-
 (use-package dired-rainbow
   :ensure t
   :after dired
