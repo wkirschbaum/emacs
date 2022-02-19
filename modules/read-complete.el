@@ -22,6 +22,7 @@
 
 ;; Enable vertico
 (use-package vertico
+  :ensure t
   :init
   (vertico-mode))
 
@@ -29,6 +30,7 @@
 ;; Enable `partial-completion' for files to allow path expansion.
 ;; You may prefer to use `initials' instead of `partial-completion'.
 (use-package orderless
+  :ensure t
   :init
   (setq completion-styles '(orderless)
         completion-category-defaults nil
@@ -62,7 +64,7 @@
                  (window-parameters (mode-line-format . none)))))
 
 (use-package consult
-  :straight t
+  :ensure t
   :demand t
   :bind (("M-i" . consult-imenu)
          ("M-g g" . consult-goto-line)

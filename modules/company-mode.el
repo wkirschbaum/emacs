@@ -19,18 +19,19 @@
   (define-key company-active-map (kbd "C-p") #'company-select-previous))
 
 (use-package company-restclient
+  :ensure t
   :init
   (with-eval-after-load 'company
     (add-to-list 'company-backends 'company-restclient)))
 
 (use-package company-terraform
-  :ensure company
+  :ensure t
   :config
   (company-terraform-init))
 
 
 (use-package company-ledger
-  :ensure company
+  :ensure t
   :init
   (with-eval-after-load 'company
     (add-to-list 'company-backends 'company-ledger)))

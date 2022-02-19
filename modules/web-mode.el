@@ -17,9 +17,3 @@
   :ensure t
   :hook web-mode
   :hook css-mode)
-
-
-;; (straight-use-package
-;;  '(lsp-tailwindcss :type git :host github :repo "merrickluo/lsp-tailwindcss"))
-
-;; (use-package lsp-tailwindcss)

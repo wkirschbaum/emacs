@@ -15,8 +15,9 @@
 (defvar whk/modules)
 (setq whk/modules
       '(
-        "bootstrap"
         "native"
+        "bootstrap-package"
+        "bootstrap"
         "gnupgp"
         "shared"
         "registers"
@@ -32,8 +33,8 @@
         "org"
         "po-mode"
         "lsp-mode"
-        ;; "elixir-mode"
-        "elixir-custom-mode"
+        "elixir-mode"
+        ;; "elixir-custom-mode"
         "erlang-mode"
         "docker-mode"
         "markdown-mode"

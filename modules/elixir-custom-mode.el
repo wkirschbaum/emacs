@@ -77,55 +77,24 @@
    (smie-merge-prec2s
     (smie-bnf->prec2
      '((id)
-       (insts (inst) (insts ";" insts))
-       (inst (exp)
-             ("import" atom)
-             ("import" atom "," keywords)
-             ("alias" atom)
-             ("alias" atom "," keywords)
-             ("def" exp-do-block "end")
-             ("def" exp "," keywords)
-             ;; ("defp" exp "," keywords)
-             ("defp" exp-do-block "end")
-             ("defmodule" atom-do-block "end")
-             ("defprotocol" atom-do-block "end")
-             ("defmacrop" atom-do-block "end")
-             ("defimpl" atom-do-block "end")
-             ("defmacro" exp-do-block "end")
-             ("quote" "do" insts "end")
-             ("case" exp-do-block "end")
-             ("fn" matches "end")
-             ;; ("if" exp "," "do:" exp)
-             ;; ("if" exp "," "do:" exp "," "else:" exp)
-             ("if" exp-do-block "end")
-             ("try" "do" insts "rescue" matches "end")
-             ("try" "do" insts "catch" matches "end")
-             ("try" "do" insts "after" matches "end")
-             ("with" exp-do-block "end")
-             ;; ("with" exp "," "do:" exp ";")
-             )
-       (exp (atom) (exp "=" exp) (exp "|>" exp) (exp "|" exp))
-       (atom-do-block
-        (atom "do" insts))
-       (exp-do-block
-        (exp "do" insts)
-        (exp "do" insts "else" insts))
-       (keywords (keyword) (keywords "," keywords))
-       (keyword (id ":" exp))
-       (specs (exp) (specs "|" specs))
-       (spec (exp "::" specs))
-       (atom (id) (atom "." atom))
-       (match (exp "->" insts))
-       (matches (match) (matches "__stab_op_break__"  matches))
-       )
-     '((assoc ";") (assoc ","))
-     '((assoc "__stab_op_break__"))
-     '((assoc "end")
-       (assoc "do"))
-     '((assoc "|") (assoc "|>") (right "="))
-     '((assoc "."))
+       (insts
+        (inst) (insts ";" insts))
+       (inst
+        ("defmodule" defmodule-contents "end")
+        ("def" def-contents "do:")
+        ("def" def-contents "end"))
+       (defmodule-contents
+        (id "do" insts))
+       (def-contents
+        (def-head "do" insts))
+       (def-head (id)))
+     '((assoc ";"))
      ))))
 
+
+;; Not in brackets:
+(defun elixir-smie--outside-exp ()
+  (zerop (car (syntax-ppss))))
 
 (defun elixir-debug--smie-parent ()
   (if (boundp 'smie--parent)
@@ -208,8 +177,8 @@
     (skip-chars-backward " \t")
     (not (or (bolp)
              (memq (char-before) '(?, ?= ?+ ?- ?* ?/ ?|))
-             (eq (char-before) ?:)
-             (member (smie-default-backward-token) '("::"))))))
+             (eq (and (char-before) ?:)
+                 (member (smie-default-backward-token) '("::")))))))
 
 (defun elixir-smie--stab-op-eol-p ()
   "Return t if the line contains a stab line without an fn initiator"

@@ -8,8 +8,8 @@
   (global-subword-mode t)
   :hook (before-save . lsp-format-buffer))
 
-;; (use-package erlang
-;;   :ensure t)
+(use-package erlang
+  :ensure t)
 
 (use-package mix :ensure t)
 (use-package exunit
@@ -39,4 +39,4 @@
 ;;     :hostmode 'poly-elixir-hostmode
 ;;     :innermodes '(poly-liveview-expr-elixir-innermode))
 ;;   )
-(setq web-mode-engines-alist '(("elixir" . "\\.ex\\'")))
+;; (setq web-mode-engines-alist '(("elixir" . "\\.ex\\'")))
