@@ -22,6 +22,20 @@
 (set-face-background 'default "#111")
 (set-face-foreground 'font-lock-function-name-face "#95e454")
 (set-face-foreground 'font-lock-string-face "#a9bc7a")
+
+;; (set-face-attribute 'default nil :height 137)
+
+(defconst original-font-face-height (face-attribute 'default :height))
+
+(defun whk/font-large ()
+  (interactive ())
+  (set-face-attribute 'default nil :height 210))
+
+(defun whk/font-normal ()
+  (interactive ())
+  (set-face-attribute 'default nil :height original-font-face-height))
+
+
 ;; (set-face-background 'lazy-highlight "#960")
 ;; (set-face-foreground 'lazy-highlight "#ccc")
 

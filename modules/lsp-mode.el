@@ -30,7 +30,9 @@
   (setq lsp-ui-doc-enable nil))
 
 ;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode)
 
 ;; optionally if you want to use debugger
 ;; (use-package dap-mode :ensure t)
