@@ -16,6 +16,8 @@
 
 ;; (load-theme 'tango-dark)
 
+(set-face-attribute 'default nil :family "hack")
+
 (load-theme 'wombat)
 
 ;; Wombat customization
