@@ -55,8 +55,7 @@
         "functions"
         "treesitter"
         "slime"
-        "experiments"
-        "secret"))
+        "experiments"))
 
 (let ((config-path "~/.config/emacs/modules/"))
   (dolist (module whk/modules)
