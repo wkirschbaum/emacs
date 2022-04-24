@@ -13,18 +13,24 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+  (setq read-extended-command-predicate
+        #'command-completion-default-include-p)
 
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist :init (savehist-mode))
-(use-package recentf :init (recentf-mode))
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t)
+
+  ;; Ignores case when completing ( works with vertico )
+  (setq read-file-name-completion-ignore-case t
+        read-buffer-completion-ignore-case t
+        completion-ignore-case t))
+
 
 ;; Enable vertico
 (use-package vertico
   :ensure t
   :init
-  (vertico-mode))
+  (vertico-mode)
+  (setq vertico-cycle t))
 
 ;; Use the `orderless' completion style.
 ;; Enable `partial-completion' for files to allow path expansion.
@@ -32,13 +38,16 @@
 (use-package orderless
   :ensure t
   :init
-  (setq completion-styles '(orderless)
+  (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
+;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
   :init
   (savehist-mode))
+
+(use-package recentf :init (recentf-mode))
 
 (use-package marginalia
   :ensure t

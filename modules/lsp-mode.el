@@ -1,7 +1,7 @@
 (use-package lsp-mode
   :ensure t
   :init
-  (add-to-list `exec-path "~/src/tools/elixir-ls/bin/")
+  (add-to-list `exec-path "~/src/elixir/elixir-ls/bin/")
   (setq lsp-keymap-prefix "C-c l")
   (setq lsp-elixir-fetch-deps t)
   (setq lsp-enable-file-watchers t

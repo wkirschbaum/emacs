@@ -10,7 +10,7 @@
 (global-auto-revert-mode t) ;; Ensure Cloud files exists for this (org mode agenda)
 (save-place-mode 1) ;; Remember where I was last time I visited the file
 (winner-mode 1)
-(pixel-scroll-precision-mode 1)
+;; (pixel-scroll-precision-mode 1)
 
 (setq display-line-numbers-type 'relative)
 (setq display-line-numbers-current-absolute t)

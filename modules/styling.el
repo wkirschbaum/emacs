@@ -31,7 +31,7 @@
 
 (defun whk/font-large ()
   (interactive ())
-  (set-face-attribute 'default nil :height 210))
+  (set-face-attribute 'default nil :height 170))
 
 (defun whk/font-normal ()
   (interactive ())

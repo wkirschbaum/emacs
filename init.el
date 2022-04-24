@@ -38,6 +38,7 @@
         "erlang-mode"
         "docker-mode"
         "markdown-mode"
+        "php-mode"
         "terraform-mode"
         "scala-mode"
         "yaml-mode"

@@ -32,3 +32,4 @@ fly_check*.el
 /.dap-breakpoints
 /modules/email.el
 /multisession/
+/modules/git-tools.el

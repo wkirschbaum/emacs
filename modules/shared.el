@@ -9,6 +9,7 @@
     (exec-path-from-shell-copy-env "SSH_AGENT_PID")
     (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
     (exec-path-from-shell-copy-env "MYSQL_SOCKET")
+    (exec-path-from-shell-copy-env "POSTGRES_SOCKET")
     (exec-path-from-shell-initialize)))
 
 (use-package yasnippet
