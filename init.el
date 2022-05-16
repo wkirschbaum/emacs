@@ -16,6 +16,7 @@
 (setq whk/modules
       '(
         "native"
+        "tab-bar"
         "bootstrap-package"
         "bootstrap"
         "gnupgp"

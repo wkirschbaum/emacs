@@ -2,6 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
+;; (load "~/.config/emacs/modules/elixir-custom-mode")
+
 (use-package elixir-mode
   :ensure t
   :config

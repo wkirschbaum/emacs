@@ -1,31 +1,40 @@
-def all?(enumerable) do
-  Enumerable.reduce(enumerable, {:cont, true}, fn entry, _ ->
-    if entry, do: {:cont, true}, else: {:halt, false}
-  end)
-  |> elem(1)
-end
+foo =
+    4;
 
-foo
+bar = 4;
 
-def foo do
-  fsdafd
-end
+@foo
 
-@type foo ::
-        String.t()
 
-@type result ::
-        {:done, term}
-        | {:halted, term}
-        | {:suspended, term, continuation}
+"""foo """
 
-4 = 5
+  """foo """
 
-x =
-  5 +
-    5 -
-    6 * 4
+  """foo """
 
-5
-|> time
-|> IO.puts()
+"ther eis eomthing #{IO.puts("foo")} here"
+
+%{foo: "fobar"}
+
+
+defmodule foo do
+
+end;
+
+bar = 4;
+
+defmodule Bar do
+  defmodule Bar do
+    foo = (bar)
+
+  end;
+
+  defmodule Bar do
+
+  end;
+
+end;
+
+defmodule foo do
+
+end;

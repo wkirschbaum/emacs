@@ -18,6 +18,9 @@
 
 (setq create-lockfiles nil)
 
+;; apropos
+(setq apropos-sort-by-scores t)
+
 ;; if we make backups put it into the backup directory
 ;; (setq make-backup-files nil)
 ;; (setq auto-save-default nil)
@@ -47,6 +50,8 @@
 (global-set-key (kbd "M-u") 'upcase-dwim)
 (global-set-key (kbd "M-l") 'downcase-dwim)
 (global-set-key (kbd "M-c") 'capitalize-dwim)
+
+(global-set-key (kbd "M-o") 'other-window)
 
 (provide 'native)
 ;;; native.el ends here
