@@ -24,6 +24,7 @@
         "registers"
         "paredit"
         "styling"
+        "undo-tree"
         "company-mode"
         "git"
         "read-complete"
