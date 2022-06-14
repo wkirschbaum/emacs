@@ -4,13 +4,18 @@
 ;;; Code:
 
 (show-paren-mode 1)
-(fset 'yes-or-no-p 'y-or-n-p)
 (column-number-mode 1)
 (set-default 'cursor-in-non-selected-windows 'hollow)
-(global-auto-revert-mode t) ;; Ensure Cloud files exists for this (org mode agenda)
+
+;; Revert Dired and other buffers
+(customize-set-variable 'global-auto-revert-non-file-buffers t)
+(global-auto-revert-mode t)
+
 (save-place-mode 1) ;; Remember where I was last time I visited the file
 (winner-mode 1)
 ;; (pixel-scroll-precision-mode 1)
+
+(setq use-short-answers t)
 
 (setq display-line-numbers-type 'relative)
 (setq display-line-numbers-current-absolute t)
@@ -46,12 +51,28 @@
 
 (global-set-key (kbd "C-h a") 'apropos-library)
 
-(global-set-key (kbd "M-SPC") 'cycle-spacing)
+(global-set-key (kbd "C-x C-o") 'cycle-spacing)
 (global-set-key (kbd "M-u") 'upcase-dwim)
 (global-set-key (kbd "M-l") 'downcase-dwim)
 (global-set-key (kbd "M-c") 'capitalize-dwim)
 
 (global-set-key (kbd "M-o") 'other-window)
+
+(tab-bar-mode)
+
+;; No need to sleep graphic display
+(if (display-graphic-p)
+    (progn
+      (global-unset-key (kbd "C-z"))
+      (global-unset-key (kbd "C-x C-z"))))
+
+;; Show error as flashing modeline
+(defun flash-mode-line ()
+  "Flashes the mode-line."
+  (invert-face 'mode-line)
+  (run-with-timer 0.1 nil #'invert-face 'mode-line))
+(setq visible-bell nil)
+(setq ring-bell-function 'flash-mode-line)
 
 (provide 'native)
 ;;; native.el ends here

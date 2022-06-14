@@ -22,13 +22,3 @@
   (add-to-list 'auto-mode-alist
                (cons "/.dockerignore\\'" 'gitignore-mode)))
 
-
-(use-package gerrit
-  :ensure t
-  :custom
-  (gerrit-host "gerrit")  ;; is needed for REST API calls
-  :config
-  (progn
-    (add-hook 'magit-status-sections-hook #'gerrit-magit-insert-status t)
-    (global-set-key (kbd "C-x i") 'gerrit-upload-transient)
-    (global-set-key (kbd "C-x o") 'gerrit-download)))
