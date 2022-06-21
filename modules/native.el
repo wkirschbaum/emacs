@@ -58,6 +58,8 @@
 
 (global-set-key (kbd "M-o") 'other-window)
 
+(global-set-key (kbd "C-c C-a") 'avy-goto-char)
+
 (tab-bar-mode)
 
 ;; No need to sleep graphic display

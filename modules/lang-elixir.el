@@ -8,7 +8,7 @@
   :ensure t
   :config
   (global-subword-mode t)
-  :hook (before-save . lsp-format-buffer))
+  :hook (before-save . eglot-format))
 
 (use-package erlang
   :ensure t)
