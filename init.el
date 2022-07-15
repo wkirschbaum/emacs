@@ -37,7 +37,8 @@
         "prog-mode"
         "read-complete"
         "styling"
-        "treesitter"))
+        "treesitter"
+        "irc"))
 
 (let ((config-path "~/.config/emacs/modules/"))
   (dolist (module whk/modules)

@@ -63,8 +63,7 @@
   :ensure t
   :demand t
   :bind
-  (("C-." . embark-act)
-   ("C-;" . embark-dwim)
+  (("C-;" . embark-dwim)
    ("C-h B" . embark-bindings)
   )
   :init
