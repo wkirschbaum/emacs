@@ -15,6 +15,8 @@
 (winner-mode 1)
 ;; (pixel-scroll-precision-mode 1)
 
+(repeat-mode 1)
+
 (setq use-short-answers t)
 
 (setq display-line-numbers-type 'relative)
@@ -55,8 +57,6 @@
 (global-set-key (kbd "M-u") 'upcase-dwim)
 (global-set-key (kbd "M-l") 'downcase-dwim)
 (global-set-key (kbd "M-c") 'capitalize-dwim)
-
-(global-set-key (kbd "M-o") 'other-window)
 
 (global-set-key (kbd "C-c C-a") 'avy-goto-char)
 
