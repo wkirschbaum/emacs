@@ -61,6 +61,9 @@
 (global-set-key (kbd "C-c C-a") 'avy-goto-char)
 
 (tab-bar-mode)
+(setq tab-bar-close-button-show nil)
+(setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator))
+(setq tab-bar-tab-hints t)
 
 ;; No need to sleep graphic display
 (if (display-graphic-p)
@@ -78,3 +81,4 @@
 
 (provide 'native)
 ;;; native.el ends here
+

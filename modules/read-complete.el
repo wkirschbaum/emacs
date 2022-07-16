@@ -1,5 +1,26 @@
-(use-package recentf :init (recentf-mode))
-(add-hook 'buffer-list-update-hook #'recentf-track-opened-file)
+(use-package recentf
+  :ensure t
+  :init
+  (setq-default recentf-max-saved-items 200)
+  (setq-default recentf-max-menu-items 50)
+  (setq recentf-exclude '((expand-file-name package-user-dir)
+                          ".cache"
+                          ".cask"
+                          ".elfeed"
+                          "bookmarks"
+                          "cache"
+                          "ido.*"
+                          "persp-confs"
+                          "recentf"
+                          "undo-tree-hist"
+                          "url"
+                          "elpa/*"
+                          "node_modules/*"
+                          "COMMIT_EDITMSG\\'"))
+  :config
+  (recentf-mode 1))
+
+;; (add-hook 'buffer-list-update-hook #'recentf-track-opened-file)
 
 (use-package emacs
   :init
@@ -199,3 +220,4 @@
 
 (use-package pcmpl-args
   :ensure t)
+
