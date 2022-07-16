@@ -33,3 +33,4 @@ fly_check*.el
 /modules/email.el
 /multisession/
 /modules/git-tools.el
+/modules/local.el
