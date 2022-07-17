@@ -53,7 +53,6 @@
 
 (global-set-key (kbd "C-h a") 'apropos-library)
 
-(global-set-key (kbd "C-x C-o") 'cycle-spacing)
 (global-set-key (kbd "M-u") 'upcase-dwim)
 (global-set-key (kbd "M-l") 'downcase-dwim)
 (global-set-key (kbd "M-c") 'capitalize-dwim)
