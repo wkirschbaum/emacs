@@ -34,3 +34,4 @@ fly_check*.el
 /multisession/
 /modules/git-tools.el
 /modules/local.el
+/fontaine-latest-state.eld
