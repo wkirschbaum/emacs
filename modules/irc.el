@@ -45,3 +45,6 @@
   (setq erc-rename-buffers t
         erc-lurker-hide-list '("JOIN" "QUIT")
         erc-lurker-threshold-time 3600))
+
+
+(load "~/Cloud/secrets/irc-servers.el")
