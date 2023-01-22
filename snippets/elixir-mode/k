@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Key value
+# key: k
+# contributor: Wilhelm H Kirschbaum
+# --
+$1: ${2:$1}$0

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Implement true
+# key: impl
+# --
+@impl true

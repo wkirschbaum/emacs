@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Logger output
+# key: logi
+# contributor: Wilhelm H Kirschbaum
+# --
+Logger.info("$1: #{inspect($1, pretty: true)}")
+$0

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Piped Labeled Inspect
+# key: pin
+# contributor: Wilhelm H Kirschbaum
+# --
+|> IO.inspect(label: "$1 (`(buffer-name)`:`(line-number-at-pos))`)")$0
+

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Insert Mox
+# key: mox
+# --
+import Mox
+
+setup :verify_on_exit!
