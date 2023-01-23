@@ -4,15 +4,15 @@
 
 (require 'eglot)
 
-(defvar whk/eglot-enabled nil)
-(load "~/src/emacs/heex-ts-mode/heex-ts-mode.el")
-(load "~/src/emacs/elixir-ts-mode/elixir-ts-mode.el")
+;; (defvar whk/eglot-enabled nil)
+;; (load "~/src/emacs/heex-ts-mode/heex-ts-mode.el")
+;; (load "~/src/emacs/elixir-ts-mode/elixir-ts-mode.el")
 
-;; (defvar whk/eglot-enabled t)
-;; (use-package elixir-ts-mode
-;;   :ensure t
-;;   :config
-;;   (global-subword-mode t))
+(defvar whk/eglot-enabled t)
+(use-package elixir-ts-mode
+  :ensure t
+  :config
+  (global-subword-mode t))
 
 (setq whk/elixir-lsp-sh "~/src/elixir/elixir-ls/bin/language_server.sh")
 

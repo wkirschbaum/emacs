@@ -2,13 +2,10 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun setup-custom-config (config-path)
-  (setq custom-file (concat config-path "custom.el"))
+(progn
+  (setq custom-file (concat user-emacs-directory "custom.el"))
   (if (file-exists-p custom-file)
       (load custom-file)))
-
-(let ((config-path user-emacs-directory))
-  (setup-custom-config config-path))
 
 (defvar whk/modules)
 (setq whk/modules
@@ -16,7 +13,6 @@
         "native"
         "minimal"
         "bootstrap"
-        "bootstrap-package"
         "compilation-mode"
         "dired"
         "elfeed"
