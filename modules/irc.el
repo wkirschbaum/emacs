@@ -1,6 +1,3 @@
-;; (use-package znc
-;;   :ensure t)
-
 (use-package erc
   :commands erc
   :config
@@ -45,6 +42,3 @@
   (setq erc-rename-buffers t
         erc-lurker-hide-list '("JOIN" "QUIT")
         erc-lurker-threshold-time 3600))
-
-
-(load "~/Cloud/secrets/irc-servers.el")

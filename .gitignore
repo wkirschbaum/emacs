@@ -26,3 +26,6 @@ eshell/history
 /snippets/org-mode/oneone
 /fontaine-latest-state.eld
 /.cache/
+/org-roam.db
+/tramp
+/.lsp-session-v1

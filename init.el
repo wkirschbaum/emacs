@@ -7,8 +7,7 @@
   (if (file-exists-p custom-file)
       (load custom-file)))
 
-(defvar whk/modules)
-(setq whk/modules
+(defvar whk/modules
       '(
         "native"
         "minimal"
@@ -36,7 +35,6 @@
         "styling"
         "irc"
         "elfeed"
-        "email"
         "floatpays"
         "project"
         "term"
@@ -44,12 +42,20 @@
         "mastodon"
         ))
 
+(defvar whk/private-modules
+      '("sourcehut" "irc-servers" "email" "elfeed-feeds"))
 
 
 (let ((config-path (concat user-emacs-directory "modules/")))
   (dolist (module whk/modules)
     (condition-case err
         (load (concat config-path module ".el"))
+      (error (display-warning module (error-message-string err))))))
+
+(let ((config-path (concat "~/Cloud/emacs/" "modules/")))
+  (dolist (module whk/private-modules)
+    (condition-case err
+        (load (expand-file-name (concat config-path module ".el")))
       (error (display-warning module (error-message-string err))))))
 
 (put 'narrow-to-region 'disabled nil)
