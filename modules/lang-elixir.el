@@ -36,15 +36,20 @@
            (lsp-mode . lsp-enable-which-key-integration))
     :commands lsp))
 
-(defun elixir-ts-mode--clean-error-filename (filename)
-  (message "|%s|" filename)
-  (string-trim filename))
-
 (define-compilation-mode elixir-ts-compilation-mode "Elixir Compilation Mode"
   "Compilation mode for Elixir mix command output."
-  (setq compilation-scroll-output t)
-  (setq-local compilation-parse-errors-filename-function
-              #'elixir-ts-mode--clean-error-filename))
+  (setq-local compilation-error-regexp-alist-alist
+              `((exunit-warning
+                 ,(concat
+                   "warning: .*\n[[:space:]]*\\"
+                   "([^[:space:]]*\\.exs?\\):\\([[:digit:]]+\\):")
+                 1 2 3 1)
+                (exunit-error
+                 "\\([^[:space:]]*\\.exs?\\):\\([[:digit:]]+\\):"
+                 1 2)))
+
+  (setq-local compilation-error-regexp-alist '(exunit-warning exunit-error))
+  (setq-local compilation-scroll-output t))
 
 (defvar elixir-ts-mode--mix-previous-test-command
   "Last elixir mix test command ran." nil)
@@ -60,7 +65,9 @@
 (defun elixir-ts-mode-mix-test-command (&optional stale-p file-name-p line-num-p)
   "Run elixir mix command specified by COMMAND."
   (let* ((default-directory (project-root (project-current)))
-         (file-relative (file-relative-name buffer-file-name))
+         (file-relative (when buffer-file-name
+                          (file-relative-name buffer-file-name)
+                          ""))
          (line-num (number-to-string (line-number-at-pos)))
          (args (if stale-p " --stale" ""))
          (command
