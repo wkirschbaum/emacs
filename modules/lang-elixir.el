@@ -43,7 +43,7 @@
                  ,(concat
                    "warning: .*\n[[:space:]]*\\"
                    "([^[:space:]]*\\.exs?\\):\\([[:digit:]]+\\):")
-                 1 2 3 1)
+                 1 2 nil 1 1)
                 (exunit-error
                  "\\([^[:space:]]*\\.exs?\\):\\([[:digit:]]+\\):"
                  1 2)))
@@ -54,18 +54,15 @@
 (defvar elixir-ts-mode--mix-previous-test-command
   "Last elixir mix test command ran." nil)
 
-(defun elixir-ts-mode-mix-command (command)
+(defun elixir-ts-mode-mix-command (command &optional project-directory)
   "Run elixir mix command specified by COMMAND."
-  (let* ((default-directory (project-root (project-current)))
-         (compilation-parse-errors-filename-function
-          #'elixir-ts-mode--error-filename))
-    (setq compilation-parse-errors-filename-function #'elixir-ts-mode--error-filename)
+  (let* ((default-directory (or project-directory (project-root (project-current)))))
     (compile (concat "mix" " " command) 'elixir-ts-compilation-mode)))
 
 (defun elixir-ts-mode-mix-test-command (&optional stale-p file-name-p line-num-p)
   "Run elixir mix command specified by COMMAND."
   (let* ((default-directory (project-root (project-current)))
-         (file-relative (when buffer-file-name
+         (file-relative (if buffer-file-name
                           (file-relative-name buffer-file-name)
                           ""))
          (line-num (number-to-string (line-number-at-pos)))
@@ -75,7 +72,7 @@
            ((and file-name-p line-num-p) (concat "test " file-relative ":" line-num))
            (file-name-p (concat "test " file-relative))
            (t "test"))))
-    (setq elixir-ts-mode--mix-previous-test-command command)
+    (setq elixir-ts-mode--mix-previous-test-command `(,command . ,default-directory))
     (elixir-ts-mode-mix-command (concat command args))))
 
 (defun elixir-ts-mode-run-test-rerun (&optional arg)
@@ -84,9 +81,11 @@
   (when elixir-ts-mode--mix-previous-test-command
     (if (and (numberp arg) (> arg 1))
         (elixir-ts-mode-mix-command
-         (concat elixir-ts-mode--mix-previous-test-command " --stale"))
+         (concat (car elixir-ts-mode--mix-previous-test-command) " --stale")
+         (cdr elixir-ts-mode--mix-previous-test-command))
       (elixir-ts-mode-mix-command
-       elixir-ts-mode--mix-previous-test-command))))
+       (car elixir-ts-mode--mix-previous-test-command)
+       (cdr elixir-ts-mode--mix-previous-test-command)))))
 
 (defun elixir-ts-mode-run-test-single (arg)
   (interactive "p")
