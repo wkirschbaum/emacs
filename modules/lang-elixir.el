@@ -39,16 +39,22 @@
 (define-compilation-mode elixir-ts-compilation-mode "Elixir Compilation Mode"
   "Compilation mode for Elixir mix command output."
   (setq-local compilation-error-regexp-alist-alist
-              `((exunit-warning
+              `((exunit-dependency
+                 "([[:alnum:]|_]+ [[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+) \\([^ ]+\\):\\([[:digit:]]+\\):"
+                 1 2)
+                (exunit-error
+                 "\\[error\\] \\([^[[:space:]]*\\):\\([[:digit:]]+\\):"
+                 1 2)
+                (exunit-warning
                  ,(concat
                    "warning: .*\n[[:space:]]*\\"
                    "([^[:space:]]*\\.exs?\\):\\([[:digit:]]+\\):")
                  1 2 nil 1 1)
-                (exunit-error
+                (exunit-other-error
                  "\\([^[:space:]]*\\.exs?\\):\\([[:digit:]]+\\):"
                  1 2)))
 
-  (setq-local compilation-error-regexp-alist '(exunit-warning exunit-error))
+  (setq-local compilation-error-regexp-alist '(exunit-dependency exunit-error exunit-warning exunit-other-error))
   (setq-local compilation-scroll-output t))
 
 (defvar elixir-ts-mode--mix-previous-test-command
@@ -75,7 +81,7 @@
     (setq elixir-ts-mode--mix-previous-test-command `(,command . ,default-directory))
     (elixir-ts-mode-mix-command (concat command args))))
 
-(defun elixir-ts-mode-run-test-rerun (&optional arg)
+(defun elixir-ts-mode-mix-test-rerun (&optional arg)
   "Run elixir test from the point of the cursor."
   (interactive "p")
   (when elixir-ts-mode--mix-previous-test-command
@@ -87,18 +93,27 @@
        (car elixir-ts-mode--mix-previous-test-command)
        (cdr elixir-ts-mode--mix-previous-test-command)))))
 
-(defun elixir-ts-mode-run-test-single (arg)
+(defun elixir-ts-mode-mix-format (arg)
+  (interactive "p")
+  "Run elixir test from the point of the cursor."
+  (interactive)
+  (let ((file-relative (if buffer-file-name
+                          (file-relative-name buffer-file-name)
+                          "")))
+    (elixir-ts-mode-mix-command (concat "format" " " file-relative))))
+
+(defun elixir-ts-mode-mix-test-single (arg)
   (interactive "p")
   "Run elixir test from the point of the cursor."
   (interactive)
   (elixir-ts-mode-mix-test-command (and (numberp arg) (> arg 1)) t t))
 
-(defun elixir-ts-mode-run-test-buffer (arg)
+(defun elixir-ts-mode-mix-test-buffer (arg)
   "Run Elixir test from the buffer."
   (interactive "p")
   (elixir-ts-mode-mix-test-command (and (numberp arg) (> arg 1)) t))
 
-(defun elixir-ts-mode-run-test-project (arg)
+(defun elixir-ts-mode-mix-test-project (arg)
   "Run Elixir test from the project."
   (interactive "p")
   (elixir-ts-mode-mix-test-command (and (numberp arg) (> arg 1))))
@@ -107,8 +122,13 @@
 (use-package exunit
   :ensure t
   :bind
-  ("C-c , a" . elixir-ts-mode-run-test-project)
-  ("C-c , s" . elixir-ts-mode-run-test-single)
-  ("C-c , v" . elixir-ts-mode-run-test-buffer)
-  ("C-c , r" . elixir-ts-mode-run-test-rerun)
   ("C-c , t" . exunit-toggle-file-and-test))
+
+(use-package elixir-ts-mode
+  :bind
+  ("C-c , a" . elixir-ts-mode-mix-test-project)
+  ("C-c , s" . elixir-ts-mode-mix-test-single)
+  ("C-c , v" . elixir-ts-mode-mix-test-buffer)
+  ("C-c , r" . elixir-ts-mode-mix-test-rerun)
+  ("C-c , :" . elixir-ts-mode-mix-format))
+
