@@ -1,3 +1,10 @@
+
+
+| :warning: WARNING                                      |
+|:-------------------------------------------------------|
+| This project moved to https://git.sr.ht/~whk/emacs     |
+
+
 # Wilhelm's Emacs configuration
 
 My personalised Emacs setup. I would not advise to copy this as is,
