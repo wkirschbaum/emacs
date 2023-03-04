@@ -1,8 +1,8 @@
 
 
-| :warning: WARNING                                      |
-|:-------------------------------------------------------|
-| This project moved to https://git.sr.ht/~whk/emacs     |
+| :warning: WARNING                                                      |
+|:-----------------------------------------------------------------------|
+| This project moved to https://git.sr.ht/~whk/emacs-personal-config     |
 
 
 # Wilhelm's Emacs configuration
