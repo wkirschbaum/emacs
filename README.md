@@ -2,7 +2,7 @@
 
 | :warning: WARNING                                                      |
 |:-----------------------------------------------------------------------|
-| This project moved to https://git.sr.ht/~whk/emacs-personal-config     |
+| This project is not being maintained anymore                           |
 
 
 # Wilhelm's Emacs configuration
